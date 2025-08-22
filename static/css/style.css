@@ -1,0 +1,102 @@
+@layer fonts {
+  @font-face {
+    font-family: 'NotoSans-Bold';
+    src: url('/assets/fonts/static/NotoSans-Bold.ttf');
+  }
+
+  @font-face {
+    font-family: 'NotoSans-Regular';
+    src: url('/assets/fonts/static/NotoSans-Regular.ttf');
+  }
+
+  :root {
+    --fs-56: calc(56 / 16 * 1rem);
+    --fs-48: calc(46 / 16 * 1rem);
+    --fs-40: calc(40 / 16 * 1rem);
+    --fs-32: calc(32 / 16 * 1rem);
+    --fs-24: calc(24 / 16 * 1rem);
+    --fs-20: calc(20 / 16 * 1rem);
+    --fs-16: calc(16 / 16 * 1rem);
+  }
+
+  h1 {
+    font-size: var(--fs-40);
+    letter-spacing: -1.79px;
+
+    @media (width >= calc(700 / 16 * 1rem)) {
+      font-size: var(--fs-56);
+      letter-spacing: -2.5px;
+    }
+  }
+
+  h2 {
+    font-size: var(--fs-32);
+    letter-spacing: -1.43px;
+
+    @media (width >= calc(700 / 16 * 1rem)) {
+      font-size: var(--fs-48);
+      letter-spacing: -2.14px;
+    }
+  }
+
+  h3 {
+    font-size: var(--fs-20);
+    letter-spacing: -0.89px;
+
+    @media (width >= calc(700 / 16 * 1rem)) {
+      font-size: var(--fs-24);
+      letter-spacing: -1.07px;
+    }
+  }
+}
+
+@layer color {
+    :root {
+    --c-dark: #000;
+    --c-navy: hsl(216, 17%, 35%);
+    --c-dark-white: #bad8e9;
+  }
+}
+
+@layer global {
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'NotoSans-Regular', Arial, Helvetica, sans-serif;
+  margin: 0;
+  font-size: var(--fs-16);
+  background: var(--c-dark);
+}
+
+img {
+    display: block;
+  max-width: 100%; /*to avoid horizontal scrolling*/
+  height: auto;
+}
+
+/* heading they come with they own marging so I have to avoid */
+h1, h2, h3 {
+  font-family: 'NotoSans-Bold', 'Times New Roman', Times, serif;
+  margin: 0;
+  line-height: 1.1;
+}
+
+p {
+  line-height: 1.3;
+ 
+}
+
+a {
+  text-decoration: none;
+}
+ ul{
+  margin: 0;
+  padding: 0;
+
+  li {
+    list-style-type: none;
+  }
+}
+}

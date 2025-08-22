@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard | EMS {% endblock title %}
+{% block content %}
+<div class="container">
+    <ul class="d-flex justify-content-between py-4">
+        <li><a href="">Analytics</a></li>
+    </ul>
+
+    <div>
+        <h2>Platform Analytics</h2>
+        <div class="d-flex justify-content-between align-items-center">
+            <p>Comprehensive platform performance insights</p>
+
+            <a href="btn">Export Report</a>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-3">
+        <div class="col-md-3">
+            <div class="card p-3">
+                <div class="d-flex justify-content-between">
+                    <h6>Total Users</h6>
+                </div>
+                <h4>6</h4>
+                <small class="text-muted">Registered users</small>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card p-3">
+                <div class="d-flex justify-content-between">
+                    <h6>Total Events</h6>
+                </div>
+                <h4>6</h4>
+                <small class="text-muted">Events created</small>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card p-3">
+                <div class="d-flex justify-content-between">
+                    <h6>Total Users</h6>
+                </div>
+                <h4>6</h4>
+                <small class="text-muted">Registered users</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Highlights -->
+    <div class="row g-3">
+        <!-- Top organizers -->
+         <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h6>Top organizers</h6>
+                    <p class="text-muted small">Most successful event organizers</p>
+
+                    <!-- Organizer List -->
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="badge bg-primary me-2">1</span>
+                                <strong>Nomsa Dlamini</strong>
+                                <small class="text-muted">8 events</small>
+                            </div>
+                            <div class="text-end">
+                                <strong>R890 000</strong>
+                                <small class="text-muted">2340 attendees</small>
+                            </div>
+                        </li>
+
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="badge bg-primary me-2">1</span>
+                                <strong>Nomsa Dlamini</strong>
+                                <small class="text-muted">8 events</small>
+                            </div>
+                            <div class="text-end">
+                                <strong>R890 000</strong>
+                                <small class="text-muted">2340 attendees</small>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+         </div>
+
+        <!-- Events by Category -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title fw-bold">Events by Category</h6>
+                    <p class="text-muted small">Distribution of event categories</p>
+
+                    <canvas id="categoryChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
