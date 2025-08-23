@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.paginator import Paginator
 from django.contrib.auth.forms import AuthenticationForm
 
-from .forms import UserRegistrationForm, AdminUserCreationForm, EventAttendeeRegistrationForm
+from .forms import UserRegistrationForm, AdminUserCreationForm, EventAttendeeRegistrationForm, EventForm
 from .models import Event, Attendee, EventRegistration
 
 # Create your views here.
@@ -46,13 +46,13 @@ def login_view(request):
     return render(request, 'login.html', {'form': form})
 
 def dashboard(user):
-    if user.role == 'admin' or user.is_superuser: 
+    if is_admin(user): 
       return redirect('home')
     else:
-        return redirect('organizer_overview', user)
+        return redirect('organizer_overview')
 
 def is_admin(user):
-    return user.is_authenticated and (user.is_superuser or user.role == 'admin')
+    return user.is_superuser or user.role == 'admin'
 
 @login_required
 @user_passes_test(is_admin)
@@ -118,6 +118,24 @@ def attendee_events(request, attendee_id):
     return render(request, '')
 
 @login_required
-def organizer_overview(request, organizer):
+def organizer_overview(request):
+    organizer = request.user
     total_events = Event.objects.filter(organizer=organizer)
     print(len(total_events))
+
+    return render(request, 'organizer_dashboard.html')
+
+@login_required
+def create_event(request):
+    if request.method == "POST":
+        form = EventForm(request.POST, request.FILES)
+        if form.is_valid():
+            event = form.save(commit=False)
+            event.organizer = request.user  # attach logged-in user
+            event.save()
+            form.save_m2m()  # save tags/relations
+            return redirect("organizer_overview")  # redirect after success
+    else:
+        form = EventForm()
+
+    return render(request, "create_event.html", {"form": form})

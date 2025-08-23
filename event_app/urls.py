@@ -8,4 +8,5 @@ urlpatterns = [
     path('admin/create-user/', views.admin_create_user, name='admin_create_user'),
     path('events/<int:pk>/register', views.register_for_event, name='register_for_event'),
     path('organizer-overview/', views.organizer_overview, name='organizer_overview'),
+    path('add-event/', views.create_event, name="create_event"),
 ]

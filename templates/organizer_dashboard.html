@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Organizer Dashboard | EMS {% endblock title %}
+{% block content %}
+<div class="container">
+    <div class="card p-4 mb-4 bg-success text-white">
+        <h4>Welcome back, {{ user.first_name }} {{user.last_name }}!</h4>
+        <p>Manage your events and connect with audiences across South Africa.</p>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card border rounded-3 p-4 mb-3 shadow-sm">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h6 class="h6 text-muted mb-0">Total Event</h6>
+                    <!-- Bootstrap + icon -->
+                    <i class="bi bi-calender-lg text-muted fs-5"></i>
+                </div>
+
+                <div>
+                    <p class="h2 fw-bold text-success mb-1">
+                        
+                    </p>
+                    <p class="text-muted small mb-0">published, Draft</p>
+                    
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+            <div class="card p-3 text-center">
+                <h6>Total Attendees</h6>
+                <h3>{{ total_attendees }}</h3>
+                <small>Across all your events</small>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card p-3 text-center">
+                <h6>Revenue</h6>
+                <h3>R{{ total_revenue|floatformat:0 }}</h3>
+                <small>From paid events</small>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card p-3 text-center">
+                <h6>Upcoming</h6>
+                <h3>{{ upcoming_events }}</h3>
+                <small>Events this month</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick action -->
+    <div class="bg-white rounded shadow p-4 mb-4" style="width: 100%;">
+        <div class="">
+            <h4>Quick Action</h4>
+
+            <p class="text-muted">Common task for event organizer</p>
+        </div>
+
+        <div class="mt-2 row g-3">
+            <div class="col-md-3 card bg-success text-white text-center py-3">
+                <p>Create Event</p>
+            </div>
+            <div class="col-md-3 card text-center">
+
+            </div>
+            <div class="col-md-3 card text-center">
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock content %}

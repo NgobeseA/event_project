@@ -94,7 +94,7 @@ class Event(models.Model):
 
     title = models.CharField(max_length=200)
     description = models.TextField()
-    category = models.CharField(max_length=60)
+    category = models.CharField(max_length=80, choices=CATEGORY_CHOICES)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=DRAFT)
     organizer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='organized_events')
 

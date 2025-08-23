@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
 
-from .models import Attendee
+from .models import Attendee, Event
 
 User = get_user_model()
 
@@ -177,3 +177,27 @@ class EventAttendeeRegistrationForm(forms.Form):
         )
 
         return registration
+
+class EventForm(forms.ModelForm):
+    class Meta:
+        model = Event
+        fields = [
+            "title", "description", "category", "status",
+            "start_date", "end_date", "start_time", "end_time",
+            "venue", "city", "is_online", "online_link", "image", "tags"
+        ]
+        widgets = {
+            "start_date": forms.DateInput(attrs={"type": "date", "class": "form-control"}),
+            "end_date": forms.DateInput(attrs={"type": "date", "class": "form-control"}),
+            "start_time": forms.TimeInput(attrs={"type": "time", "class": "form-control"}),
+            "end_time": forms.TimeInput(attrs={"type": "time", "class": "form-control"}),
+            "description": forms.Textarea(attrs={"rows": 4, "class": "form-control"}),
+            "title": forms.TextInput(attrs={"class": "form-control"}),
+            "venue": forms.TextInput(attrs={"class": "form-control"}),
+            "city": forms.TextInput(attrs={"class": "form-control"}),
+            "online_link": forms.URLInput(attrs={"class": "form-control"}),
+            "tags": forms.TextInput(attrs={"placeholder": "music, conference, free", "class": "form-control"}),
+            "category": forms.Select(attrs={"class": "form-select"}),
+            "status": forms.Select(attrs={"class": "form-select"}),
+            "is_online": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        }

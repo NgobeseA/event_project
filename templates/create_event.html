@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container py-4">
+  <h2 class="mb-4">Create New Event</h2>
+
+  <form method="post" enctype="multipart/form-data" class="row g-3">
+    {% csrf_token %}
+
+    <div class="col-md-6">
+      <label class="form-label">Title</label>
+      {{ form.title }}
+    </div>
+
+    <div class="col-md-12">
+      <label class="form-label">Description</label>
+      {{ form.description }}
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">Category</label>
+      {{ form.category }}
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">Status</label>
+      {{ form.status }}
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">Start Date</label>
+      {{ form.start_date }}
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">End Date</label>
+      {{ form.end_date }}
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">Start Time</label>
+      {{ form.start_time }}
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">End Time</label>
+      {{ form.end_time }}
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">Venue</label>
+      {{ form.venue }}
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">City</label>
+      {{ form.city }}
+    </div>
+
+    <div class="col-md-6 form-check">
+      {{ form.is_online }}
+      <label class="form-check-label">Is Online Event?</label>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">Online Link (if online)</label>
+      {{ form.online_link }}
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">Image</label>
+      {{ form.image }}
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">Tags</label>
+      {{ form.tags }}
+    </div>
+
+    <div class="col-12">
+      <button type="submit" class="btn btn-primary">Create Event</button>
+      <a href="{% url 'organizer_overview' %}" class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

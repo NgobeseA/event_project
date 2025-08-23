@@ -55,48 +55,56 @@
     --c-dark: #000;
     --c-navy: hsl(216, 17%, 35%);
     --c-dark-white: #bad8e9;
+
+    --background: 240 10% 96%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
   }
 }
 
 @layer global {
-*, *::before, *::after {
-  box-sizing: border-box;
-}
 
-body {
-  font-family: 'NotoSans-Regular', Arial, Helvetica, sans-serif;
-  margin: 0;
-  font-size: var(--fs-16);
-  background: var(--c-dark);
-}
-
-img {
-    display: block;
-  max-width: 100%; /*to avoid horizontal scrolling*/
-  height: auto;
-}
-
-/* heading they come with they own marging so I have to avoid */
-h1, h2, h3 {
-  font-family: 'NotoSans-Bold', 'Times New Roman', Times, serif;
-  margin: 0;
-  line-height: 1.1;
-}
-
-p {
-  line-height: 1.3;
- 
-}
-
-a {
-  text-decoration: none;
-}
- ul{
-  margin: 0;
-  padding: 0;
-
-  li {
-    list-style-type: none;
+  body {
+    font-family: 'NotoSans-Regular', Arial, Helvetica, sans-serif;
+    margin: 0;
+    font-size: var(--fs-16);
   }
+
+  img {
+      display: block;
+    max-width: 100%; /*to avoid horizontal scrolling*/
+    height: auto;
+  }
+
+  /* heading they come with they own marging so I have to avoid */
+  h1, h2, h3 {
+    font-family: 'NotoSans-Bold', 'Times New Roman', Times, serif;
+    margin: 0;
+    line-height: 1.1;
+  }
+
+  p {
+    line-height: 1.3;
+  
+  }
+
+  a {
+    text-decoration: none;
+  }
+  ul{
+    margin: 0;
+    padding: 0;
+
+    li {
+      list-style-type: none;
+    }
+  }
+
+  
 }
-}
+
+.main {
+    background: var(--background)
+  }
