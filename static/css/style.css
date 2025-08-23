@@ -79,7 +79,7 @@
   }
 
   /* heading they come with they own marging so I have to avoid */
-  h1, h2, h3 {
+  h1, h2, h3, h6 {
     font-family: 'NotoSans-Bold', 'Times New Roman', Times, serif;
     margin: 0;
     line-height: 1.1;

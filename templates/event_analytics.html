@@ -1,17 +1,17 @@
 {% extends "base.html" %}
-{% block title %}Organizer Dashboard | EMS {% endblock title %}
+{% block title %}Event Analytics | EMS {% endblock title %}
 {% block content %}
 <div class="container">
     <div class="card p-4 mb-4 bg-success text-white">
-        <h4>Welcome back, {{ user.first_name }} {{user.last_name }}!</h4>
-        <p>Manage your events and connect with audiences across South Africa.</p>
+        <h4>Event Analytics</h4>
+        <p>Detailed insights and performance metrics</p>
     </div>
 
     <div class="row g-3 mb-4">
         <div class="col-md-3">
             <div class="card border rounded-3 p-4 mb-3 shadow-sm">
                 <div class="d-flex align-items-center justify-content-between mb-3">
-                    <h6 class="h6 text-muted mb-0">Total Event</h6>
+                    <h6 class="h6 text-muted mb-0">Total Views</h6>
                     <!-- Bootstrap + icon -->
                     <i class="bi bi-calender-lg text-muted fs-5"></i>
                 </div>
@@ -20,7 +20,7 @@
                     <p class="h2 fw-bold text-success mb-1">
                         
                     </p>
-                    <p class="text-muted small mb-0">published, Draft</p>
+                    <p class="text-muted small mb-0">Event page views</p>
                     
                 </div>
             </div>
@@ -30,7 +30,7 @@
         <div class="col-md-3">
             <div class="card border rounded-3 p-4 mb-3 shadow-sm">
                 <div class="d-flex align-items-center justify-content-between mb-3">
-                    <h6 class="h6 text-muted mb-0">Total Attendees</h6>
+                    <h6 class="h6 text-muted mb-0">Registrations</h6>
                     <!-- Bootstrap + icon -->
                     <i class="bi bi-calender-lg text-muted fs-5"></i>
                 </div>
@@ -39,7 +39,7 @@
                     <p class="h2 fw-bold text-success mb-1">
                         
                     </p>
-                    <p class="text-muted small mb-0">Across all the events</p>
+                    <p class="text-muted small mb-0">Total attendees</p>
                     
                 </div>
             </div>
@@ -48,7 +48,7 @@
         <div class="col-md-3">
             <div class="card border rounded-3 p-4 mb-3 shadow-sm">
                 <div class="d-flex align-items-center justify-content-between mb-3">
-                    <h6 class="h6 text-muted mb-0">Upcoming Events</h6>
+                    <h6 class="h6 text-muted mb-0">Conversion Rate</h6>
                     <!-- Bootstrap + icon -->
                     <i class="bi bi-calender-lg text-muted fs-5"></i>
                 </div>
@@ -57,7 +57,7 @@
                     <p class="h2 fw-bold text-success mb-1">
                         
                     </p>
-                    <p class="text-muted small mb-0">Events in this month </p>
+                    <p class="text-muted small mb-0">Views to registrations</p>
                     
                 </div>
             </div>
@@ -73,25 +73,17 @@
     </div>
 
     <!-- Quick action -->
-    <div class="bg-white rounded shadow p-4 mb-4" style="width: 100%;">
-        <div class="">
-            <h4>Quick Action</h4>
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="card shadow-sm rounded-3 ">
+                <div>
+                    <h6>Attendee Details</h6>
+                    <p class="text-nuted">View all the registered pleople</p>
+                </div>
 
-            <p class="text-muted">Common task for event organizer</p>
-        </div>
-
-        <div class="mt-2 row gap-5">
-            <div class="col-md-3 card bg-success text-white text-center py-3">
-                <p>Create Event</p>
-            </div>
-            <div class="col-md-3 card text-center">
-
-            </div>
-            <div class="col-md-3 card text-center">
-
+                
             </div>
         </div>
-
     </div>
 </div>
 

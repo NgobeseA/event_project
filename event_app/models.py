@@ -118,6 +118,7 @@ class Event(models.Model):
     image = models.ImageField(upload_to='event_images/', blank=True, null=True)
     tags = models.TextField(help_text='Comma-separated tags', blank=True)
 
+    views_count = models.PositiveIntegerField(default=0, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -128,8 +129,12 @@ class Event(models.Model):
         return self.title
 
     @property
-    def orginer_name(self):
-        return f'{self.orginizer.first_name}'
+    def organizer_name(self):
+        return f'{self.organizer.first_name} {self.organizer.last_name}'
+
+    @property
+    def organizer_email(self):
+        return f'{self.organizer.email}'
     
     @property
     def current_attendees(self):

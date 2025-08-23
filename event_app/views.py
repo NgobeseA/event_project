@@ -120,7 +120,9 @@ def attendee_events(request, attendee_id):
 @login_required
 def organizer_overview(request):
     organizer = request.user
-    total_events = Event.objects.filter(organizer=organizer)
+    events = Event.objects.filter(organizer=organizer)
+
+    total_events = events.count()
     print(len(total_events))
 
     return render(request, 'organizer_dashboard.html')
@@ -139,3 +141,27 @@ def create_event(request):
         form = EventForm()
 
     return render(request, "create_event.html", {"form": form})
+
+def view_event(request, pk):
+    """
+    View function for displaying details of a single event.
+    
+    Retrieves an event by its primary key (pk) and renders the event detail page.
+    Also fetches recommended events based on the selected event's category.
+    """
+    event = get_object_or_404(Event, pk=pk)
+    user = event.organizer_name()
+    organizer_contact = user.contact_number
+    # user_contact = user.mobile_number
+    session_key = f'viewed_event_{pk}'
+    if not request.session.get(session_key):
+        Event.objects.filter(pk=pk).update(views_count=F('views_count')+1)
+        event.refresh_from_db()
+        request.session[session_key] = True
+    
+    context = {
+        'event': event,
+        'organizer_email': user_email,
+        'organizer_contact': organizer_contact
+    }
+    return render(request, 'event_details.html', context)
