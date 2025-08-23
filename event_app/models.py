@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from django.utils import timezone
 
 
-User = get_user_model()
+
 # Create your models here.
 class CustomUser(AbstractUser):
     ROLE_CHOICES = [
@@ -18,6 +18,8 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return f'{self.username} ({self.role})'
 
+User = get_user_model()
+
 class Attendee(models.Model):
     """
     Model to store attendee information
@@ -29,8 +31,8 @@ class Attendee(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True, related_name='attendee_profile')
 
-    created_at = models.DateTImeField(auto_now_add=True)
-    updated_at = models.DateTImeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['first_name', 'last_name']
@@ -116,8 +118,8 @@ class Event(models.Model):
     image = models.ImageField(upload_to='event_images/', blank=True, null=True)
     tags = models.TextField(help_text='Comma-separated tags', blank=True)
 
-    created_at = models.DateTImeField(auto_now_add=True)
-    updated_at = models.DateTImeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['-created_at']
@@ -178,8 +180,8 @@ class EventRegistration(models.Model):
     attendee = models.ForeignKey(Attendee, on_delete=models.CASCADE, related_name='regisrations')
 
     status = models.CharField(max_length=30, choices=REGISTRATION_STATUS_CHOICES, default='registered')
-    registered_at = models.DateTImeField(auto_now_add=True)
-    updated_at = models.DateTImeField(auto_now=True)
+    registered_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         unique_together = ['event', 'attendee']
