@@ -12,6 +12,7 @@ from django.db.models.functions import TruncDate
 
 from .forms import UserRegistrationForm, AdminUserCreationForm, EventAttendeeRegistrationForm, EventForm
 from .models import Event, Attendee, EventRegistration, CustomUser
+from .utils import notify_event_attendees
 
 # Create your views here.
 def admin_dashboard(request):
@@ -307,3 +308,39 @@ def event_analytics(request, event_id):
     }
 
     return render(request, 'event_analytics.html', context)
+
+@login_required
+def cancel_event(request, event_id):
+    """Cancel an event and notify all attendees."""
+    event = get_object_or_404(Event, id=event_id, organizer=request.user)
+
+    # Update status
+    event.status = Event.CANCELLED
+    event.save()
+
+    # Notify attendees
+    subject = f"Event Cancelled: {event.title}"
+    notify_event_attendees(event, subject, "event_cancelled")
+
+    messages.success(request, f"The event '{event.title}' has been cancelled. Attendees notified.")
+    return redirect("event_analytics", event_id=event.id)
+
+def edit_event(request, event_id):
+    """Edit an event and notify attendees of updates."""
+    event = get_object_or_404(Event, id=event_id, organizer=request.user)
+
+    if request.method == "POST":
+        form = EventForm(request.POST, instance=event)
+        if form.is_valid():
+            form.save()
+
+            # Notify attendees
+            subject = f"Event Updated: {event.title}"
+            notify_event_attendees(event, subject, "event_updated")
+
+            messages.success(request, f"The event '{event.title}' was updated and attendees notified.")
+            return redirect("event_details", event_id=event.id)
+    else:
+        form = EventForm(instance=event)
+
+    return render(request, "events/edit_event.html", {"form": form, "event": event})

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: Arial, sans-serif; background:#f9f9f9; padding:20px; }
+    .card { background:#fff; padding:20px; border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
+    .btn { display:inline-block; background:#dc3545; color:#fff; padding:10px 16px; text-decoration:none; border-radius:4px; }
+    .btn:hover { background:#c82333; }
+    .footer { margin-top:20px; font-size:12px; color:#666; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Event Cancelled: {{ event.title }}</h2>
+    <p>Dear Attendee,</p>
+    <p>We regret to inform you that the event <strong>{{ event.title }}</strong> has been <b>cancelled</b>.</p>
+    <p>Please check our website for alternative events.</p>
+    <a href="http://example.com/events/{{ event.id }}" class="btn">View Events</a>
+    <p class="footer">Thank you for being part of {{ event.organizer.username }}’s community.</p>
+  </div>
+</body>
+</html>
