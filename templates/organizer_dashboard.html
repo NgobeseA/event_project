@@ -18,10 +18,11 @@
 
                 <div>
                     <p class="h2 fw-bold text-success mb-1">
-                        
+                        {{total_events}}
                     </p>
-                    <p class="text-muted small mb-0">published, Draft</p>
-                    
+                    <p class="text-muted small mb-0">{{published_events_count}} published, {{draft_events_count}} Draft
+                    </p>
+
                 </div>
             </div>
 
@@ -37,10 +38,10 @@
 
                 <div>
                     <p class="h2 fw-bold text-success mb-1">
-                        
+                        {{ total_attendees }}
                     </p>
                     <p class="text-muted small mb-0">Across all the events</p>
-                    
+
                 </div>
             </div>
         </div>
@@ -55,10 +56,10 @@
 
                 <div>
                     <p class="h2 fw-bold text-success mb-1">
-                        
+                        {{upcoming_events_count}}
                     </p>
                     <p class="text-muted small mb-0">Events in this month </p>
-                    
+
                 </div>
             </div>
         </div>
@@ -84,8 +85,8 @@
             <div class="col-md-3 card bg-success text-white text-center py-3">
                 <p>Create Event</p>
             </div>
-            <div class="col-md-3 card text-center">
-
+            <div class="col-md-3 card text-center py-3">
+                <p>Manage Events</p>
             </div>
             <div class="col-md-3 card text-center">
 
@@ -93,6 +94,123 @@
         </div>
 
     </div>
+
+    <!-- Highligh of the report -->
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="bg-white rounded shadow p-3 mb-3">
+                {% for event in organizer_events %}
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Title</th>
+                            <th scope="col">Venue</th>
+                            <th scope="col">Views</th>
+                        </tr>
+
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><a href="">{{event.title}}</a></td>
+                            <td>{{event.venue}}</td>
+                            <td>{{event.views_count}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                {% empty %}
+                <p class="text-muted">No events found.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="bg-white rounded shadow p-3 mb-3">
+                {%if total_events > 0 %}
+                <canvas id="categoryChart"></canvas>
+                {% else %}
+                <p class="text-muted">No events created yet. Create your first event to see the what we have cooked for
+                    you!</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 </div>
 
+
+<!-- JavaScript chart -->
+<script>
+    {% if total_events > 0 %}
+    document.addEventListener('DOMContentLoaded', function () {
+        // Get chart data from Django context
+        const chartData = JSON.parse('{{ category_chart_data|safe }}');
+
+        // Get canvas context
+        const ctx = document.getElementById('categoryChart').getContext('2d');
+
+        // Create the pie chart
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: chartData.labels,
+                datasets: [{
+                    data: chartData.data,
+                    backgroundColor: chartData.colors,
+                    borderColor: '#ffffff',
+                    borderWidth: 2,
+                    hoverBorderWidth: 3,
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Event Categories by Percentage',
+                        font: {
+                            size: 16,
+                            weight: 'bold'
+                        },
+                        padding: 20
+                    },
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 15,
+                            usePointStyle: true,
+                            font: {
+                                size: 12
+                            }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                const label = context.label || '';
+                                const value = context.parsed;
+                                return `${label}: ${value}%`;
+                            }
+                        },
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleColor: '#ffffff',
+                        bodyColor: '#ffffff',
+                        borderColor: '#ffffff',
+                        borderWidth: 1
+                    }
+                },
+                animation: {
+                    animateRotate: true,
+                    animateScale: true,
+                    duration: 1000
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                }
+            }
+        });
+    });
+    {% endif %}
+</script>
 {% endblock content %}

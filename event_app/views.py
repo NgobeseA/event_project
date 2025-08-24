@@ -4,6 +4,10 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.paginator import Paginator
 from django.contrib.auth.forms import AuthenticationForm
+from django.db.models import Count
+from datetime import datetime
+from django.utils import timezone
+import json
 
 from .forms import UserRegistrationForm, AdminUserCreationForm, EventAttendeeRegistrationForm, EventForm
 from .models import Event, Attendee, EventRegistration
@@ -122,10 +126,98 @@ def organizer_overview(request):
     organizer = request.user
     events = Event.objects.filter(organizer=organizer)
 
-    total_events = events.count()
-    print(len(total_events))
 
-    return render(request, 'organizer_dashboard.html')
+    total_events = events.count()
+    published_events_count = events.filter(status=Event.PUBLISHED).count()
+    draft_events_count = events.filter(status=Event.DRAFT).count()
+    
+    # Get current month's start and end dates
+    now = timezone.now()
+    current_month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    if now.month == 12:
+        next_month_start = now.replace(year=now.year + 1, month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+    else:
+        next_month_start = now.replace(month=now.month + 1, day=1, hour=0, minute=0, second=0, microsecond=0)
+    
+    # Upcoming events for this month (from today until end of current month)
+    upcoming_events_this_month = events.filter(
+        start_date__gte=now.date(),
+        start_date__lt=next_month_start.date(),
+        status=Event.PUBLISHED
+    )
+    upcoming_events_count = upcoming_events_this_month.count()
+    
+    # Total attendees across all events
+    total_attendees = events.aggregate(
+        total=Count('attendees', distinct=True)
+    )['total'] or 0
+    
+    # Get organizer's events ordered by number of attendees (most attendees first)
+    organizer_events = events.annotate(
+        attendee_count=Count('attendees')
+    ).order_by('-attendee_count', '-created_at')  # Secondary sort by creation date
+
+    category_data = events.values('category').annotate(
+        count=Count('id')
+    ).order_by('-count')
+    
+    # Prepare chart data
+    chart_labels = []
+    chart_data = []
+    chart_colors = []
+    
+    # Color mapping for each category
+    category_colors = {
+        Event.MUSIC_ARTS: '#FF6384',
+        Event.BUSINESS: '#36A2EB', 
+        Event.SPORTS: '#FFCE56',
+        Event.TECHNOLOGY: '#4BC0C0',
+        Event.FOOD_DRINK: '#9966FF',
+        Event.HEALTH_WELLNESS: '#FF9F40',
+        Event.EDUCATION: '#FF6384',
+        Event.COMMUNITY: '#C9CBCF',
+        Event.CHARITY: '#4BC0C0',
+        Event.GOVERNMENT: '#36A2EB',
+        Event.TOURISM: '#FFCE56'
+    }
+    
+    # Calculate percentages and prepare chart data
+    for item in category_data:
+        category = item['category']
+        count = item['count']
+        percentage = round((count / total_events) * 100, 1) if total_events > 0 else 0
+        
+        # Get category display name
+        category_display = dict(Event.CATEGORY_CHOICES).get(category, category)
+        
+        chart_labels.append(category_display)
+        chart_data.append(percentage)
+        chart_colors.append(category_colors.get(category, '#C9CBCF'))
+    
+    # Convert to JSON for JavaScript
+    chart_data_json = json.dumps({
+        'labels': chart_labels,
+        'data': chart_data,
+        'colors': chart_colors
+    })
+    
+    print(f"Total events: {total_events}")
+    print(f"Published: {published_events_count}, Draft: {draft_events_count}")
+    print(f"Upcoming this month: {upcoming_events_count}")
+    
+    context = {
+        'total_events': total_events,
+        'published_events_count': published_events_count,
+        'draft_events_count': draft_events_count,
+        'upcoming_events_count': upcoming_events_count,
+        'total_attendees': total_attendees,
+        'organizer_events': organizer_events,  # List of events ordered by attendee count
+        'category_chart_data': chart_data_json,  # JSON data for Chart.js
+        'category_breakdown': category_data,
+    }
+
+
+    return render(request, 'organizer_dashboard.html', context)
 
 @login_required
 def create_event(request):
