@@ -127,7 +127,7 @@ class Event(models.Model):
     def __str__(self):
         return self.title
 
-    @property
+    
     def organizer_name(self):
         return f'{self.organizer.first_name} {self.organizer.last_name}'
 

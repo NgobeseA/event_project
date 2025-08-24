@@ -2,6 +2,16 @@
 {% block title %}Organizer Dashboard | EMS {% endblock title %}
 {% block content %}
 <div class="container">
+    {% if messages %}
+            <div class="container mt-3">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
     <div class="card p-4 mb-4 bg-success text-white">
         <h4>Welcome back, {{ user.first_name }} {{user.last_name }}!</h4>
         <p>Manage your events and connect with audiences across South Africa.</p>
@@ -55,7 +65,7 @@
                 </div>
 
                 <div>
-                    <p class="h2 fw-bold text-success mb-1">
+                    <p class="h2 fw-bold text-danger mb-1">
                         {{upcoming_events_count}}
                     </p>
                     <p class="text-muted small mb-0">Events in this month </p>
@@ -83,7 +93,7 @@
 
         <div class="mt-2 row gap-5">
             <div class="col-md-3 card bg-success text-white text-center py-3">
-                <p>Create Event</p>
+                <p><a href="{% url 'create_event' %}" class="text-white" style="text-decoration: none;"> Create Event</a></p>
             </div>
             <div class="col-md-3 card text-center py-3">
                 <p>Manage Events</p>
@@ -99,7 +109,7 @@
     <div class="row g-3">
         <div class="col-md-6">
             <div class="bg-white rounded shadow p-3 mb-3">
-                {% for event in organizer_events %}
+                {% if organizer_events %}
                 <table class="table">
                     <thead>
                         <tr>
@@ -110,16 +120,18 @@
 
                     </thead>
                     <tbody>
+                        {% for event in organizer_events %}
                         <tr>
-                            <td><a href="">{{event.title}}</a></td>
+                            <td><a href="{% url 'event_analytics' event.pk %}">{{event.title}}</a></td>
                             <td>{{event.venue}}</td>
                             <td>{{event.views_count}}</td>
                         </tr>
+                        {%endfor%}
                     </tbody>
                 </table>
-                {% empty %}
+                {% else %}
                 <p class="text-muted">No events found.</p>
-                {% endfor %}
+                {% endif %}
             </div>
         </div>
 

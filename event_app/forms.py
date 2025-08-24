@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
 
-from .models import Attendee, Event
+from .models import Attendee, Event, EventRegistration
 
 User = get_user_model()
 
@@ -165,15 +165,12 @@ class EventAttendeeRegistrationForm(forms.Form):
         if not created:
             attendee.first_name = self.cleaned_data['first_name']
             attendee.last_name = self.cleaned_data['last_name']
-            if self.cleaned_data['phone_number']:
-                attendee.phone_number = self.cleaned_data['phone_number']
             attendee.save()
 
         # Create registration
         registration = EventRegistration.objects.create(
             event=self.event,
             attendee=attendee,
-            special_requirements=self.cleaned_data['special_requirements']
         )
 
         return registration

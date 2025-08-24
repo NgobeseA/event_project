@@ -1,0 +1,361 @@
+{% extends "base.html" %} {% block title %}View Event Details | EMS{%endblock %}
+{%load static%}
+{% block content%}
+<section class="fluid-container bg-light">
+    <div class="event-container event-image">
+        <div class="container text-container">
+            {% if messages %}
+            <div class="container mt-3">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <h1>{{event.title}}</h1>
+            {% if request.user == event.organizer %}
+            <div class="d-flex gap-2">
+                <a href="" class="button">Edit Event</a>
+                <button type="button" class="button" style="background-color: red; color: #fff;" data-bs-toggle="modal"
+                    data-bs-target="#deleteEvent">
+                    Detele
+                </button>
+            </div>
+
+            {% endif %}
+            <!-- Modal -->
+            <div class="modal fade modal-dialog modal-dialog-centered" id="deleteEvent" tabindex="-1"
+                aria-labelledby="deleteModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="exampleModalLabel">{{event.title}}</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            You are about to delete {{event.title}}, Are you sure about that?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, Cancel</button>
+                            <button type="button" class="btn btn-danger">Yes, Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container main-content">
+        <div class="row">
+            <!-- Left Column - Event Image and Description -->
+            <div class="col-lg-8">
+                <div class="fade-in mb-5">
+                    <!-- Event Image -->
+                    {% if event.image %}
+                    <img src="{{ event.image.url }}" alt="{{ event.title }}" class="event-image">
+                    {% endif %}
+                    <!-- Event Description -->
+                    <div class="event-description">
+                        {{ event.description|safe }}
+                    </div>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                        data-bs-target="#RegisterModal">Register</button>
+
+                    <!-- Register Modal -->
+                    <div class="modal fade" id="RegisterModal" tabindex="-1" aria-labelledby="RegisterModalLabel"
+                        aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content border-0 shadow-lg">
+
+                                <!-- Header -->
+                                <div class="modal-header bg-primary text-white">
+                                    <h5 class="modal-title fw-semibold" id="RegisterModalLabel">
+                                        Register for {{ event.title }}
+                                    </h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+
+                                <!-- Body -->
+                                <div class="modal-body">
+                                    <form action="{% url 'register_for_event' event.pk %}" method="post">
+                                        {% csrf_token %}
+
+                                        <div class="mb-3">
+                                            {{ form.first_name.label_tag }}
+                                            {{ form.first_name }}
+                                        </div>
+
+                                        <div class="mb-3">
+                                            {{ form.last_name.label_tag }}
+                                            {{ form.last_name }}
+                                        </div>
+
+                                        <div class="mb-3">
+                                            {{ form.email.label_tag }}
+                                            {{ form.email }}
+                                        </div>
+
+                                        <!-- Footer with actions -->
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-outline-secondary"
+                                                data-bs-dismiss="modal">
+                                                Cancel
+                                            </button>
+                                            <button type="submit" class="btn btn-success">
+                                                <i class="bi bi-check-circle me-1"></i> Register
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+
+                <section id="upcoming-events">
+                    <div class="container">
+                        <div class="py-5 text-center">
+                            <h1 class="category-title">Events you may like</h1>
+                            <hr class="section-divider">
+                        </div>
+                        <!-- filter form in events -->
+                        <div>
+                            <form action="" method="post"></form>
+                        </div>
+                        <!-- filter end form -->
+
+                        <!-- list of events -->
+                        <div class="row">
+                            {% for event in events %}
+                            <div class="col-md-6 mb-4">
+                                <div class="card h-100 fade-in my-card">
+                                    {% if event.image %}
+                                    <img src="{{ event.image.url }}" class="card-img-top" alt="{{ event.title }}" />
+                                    {% endif %}
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between card-header">
+                                            <h5 class="card-title my-card-title">{{ event.title }}</h5>
+                                            <span>{{event.category}}</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <div class="d-flex gap-1 ">
+                                                <i class="bi bi-calendar-event" style="color:#6B7280;" 13></i>
+                                                <p class="card-text" style="color:#6B7280;">{{ event.date }}</p>
+                                            </div>
+                                            <div class="d-flex gap-1">
+                                                <i class="bi bi-geo-alt-fill" style="color:#6B7280;"></i>
+                                                <p class="card-text" style="color:#6B7280;">
+                                                    {{ event.location }}
+                                                </p>
+                                            </div>
+                                            <div class="d-flex gap-1">
+                                                <i class="bi bi-person-fill" style="color:#6B7280;"></i>
+                                                <p class="card-text" style="color:#6B7280;">
+                                                    {{ organizer_name }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <p class="event-description"> {{ event.brief }}</p>
+
+
+                                        <div class="d-grid gap-2">
+                                            <a href="" class="btn btn-primary">View Details</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <p class="text-muted">No events found.</p>
+                            {% endfor %}
+                        </div>
+                        <!-- end list of events -->
+                    </div>
+
+
+                </section>
+            </div>
+
+
+
+            <!-- Right Column - Event Details -->
+            <div class="col-lg-4">
+                <div class="event-details-card fade-in bg-white rounded shadow">
+                    <!-- Header -->
+                    <div class="event-details-header bg-success text-white p-4 rounded-3">
+                        <h3 class="event-details-title">Event Details</h3>
+
+                    </div>
+
+                    <div class="p-3">
+                        <!-- Countdown Timer -->
+                        <div id="countdown" class="text-center">
+                            <h2>Event Countdown:</h2>
+                            <div class="row d-flex justify-content-center">
+                                <div class="">
+                                    <div class="card">
+                                        <div class="card-body d-flex justify-content-between gap-2">
+                                            <div>
+                                                <h5 id="days">0</h5>
+                                                <p>Days</p>
+                                            </div>
+                                            <div>
+                                                <h5 id="hours">0</h5>
+                                                <p>Hours</p>
+                                            </div>
+
+                                            <div>
+                                                <h5 id="minutes">0</h5>
+                                                <p>Minutes</p>
+                                            </div>
+
+                                            <div>
+                                                <h5 id="seconds">0</h5>
+                                                <p>Seconds</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Event Info -->
+                        <div class="event-info">
+                            <!-- Start Date -->
+                            <div class="event-info-item">
+                                <div class="event-info-icon">
+                                    <i class="far fa-calendar"></i>
+                                </div>
+                                <div class="event-info-content">
+                                    <div class="event-info-label">Start Time</div>
+                                    <div class="event-info-value">{{ event.start_time }}</div>
+                                </div>
+                            </div>
+
+                            <!-- End Date -->
+                            <div class="event-info-item">
+                                <div class="event-info-icon">
+                                    <i class="far fa-calendar-times"></i>
+                                </div>
+                                <div class="event-info-content">
+                                    <div class="event-info-label">End time</div>
+                                    <div class="event-info-value">{{ event.end_time }}</div>
+                                </div>
+                            </div>
+
+                            <!-- Door Time -->
+                            {% if event.door_time %}
+                            <div class="event-info-item">
+                                <div class="event-info-icon">
+                                    <i class="fas fa-door-open"></i>
+                                </div>
+                                <div class="event-info-content">
+                                    <div class="event-info-label">Door Time</div>
+                                    <div class="event-info-value">{{ event.door_time|date:"g:i a" }}</div>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <!-- Status -->
+                            <div class="event-info-item">
+                                <div class="event-info-icon">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <div class="event-info-content">
+                                    <div class="event-info-label">Status</div>
+                                    <div class="event-info-value status-upcoming">{{ event.status}}</div>
+                                </div>
+                            </div>
+
+                            <!-- Location -->
+                            <div class="event-info-item">
+                                <div class="event-info-icon">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div class="event-info-content">
+                                    <div class="event-info-label">Location</div>
+                                    <div class="event-info-value">{{ event.city|default:"Sandton" }}</div>
+                                </div>
+                            </div>
+
+                            <!-- venue -->
+                            <div class="event-info-item">
+                                <div class="event-info-icon">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div class="event-info-content">
+                                    <div class="event-info-label">Venue</div>
+                                    <div class="event-info-value">{{ event.venue|default:"ABT Telecoms Head Office" }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <p class="text-muted">Contact Info</p>
+
+                            <!-- Organizer -->
+                            <div class="event-info-item">
+                                <div class="event-info-icon">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div class="event-info-content">
+                                    <div class="event-info-label">Organizer</div>
+                                    <div class="event-info-value">{{ event.organizer|default:"Admin" }}</div>
+                                </div>
+                            </div>
+
+                            <div class="event-info-item">
+                                <div class="event-info-icon">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div class="event-info-content">
+                                    <div class="event-info-label">Organizer Email</div>
+                                    <div class="event-info-value">{{ organizer_email|default:"admin@ems.co.za" }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+<script>
+    function updateCountdown() {
+        // Get the event date from Django
+        const eventDateString = "{{ event.start_date|date:'c' }}";
+        const eventDate = new Date(eventDateString);
+        const now = new Date();
+        const distance = eventDate.getTime() - now.getTime();
+
+        if (distance > 0) {
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            console.log(days);
+            document.getElementById('days').innerHTML = days;
+            document.getElementById('hours').textContent = hours;
+            document.getElementById('minutes').textContent = minutes;
+            document.getElementById('seconds').textContent = seconds;
+        } else {
+            document.getElementById('countdown').innerHTML = '<div class="text-center"><h4>Event Started!</h4></div>';
+        }
+    }
+
+    // Update countdown every second
+    setInterval(updateCountdown, 1000);
+    updateCountdown(); // Initial call
+</script>
+{% endblock%}
