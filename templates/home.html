@@ -1,0 +1,108 @@
+{% extends "base.html" %} 
+{%load static%}
+{% block title %}Home | EMS{% endblock title %}
+{%block content %}
+<section id="hero" class="container-fluid mt-4">
+  <!-- <div class="container text-start">
+    <h1 class="hero-title">Plan, Execute, <br>And Enjoy events</h1>
+    <p class="hero-subtitle">
+      Create, manage, and promote events with our intuitive event management
+      system. From conferences to weddings, we've got you covered.
+    </p>
+    {% if user.is_authenticated %}
+      <a href="" class="btn">Get started</a>
+    {% else %}
+      <button type="button" data-bs-target="#loginModal" data-bs-toggle="modal">Get Started</button>
+    {% endif%}
+
+  </div> -->
+   <div class="container">
+    {% if messages %}
+  <div class="messages">
+    {% for message in messages %}
+      <div class="alert 
+        {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}" 
+        role="alert">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+    <div class="row align-items-center flex-md-row flex-column-reverse text-center text-md-start">
+      <div class="col-md-6 hero-content">
+        <h1 class="mb-3">Plan, Execute, <br>And Enjoy events</h1>
+        <p class="mb-4">Create, manage, and promote events with our intuitive event management
+      system. From conferences to weddings, we've got you covered.
+      </p>
+      <a href="" class="button">Browse Events →</a>
+      </div>
+      <div class="col-md-6 mb-4 mb-md-0">
+        <img src="{% static 'images/woman.jpg' %}" alt="People enjoying an event" class="img-fluid rounded">
+      </div>
+    </div>
+
+    <div class="trusted-partners mt-5 text-center">
+      <p>We are trusted by many South Africans.</p>
+      <div class="d-flex flex-wrap justify-content-center gap-3">
+        <p class="text-muted"> Toyota</p>
+        <p class="text-muted">Rocking</p>
+        <p class="text-muted">Data Centrix</p>
+      </div>
+    </div>
+  </div>
+</div>
+  <div class="col-md-4"></div>
+</section>
+<section id="upcoming-events">
+  <div class="container">
+    <div class="py-5 text-center">
+      <h1 class="category-title" >Upcoming Events</h1>
+      <p>
+        Join us for exciting events! Exhibition, career expo, workshops, live
+        music and more.
+      </p>
+      <hr class="section-divider">
+    </div>
+    <!-- filter form in events -->
+    <div>
+      <form action="" method="post"></form>
+    </div>
+    <!-- filter end form -->
+
+    <!-- list of events -->
+    <div class="row">
+      {% for event in events %}
+      <div class="col-md-4 mb-4">
+        <div class="event-card">
+          <img src="{{event.image}}" max-height="180px" alt="{{event.title}}">
+          <div class="event-card-header">
+            <p><strong class="text-muted">{{event.title}}</strong></p>
+            <p class="text-muted"><i class="fa-solid fa-location-dot"></i>{{event.location}}</p>
+          </div>
+          <ul class="pb-3">
+            <li class="text-muted"><i class="fa-solid fa-calendar-days"></i>{{event.date}}</li>
+            
+            <li class="text-muted"><i class="fa-solid fa-layer-group"></i>{{event.category}}</li>
+            <li class="text-muted"><i class="fa-solid fa-user"></i>{{event.organizer}}</li>
+          </ul>
+
+          <p class="text-muted">{{event.brief}}</p>
+
+          <div class="d-flex justify-content-between align-items-center pt-3">
+            <p class="text-muted"><i class="fa-solid fa-eye"></i>Views: {{event.views_count}}</p>
+            <a href="{% url 'event_details' event.pk %}" class="button">View Details</a>
+          </div>
+          
+        </div>
+      </div>
+      {% empty %}
+      <p class="text-muted">No events found.</p>
+      {% endfor %}
+    </div>
+    <!-- end list of events -->
+
+</div>
+
+  </div>
+</section>
+{% endblock content %}

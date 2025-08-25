@@ -108,6 +108,21 @@ def login_view(request):
         form = AuthenticationForm()
     return render(request, 'login.html', {'form': form})
 
+def attendee_login(request):
+    if request.method == "POST":
+        email = request.POST.get('email')  # ✅ use POST instead of clean_data
+        user = Attendee.objects.filter(email=email).first()
+        print(user)
+        if user:
+            # You might want to "log in" the attendee in session
+            request.session['attendee_id'] = user.id
+            messages.success(request, f"Welcome back, {user.first_name}!")
+            return redirect('home')
+        else:
+            messages.error(request, "User not found!!")
+    return render(request, 'login.html')
+
+
 def dashboard(user):
     if is_admin(user): 
       return redirect('home')
@@ -401,3 +416,7 @@ def edit_event(request, event_id):
         form = EventForm(instance=event)
 
     return render(request, "events/edit_event.html", {"form": form, "event": event})
+
+def home_view(request):
+    events = Event.objects.filter(status=Event.PUBLISHED)
+    return render(request, 'home.html', {'events': events})

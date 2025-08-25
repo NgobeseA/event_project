@@ -1,0 +1,67 @@
+<nav class="navbar navbar-expand-lg" id="navbar">
+  <div class="container-fluid">
+    <a class="navbar-brand text-center" href="{% url 'home' %}"><span style="font-style: italic; font-size: 16px;">Event Management Systems</span> </a>
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="{% url 'home' %}"
+            >Home</a
+          >
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="">Events</a>
+        </li>
+        {% if user.is_authenticated %}
+        <li class="nav-item">
+          <a class="nav-link" href="">Add Event</a>
+        </li>
+        {%endif%}
+        <li class="nav-item">
+          <a class="nav-link" href="">Gallery</a>
+        </li>
+      </ul>
+      <div class="ms-auto">
+        {% if user.is_authenticated%}
+        <div class="dropdown text-end">
+          <a
+            href="#"
+            class="d-flex justify-content-center align-items-center gap-1 link-dark text-decoration-none dropdown-toggle"
+            id="userDropdown"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            <div class="user-circle">{{ user.username|slice:":1"|upper }}</div>
+            <small class="username-text">{{ user.username }}</small>
+             <ul class="dropdown-menu text-small" aria-labelledby="userDropdown">
+              <li class="nav-item">
+          <a class="nav-link" href="">My Events</a>
+        </li>
+            <li>
+              <a class="dropdown-item" href="">Logout</a>
+            </li>
+          </ul>
+          </a>
+          
+        </div>
+
+        {%else%}
+        <div class="d-flex">
+          <a href="{% url 'login' %}" class="nav-link button">Sign In / Sign Up</a>
+          
+        </div>
+        {%endif%}
+      </div>
+    </div>
+  </div>
+</nav>
