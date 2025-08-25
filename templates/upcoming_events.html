@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+
+<div class="container p-4">
+<h2 class="h2" style="text-align:center">Upcoming Events</h2>
+
+<div class="row">
+  {% for event in events %}
+  <div class="col-md-3 p-3">
+    <div class="card" style="width: 18rem; border-radius: 5px;">
+      {% if event.image %}
+      <img src="{{ event.image.url }}" class="card-img-top" height="160px" alt="{{ event.title }}">
+      {% else %}
+      <img src="{% static 'images/default1.jpg' %}" class="card-img-top" alt="Default Event Image">
+      {% endif %}
+      <div class="card-body text-center bg-light text-dark">
+        <h5 class="card-title">{{ event.title }}</h5>
+        <p class="card-text">{{ event.start_date }}</p>
+        <a href="{% url 'event_details' event.pk %}" class="btn btn-primary">View More</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal fade" id="eventModal{{ event.id }}" tabindex="-1" aria-labelledby="eventModalLabel{{ event.id }}"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content bg-modal">
+        <div class="modal-header">
+          <h5 class="modal-title" id="eventModalLabel{{ event.id }}">{{ event.title }}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p><strong>Organizer:</strong> {{ event.organizer}}</p>
+          <p><strong>Date:</strong> {{ event.start_date }}</p>
+          <p><strong>Time:</strong> {{ event.time }}</p>
+          <p><strong>Location:</strong> {{ event.city }}</p>
+          <p><strong>Description:</strong> {{ event.description }}</p>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+ 
+</div>
+ <!-- Pagination Controls -->
+  {% if events.has_previous %}
+    <a class="btn btn-outline-secondary" href="?page=1">&laquo; First</a>
+    <a class="btn btn-outline-secondary" href="?page={{ events.previous_page_number }}"> previous </a>
+  {% endif %}
+  Page {{events.number }} of {{events.paginator.num_pages}}
+
+  {% if events.has_next %}
+  <a class="btn btn-outline-dark" href="?page={{events.next_page_number}}">Next</a>
+  <a class="btn btn-outline-dark" href="?page={{events.paginator.num_pages}}"> last Page &raquo;</a>
+  
+  {% endif %}
+
+</div>
+ 
+{% endblock %}

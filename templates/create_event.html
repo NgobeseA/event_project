@@ -3,6 +3,17 @@
 
 {% block content %}
 <div class="container py-4">
+  {% if messages %}
+  <div class="messages">
+    {% for message in messages %}
+      <div class="alert 
+        {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}" 
+        role="alert">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+    {%endif%}
   <h2 class="">Create New Event</h2>
   <p>Fill in the details below about the event</p>
 

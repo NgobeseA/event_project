@@ -11,6 +11,8 @@ from django.utils import timezone
 import json
 from django.db.models.functions import TruncDate
 from django.utils.safestring import mark_safe
+from django.utils.timezone import now
+from django.db import DatabaseError
 
 from .forms import UserRegistrationForm, AdminUserCreationForm, EventAttendeeRegistrationForm, EventForm
 from .models import Event, Attendee, EventRegistration, CustomUser
@@ -105,7 +107,7 @@ def login_view(request):
                 if user is not None:
                     login(request, user)  # Django login for real User/Admin
                     messages.success(request, f"Welcome {user.username}!")
-                    return redirect("dashboard")  # adjust to your route
+                    return dashboard(user) # adjust to your route
                 else:
                     messages.error(request, "Invalid username or password")
             else:
@@ -118,6 +120,7 @@ def login_view(request):
             if attendee:
                 # Store attendee in session
                 request.session["attendee_id"] = attendee.id
+                request.session["attendee_name"] = attendee.first_name
                 messages.success(request, f"Welcome back, {attendee.first_name}!")
                 return redirect("home")  # attendee homepage
             else:
@@ -143,6 +146,12 @@ def attendee_login(request):
             messages.error(request, "User not found!!")
     return render(request, 'login.html')
 
+def attendee_logout(request):
+    """Logs out an attendee by clearing session data"""
+    if "attendee_id" in request.session:
+        request.session.flush()  # clears all session data
+        messages.success(request, "You have been logged out successfully.")
+    return redirect("home")
 
 def dashboard(user):
     if is_admin(user): 
@@ -405,17 +414,22 @@ def event_analytics(request, event_id):
 @login_required
 def cancel_event(request, event_id):
     """Cancel an event and notify all attendees."""
-    event = get_object_or_404(Event, id=event_id, organizer=request.user)
+    try:
+        event = get_object_or_404(Event, id=event_id, organizer=request.user)
 
-    # Update status
-    event.status = Event.CANCELLED
-    event.save()
+        # Update status
+        event.status = Event.CANCELLED
+        event.save()
 
-    # Notify attendees
-    subject = f"Event Cancelled: {event.title}"
-    notify_event_attendees(event, subject, "event_cancelled")
+        # Notify attendees
+        subject = f"Event Cancelled: {event.title}"
+        #notify_event_attendees(event, subject, "event_cancelled")
 
-    messages.success(request, f"The event '{event.title}' has been cancelled. Attendees notified.")
+        messages.success(request, f"The event '{event.title}' has been cancelled. Attendees notified.")
+    except DatabaseError as db_err:
+        messages.error(request, f"Database error: {db_err}")
+    except Exception as e:
+        messages.error(request, f"Something went wrong: {str(e)}")
     return redirect("event_analytics", event_id=event.id)
 
 def logout_view(request):
@@ -444,8 +458,15 @@ def edit_event(request, event_id):
     else:
         form = EventForm(instance=event)
 
-    return render(request, "events/edit_event.html", {"form": form, "event": event})
+    return render(request, "create_event.html", {"form": form, "event": event})
 
 def home_view(request):
     events = Event.objects.filter(status=Event.PUBLISHED)
     return render(request, 'home.html', {'events': events})
+
+def upcoming_events_view(request):
+    events = Event.objects.filter(start_date__gte=now(),status=Event.PUBLISHED).order_by('start_date')
+    paginator = Paginator(events, 8)  # Show 5 events per page
+    page_number = request.GET.get('page')
+    events = paginator.get_page(page_number)
+    return render(request, 'upcoming_events.html', {'events': events})
