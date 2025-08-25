@@ -1,5 +1,6 @@
 from django.shortcuts import render,redirect, get_object_or_404
 from django.contrib.auth import login, authenticate
+from django.contrib.auth import logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.paginator import Paginator
@@ -90,25 +91,45 @@ def register_view(request):
     return render(request, 'registration.html', {'form': form})
 
 def login_view(request):
-    if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
+    if request.method == "POST":
+        login_type = request.POST.get("login_type")  # "organizer" or "attendee"
 
-        if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
+        # ---- ORGANIZER/ADMIN LOGIN ----
+        if login_type == "organizer":
+            form = AuthenticationForm(request, data=request.POST)
+            if form.is_valid():
+                username = form.cleaned_data.get("username")
+                password = form.cleaned_data.get("password")
+                user = authenticate(request, username=username, password=password)
 
-            user = authenticate(request, username=username, password=password)
-
-            if user is not None:
-                login(request, user)
-                return dashboard(user)
+                if user is not None:
+                    login(request, user)  # Django login for real User/Admin
+                    messages.success(request, f"Welcome {user.username}!")
+                    return redirect("dashboard")  # adjust to your route
+                else:
+                    messages.error(request, "Invalid username or password")
             else:
-                messages.error(request, 'Invalid username or password')
+                messages.error(request, "Please correct the errors below.")
+        # ---- ATTENDEE LOGIN ----
+        elif login_type == "attendee":
+            email = request.POST.get("email")
+            attendee = Attendee.objects.filter(email=email).first()
+
+            if attendee:
+                # Store attendee in session
+                request.session["attendee_id"] = attendee.id
+                messages.success(request, f"Welcome back, {attendee.first_name}!")
+                return redirect("home")  # attendee homepage
+            else:
+                messages.error(request, "Attendee not found. Please register first.")
+
     else:
         form = AuthenticationForm()
-    return render(request, 'login.html', {'form': form})
+
+    return render(request, "login.html", {"form": AuthenticationForm()})
 
 def attendee_login(request):
+    print('Attendee Attempt...')
     if request.method == "POST":
         email = request.POST.get('email')  # ✅ use POST instead of clean_data
         user = Attendee.objects.filter(email=email).first()
@@ -396,6 +417,14 @@ def cancel_event(request, event_id):
 
     messages.success(request, f"The event '{event.title}' has been cancelled. Attendees notified.")
     return redirect("event_analytics", event_id=event.id)
+
+def logout_view(request):
+    logout(request)
+    return redirect('home')
+
+def logout_success(request):
+    return render(request, 'logout.html')
+
 
 def edit_event(request, event_id):
     """Edit an event and notify attendees of updates."""

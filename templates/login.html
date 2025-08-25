@@ -28,8 +28,9 @@
         <!-- Organizer Login -->
         <div class="tab-pane fade show active" id="organizer" role="tabpanel" aria-labelledby="organizer-tab">
           <h4 class="text-center mb-3">Organizer Login</h4>
-          <form method="post" action="{% url 'login' %}">
+          <form method="post">
             {% csrf_token %}
+            <input type="hidden" name="login_type" value="organizer">
             <div class="mb-3">
               <label for="username" class="form-label">Username</label>
               <input type="text" class="form-control" id="username" name="username" required>
@@ -51,9 +52,10 @@
         <!-- Attendee Login -->
         <div class="tab-pane fade" id="attendee" role="tabpanel" aria-labelledby="attendee-tab">
           <h4 class="text-center mb-3">Attendee Login</h4>
-          <form method="post" action="{% url 'attendee_login' %}">
+          <form method="post">
             {% csrf_token %}
             <div class="mb-3">
+              <input type="hidden" name="login_type" value="attendee">
               <label for="attendeeEmail" class="form-label">Email</label>
               <input type="email" class="form-control" id="attendeeEmail" name="email" required>
             </div>
@@ -69,4 +71,4 @@
 </div>
 
 {% endblock %}
-``
+``<input type="Password" class="form-control" id="password" password="Password" required>
