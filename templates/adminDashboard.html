@@ -18,32 +18,74 @@
     <!-- Stats Cards -->
     <div class="row g-3">
         <div class="col-md-3">
-            <div class="card p-3">
-                <div class="d-flex justify-content-between">
-                    <h6>Total Users</h6>
+            <div class="card border rounded-3 p-4 mb-3 shadow-sm">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h6 class="h6 text-muted mb-0">Total Users</h6>
+                    <!-- Bootstrap + icon -->
+                    <i class="bi bi-calender-lg text-muted fs-5"></i>
                 </div>
-                <h4>6</h4>
-                <small class="text-muted">Registered users</small>
+
+                <div>
+                    <p class="h2 fw-bold text-success mb-1">
+                        {{ total_users }}
+                    </p>
+                    <p class="text-muted small mb-0">Across all the events</p>
+
+                </div>
             </div>
         </div>
 
         <div class="col-md-3">
-            <div class="card p-3">
-                <div class="d-flex justify-content-between">
-                    <h6>Total Events</h6>
+            <div class="card border rounded-3 p-4 mb-3 shadow-sm">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h6 class="h6 text-muted mb-0">Total Published Events</h6>
+                    <!-- Bootstrap + icon -->
+                    <i class="bi bi-calender-lg text-muted fs-5"></i>
                 </div>
-                <h4>6</h4>
-                <small class="text-muted">Events created</small>
+
+                <div>
+                    <p class="h2 fw-bold text-success mb-1">
+                        {{ total_published_events }}
+                    </p>
+                    <p class="text-muted small mb-0">Across all the events</p>
+
+                </div>
             </div>
         </div>
 
         <div class="col-md-3">
-            <div class="card p-3">
-                <div class="d-flex justify-content-between">
-                    <h6>Total Users</h6>
+            <div class="card border rounded-3 p-4 mb-3 shadow-sm">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h6 class="h6 text-muted mb-0">Total Registration</h6>
+                    <!-- Bootstrap + icon -->
+                    <i class="bi bi-calender-lg text-muted fs-5"></i>
                 </div>
-                <h4>6</h4>
-                <small class="text-muted">Registered users</small>
+
+                <div>
+                    <p class="h2 fw-bold text-success mb-1">
+                        {{ total_registrations }}
+                    </p>
+                    <p class="text-muted small mb-0">Across all the events</p>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border rounded-3 p-4 mb-3 shadow-sm">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h6 class="h6 text-muted mb-0">Conversion Rate</h6>
+                    <!-- Bootstrap + icon -->
+                    <i class="bi bi-calender-lg text-muted fs-5"></i>
+                </div>
+
+                <div>
+                    <p class="h2 fw-bold text-success mb-1">
+                        {{ avg_conversion_rate }}
+                    </p>
+                    <p class="text-muted small mb-0">Across all the events</p>
+
+                </div>
             </div>
         </div>
     </div>
@@ -51,41 +93,32 @@
     <!-- Highlights -->
     <div class="row g-3">
         <!-- Top organizers -->
-         <div class="col-md-6">
-            <div class="card">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
                 <div class="card-body">
-                    <h6>Top organizers</h6>
+                    <h6>Top Organizers</h6>
                     <p class="text-muted small">Most successful event organizers</p>
 
-                    <!-- Organizer List -->
                     <ul class="list-group list-group-flush">
+                        {% for organizer in top_organizers %}
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             <div>
-                                <span class="badge bg-primary me-2">1</span>
-                                <strong>Nomsa Dlamini</strong>
-                                <small class="text-muted">8 events</small>
+                                <span class="badge bg-primary me-2">{{ forloop.counter }}</span>
+                                <strong>{{ organizer.organizer__username }}</strong>
+                                <small class="text-muted">{{ organizer.total_events }} events</small>
                             </div>
                             <div class="text-end">
-                                <strong>R890 000</strong>
-                                <small class="text-muted">2340 attendees</small>
+                                <small class="text-muted">{{ organizer.total_attendees }} attendees</small>
                             </div>
                         </li>
-
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <span class="badge bg-primary me-2">1</span>
-                                <strong>Nomsa Dlamini</strong>
-                                <small class="text-muted">8 events</small>
-                            </div>
-                            <div class="text-end">
-                                <strong>R890 000</strong>
-                                <small class="text-muted">2340 attendees</small>
-                            </div>
-                        </li>
+                        {% empty %}
+                        <li class="list-group-item">No organizers found</li>
+                        {% endfor %}
                     </ul>
                 </div>
             </div>
-         </div>
+        </div>
+
 
         <!-- Events by Category -->
         <div class="col-md-6">
@@ -94,10 +127,32 @@
                     <h6 class="card-title fw-bold">Events by Category</h6>
                     <p class="text-muted small">Distribution of event categories</p>
 
-                    <canvas id="categoryChart" height="200"></canvas>
+                    <canvas id="categoryPieChart"></canvas>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+  const ctx = document.getElementById('categoryPieChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: {{ chart_labels|safe }},
+      datasets: [{
+        data: {{ chart_data|safe }},
+        backgroundColor: {{ chart_colors|safe }},
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'bottom'
+        }
+      }
+    }
+  });
+</script>
 {% endblock content %}

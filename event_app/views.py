@@ -4,11 +4,12 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.paginator import Paginator
 from django.contrib.auth.forms import AuthenticationForm
-from django.db.models import Count, F
+from django.db.models import Count, F, Avg, Sum
 from datetime import datetime
 from django.utils import timezone
 import json
 from django.db.models.functions import TruncDate
+from django.utils.safestring import mark_safe
 
 from .forms import UserRegistrationForm, AdminUserCreationForm, EventAttendeeRegistrationForm, EventForm
 from .models import Event, Attendee, EventRegistration, CustomUser
@@ -16,7 +17,63 @@ from .utils import notify_event_attendees
 
 # Create your views here.
 def admin_dashboard(request):
-    return render(request, 'adminDashboard.html')
+    # Stats
+    total_users = CustomUser.objects.count()
+    total_published_events = Event.objects.filter(status=Event.PUBLISHED).count()
+    total_registrations = EventRegistration.objects.count()
+    total_views = Event.objects.aggregate(views=Sum("views_count"))["views"] or 0
+    avg_conversion_rate = round((total_registrations / total_views * 100), 1) if total_views > 0 else 0
+
+    # Top Organizers (ranked by attendees)
+    top_organizers = (
+        Event.objects.filter(status=Event.PUBLISHED)
+        .annotate(attendee_count=Count("attendees"))
+        .values("organizer__id", "organizer__username")
+        .annotate(
+            total_attendees=Count("attendees"),
+            total_events=Count("id")
+        )
+        .order_by("-total_attendees")[:5]  # Top 5
+    )
+
+    # Category usage for pie chart
+    category_counts = (
+        Event.objects.values("category")
+        .annotate(total=Count("id"))
+        .order_by("category")
+    )
+    total_events = Event.objects.count()
+    category_data = []
+    for c in category_counts:
+        percentage = (c["total"] / total_events * 100) if total_events > 0 else 0
+        category_data.append({
+            "category": c["category"],
+            "label": dict(Event.CATEGORY_CHOICES).get(c["category"], "Other"),
+            "percentage": round(percentage, 1),
+            "color": {
+                Event.MUSIC_ARTS: '#FF6384',
+                Event.BUSINESS: '#36A2EB',
+                Event.SPORTS: '#FFCE56',
+                Event.TECHNOLOGY: '#4BC0C0',
+                Event.FOOD_DRINK: '#9966FF',
+                Event.HEALTH_WELLNESS: '#FF9F40',
+                Event.EDUCATION: '#FF6384',
+                Event.COMMUNITY: '#C9CBCF',
+                Event.CHARITY: '#4BC0C0',
+                Event.GOVERNMENT: '#36A2EB',
+                Event.TOURISM: '#FFCE56'
+            }.get(c["category"], "#999999"),
+        })
+
+    context = {
+        "total_users": total_users,
+        "total_published_events": total_published_events,
+        "total_registrations": total_registrations,
+        "avg_conversion_rate": avg_conversion_rate,
+        "top_organizers": top_organizers,
+        "category_data": category_data,
+    }
+    return render(request, "adminDashboard.html", context)
 
 def register_view(request):
     if request.method == 'POST':
