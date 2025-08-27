@@ -470,3 +470,77 @@ def upcoming_events_view(request):
     page_number = request.GET.get('page')
     events = paginator.get_page(page_number)
     return render(request, 'upcoming_events.html', {'events': events})
+
+def attendee_overview(request, attendee_id):
+    attendee = get_object_or_404(Attendee, id=attendee_id)
+    now = timezone.now()
+
+    # Events the user is attending
+    events = Event.objects.filter(attendees=attendee).distinct()
+    
+    total_events = events.count()
+    
+    upcoming_events = events.filter(start_date__gte=now.date(), status=Event.PUBLISHED)
+    upcoming_events_count = upcoming_events.count()
+    
+    past_events = events.filter(start_date__lt=now.date(), status=Event.PUBLISHED)
+    past_events_count = past_events.count()
+
+    # Events grouped by category
+    category_data = events.values('category').annotate(
+        count=Count('id')
+    ).order_by('-count')
+    
+    # Prepare chart data
+    chart_labels = []
+    chart_data = []
+    chart_colors = []
+
+    # Color mapping for categories (same as organizer)
+    category_colors = {
+        Event.MUSIC_ARTS: '#FF6384',
+        Event.BUSINESS: '#36A2EB', 
+        Event.SPORTS: '#FFCE56',
+        Event.TECHNOLOGY: '#4BC0C0',
+        Event.FOOD_DRINK: '#9966FF',
+        Event.HEALTH_WELLNESS: '#FF9F40',
+        Event.EDUCATION: '#FF6384',
+        Event.COMMUNITY: '#C9CBCF',
+        Event.CHARITY: '#4BC0C0',
+        Event.GOVERNMENT: '#36A2EB',
+        Event.TOURISM: '#FFCE56'
+    }
+
+    for item in category_data:
+        category = item['category']
+        count = item['count']
+        percentage = round((count / total_events) * 100, 1) if total_events > 0 else 0
+        category_display = dict(Event.CATEGORY_CHOICES).get(category, category)
+        
+        chart_labels.append(category_display)
+        chart_data.append(percentage)
+        chart_colors.append(category_colors.get(category, '#C9CBCF'))
+
+    chart_data_json = json.dumps({
+        'labels': chart_labels,
+        'data': chart_data,
+        'colors': chart_colors
+    })
+
+    # Order events by start date (soonest first)
+    upcoming_events_ordered = upcoming_events.order_by('start_date')
+
+    print(f"Total registered events: {total_events}")
+    print(f"Upcoming events: {upcoming_events_count}, Past events: {past_events_count}")
+
+    context = {
+        'attendee': attendee.first_name,
+        'total_events': total_events,
+        'upcoming_events_count': upcoming_events_count,
+        'past_events_count': past_events_count,
+        'attendee_events': upcoming_events_ordered,  # or all events, if needed
+        'category_chart_data': chart_data_json,
+        'category_breakdown': category_data,
+    }
+
+    return render(request, 'attendee_dashboard.html', context)

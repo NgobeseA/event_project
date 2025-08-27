@@ -9,6 +9,7 @@ class CustomUser(AbstractUser):
     ROLE_CHOICES = [
         ('admin', 'Admin'),
         ('organizer', 'Organizer'),
+        ('attendee', 'Attendee'),
     ]
 
     contact_number = models.CharField(max_length=15, blank=True, null=True)
@@ -28,7 +29,7 @@ class Attendee(models.Model):
     last_name = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True, related_name='attendee_profile')
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, blank=True, null=True, related_name='attendee_profile')
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -37,6 +38,11 @@ class Attendee(models.Model):
         ordering = ['first_name', 'last_name']
         verbose_name = 'Attendee'
         verbose_name_plural = 'Attendees'
+
+    def get_favorited_events(self):
+        """Return all favorited events for this attendee"""
+        return Event.objects.filter(favorites__attendee=self)
+
     
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
@@ -130,6 +136,9 @@ class Event(models.Model):
     
     def organizer_name(self):
         return f'{self.organizer.first_name} {self.organizer.last_name}'
+    
+    def get_favorited_by(self):
+        return Attendee.objects.filter(event_favorites__event=self)
 
     @property
     def organizer_email(self):
@@ -212,3 +221,21 @@ class EventRegistration(models.Model):
             self.save()
             return True
         return False
+    
+    def __str__(self):
+        return f'{self.attendee} favorited "{self.event}" on {self.created_at}'
+    
+    class EventFavorite(models.Model):
+    attendee = models.ForeignKey('Attendee', on_delete=models.CASCADE, related_name='event_favorites')
+    event = models.ForeignKey('Event', on_delete=models.CASCADE, related_name='favorites')
+    favorited_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        unique_together = ('attendee', 'event')
+        ordering = ['-favorited_at']
+        verbose_name = 'Event Favorite'
+        verbose_name_plural = 'Event Favorites'
+
+    def __str__(self):
+        return f'{self.attendee} favorited "{self.event}" on {self.favorited_at}'
+    
