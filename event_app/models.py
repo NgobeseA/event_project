@@ -225,7 +225,7 @@ class EventRegistration(models.Model):
     def __str__(self):
         return f'{self.attendee} favorited "{self.event}" on {self.created_at}'
     
-    class EventFavorite(models.Model):
+class EventFavorite(models.Model):
     attendee = models.ForeignKey('Attendee', on_delete=models.CASCADE, related_name='event_favorites')
     event = models.ForeignKey('Event', on_delete=models.CASCADE, related_name='favorites')
     favorited_at = models.DateTimeField(default=timezone.now)
