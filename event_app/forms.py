@@ -198,3 +198,12 @@ class EventForm(forms.ModelForm):
             "status": forms.Select(attrs={"class": "form-select"}),
             "is_online": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
+class BudgetItemForm(forms.Form):
+    name = forms.CharField(max_length=100, required=False, widget=forms.TextInput(attrs={'placeholder': 'Item'}))
+    budget = forms.DecimalField(required=False, decimal_places=2, max_digits=10)
+    
+
+class EventBudgetForm(forms.Form):
+    event_name = forms.CharField(max_length=255)
+    date = forms.CharField(max_length=100)
+    total_budget = forms.DecimalField(decimal_places=2, max_digits=10)
