@@ -124,6 +124,9 @@ class Event(models.Model):
     image = models.ImageField(upload_to='event_images/', blank=True, null=True)
     tags = models.TextField(help_text='Comma-separated tags', blank=True)
 
+    max_attendees = models.PositiveIntegerField(blank=True, null=True)
+    registration_deadline = models.DateTimeField(blank=True, null=True)
+
     views_count = models.PositiveIntegerField(default=0, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
