@@ -18,7 +18,7 @@ urlpatterns = [
     path('login/', views.attendee_login, name='attendee_login'),
     path('logout/', views.logout_view, name='logout'),
     path("attendee/logout/", views.attendee_logout, name="attendee_logout"),
-     path('upcoming/', views.upcoming_events_view, name='upcoming_events'),
-    
+    path('upcoming/', views.upcoming_events_view, name='upcoming_events'),
+    path('attendee_overview/<int:attendee_id>/', views.attendee_overview, name='attendee_overview'),
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
