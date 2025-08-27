@@ -102,6 +102,7 @@ class Event(models.Model):
     category = models.CharField(max_length=80, choices=CATEGORY_CHOICES)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=DRAFT)
     organizer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='organized_events')
+    is_approved = models.BooleanField(default=False)
 
     attendees = models.ManyToManyField(
         Attendee,
