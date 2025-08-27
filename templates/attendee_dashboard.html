@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% block title %}Attendee Dashboard | EMS{% endblock title %}
+{% block content %}
+<div class="container p-4">
+    {% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="card p-4 bg-success text-white">
+        <h4>Welcome back, {{ attendee }} !</h4>
+        <p>Here's a summary of your upcoming events and activities.</p>
+    </div>
+
+    <div class="row g-3 mb-2 mt-2">
+        <div class="col-md-4">
+            <div class="card border rounded-3 p-4 mb-3 shadow-sm">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h6 class="h6 text-muted mb-0">Total Events Registered</h6>
+                    <i class="bi bi-calendar-check text-muted fs-5"></i>
+                </div>
+                <div>
+                    <p class="h2 fw-bold text-primary mb-1">{{ total_events }}</p>
+                    <p class="text-muted small mb-0">Events you've registered for</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border rounded-3 p-4 mb-3 shadow-sm">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h6 class="h6 text-muted mb-0">Upcoming Events</h6>
+                    <i class="bi bi-clock-history text-muted fs-5"></i>
+                </div>
+                <div>
+                    <p class="h2 fw-bold text-success mb-1">{{ upcoming_events_count }}</p>
+                    <p class="text-muted small mb-0">Starting from today</p>
+                </div>
+            </div>
+        </div>
+
+        
+
+    <!-- Registered events list -->
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="bg-white rounded shadow p-3 mb-3">
+                <h5 class="mb-3">Your Upcoming Events</h5>
+                {% if attendee_events %}
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Title</th>
+                            <th scope="col">Venue</th>
+                            <th scope="col">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for event in attendee_events %}
+                        <tr>
+                            <td><a href="{% url 'event_detail' event.pk %}">{{ event.title }}</a></td>
+                            <td>{{ event.venue }}</td>
+                            <td>{{ event.start_date }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-muted">You're not registered for any upcoming events.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="bg-white rounded shadow p-3 mb-3">
+                {% if total_events > 0 %}
+                <canvas id="categoryChart"></canvas>
+                {% else %}
+                <p class="text-muted">You haven't joined any events yet. Join some to see insights here!</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js pie chart -->
+<script>
+    {% if total_events > 0 %}
+    document.addEventListener('DOMContentLoaded', function () {
+        const chartData = JSON.parse('{{ category_chart_data|safe }}');
+        const ctx = document.getElementById('categoryChart').getContext('2d');
+
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: chartData.labels,
+                datasets: [{
+                    data: chartData.data,
+                    backgroundColor: chartData.colors,
+                    borderColor: '#ffffff',
+                    borderWidth: 2,
+                    hoverBorderWidth: 3,
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Events by Category',
+                        font: {
+                            size: 16,
+                            weight: 'bold'
+                        },
+                        padding: 20
+                    },
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 15,
+                            usePointStyle: true,
+                            font: {
+                                size: 12
+                            }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                const label = context.label || '';
+                                const value = context.parsed;
+                                return `${label}: ${value}%`;
+                            }
+                        },
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleColor: '#ffffff',
+                        bodyColor: '#ffffff',
+                        borderColor: '#ffffff',
+                        borderWidth: 1
+                    }
+                },
+                animation: {
+                    animateRotate: true,
+                    animateScale: true,
+                    duration: 1000
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                }
+            }
+        });
+    });
+    {% endif %}
+</script>
+{% endblock content %}
