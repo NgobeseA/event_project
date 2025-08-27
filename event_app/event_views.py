@@ -13,6 +13,8 @@ from django.utils.timezone import now
 from .models import Event, Attendee
 from .forms import EventAttendeeRegistrationForm, EventForm, EventRegistration
 from .utils import notify_event_attendees
+from django.forms import formset_factory
+from .forms import EventBudgetForm, BudgetItemForm
 
 def register_for_event(request, event_id):
     """Register an attendee for an event"""
@@ -178,3 +180,33 @@ def upcoming_events_view(request):
     page_number = request.GET.get('page')
     events = paginator.get_page(page_number)
     return render(request, 'upcoming_events.html', {'events': events})
+
+
+def event_budget_view(request):
+    BudgetItemFormSet = formset_factory(BudgetItemForm, extra=4)
+
+    if request.method == 'POST':
+        event_form = EventBudgetForm(request.POST)
+        venue_formset = BudgetItemFormSet(request.POST, prefix='venue')
+        catering_formset = BudgetItemFormSet(request.POST, prefix='catering')
+        decor_formset = BudgetItemFormSet(request.POST, prefix='decor')
+        program_formset = BudgetItemFormSet(request.POST, prefix='program')
+
+        if all([event_form.is_valid(), venue_formset.is_valid(), catering_formset.is_valid(), 
+                decor_formset.is_valid(), program_formset.is_valid()]):
+            # Save or process data here
+            return redirect('budget_success')  # Redirect to a success page
+    else:
+        event_form = EventBudgetForm()
+        venue_formset = BudgetItemFormSet(prefix='venue')
+        catering_formset = BudgetItemFormSet(prefix='catering')
+        decor_formset = BudgetItemFormSet(prefix='decor')
+        program_formset = BudgetItemFormSet(prefix='program')
+
+    return render(request, 'budget.html', {
+        'event_form': event_form,
+        'venue_formset': venue_formset,
+        'catering_formset': catering_formset,
+        'decor_formset': decor_formset,
+        'program_formset': program_formset,
+    })
