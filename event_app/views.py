@@ -1,5 +1,6 @@
 from django.shortcuts import render,redirect, get_object_or_404
 from django.contrib.auth import login, authenticate
+from django.contrib.auth import logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.paginator import Paginator
@@ -8,12 +9,12 @@ from django.db.models import Count, F, Avg, Sum
 from datetime import datetime
 from django.utils import timezone
 import json
-from django.db.models.functions import TruncDate
-from django.utils.safestring import mark_safe
+from django.utils.timezone import now
+
 
 from .forms import UserRegistrationForm, AdminUserCreationForm, EventAttendeeRegistrationForm, EventForm
 from .models import Event, Attendee, EventRegistration, CustomUser
-from .utils import notify_event_attendees
+
 
 # Create your views here.
 def admin_dashboard(request):
@@ -90,25 +91,46 @@ def register_view(request):
     return render(request, 'registration.html', {'form': form})
 
 def login_view(request):
-    if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
+    if request.method == "POST":
+        login_type = request.POST.get("login_type")  # "organizer" or "attendee"
 
-        if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
+        # ---- ORGANIZER/ADMIN LOGIN ----
+        if login_type == "organizer":
+            form = AuthenticationForm(request, data=request.POST)
+            if form.is_valid():
+                username = form.cleaned_data.get("username")
+                password = form.cleaned_data.get("password")
+                user = authenticate(request, username=username, password=password)
 
-            user = authenticate(request, username=username, password=password)
-
-            if user is not None:
-                login(request, user)
-                return dashboard(user)
+                if user is not None:
+                    login(request, user)  # Django login for real User/Admin
+                    messages.success(request, f"Welcome {user.username}!")
+                    return dashboard(user) # adjust to your route
+                else:
+                    messages.error(request, "Invalid username or password")
             else:
-                messages.error(request, 'Invalid username or password')
+                messages.error(request, "Please correct the errors below.")
+        # ---- ATTENDEE LOGIN ----
+        elif login_type == "attendee":
+            email = request.POST.get("email")
+            attendee = Attendee.objects.filter(email=email).first()
+
+            if attendee:
+                # Store attendee in session
+                request.session["attendee_id"] = attendee.id
+                request.session["attendee_name"] = attendee.first_name
+                messages.success(request, f"Welcome back, {attendee.first_name}!")
+                return redirect("home")  # attendee homepage
+            else:
+                messages.error(request, "Attendee not found. Please register first.")
+
     else:
         form = AuthenticationForm()
-    return render(request, 'login.html', {'form': form})
+
+    return render(request, "login.html", {"form": AuthenticationForm()})
 
 def attendee_login(request):
+    print('Attendee Attempt...')
     if request.method == "POST":
         email = request.POST.get('email')  # ✅ use POST instead of clean_data
         user = Attendee.objects.filter(email=email).first()
@@ -122,6 +144,12 @@ def attendee_login(request):
             messages.error(request, "User not found!!")
     return render(request, 'login.html')
 
+def attendee_logout(request):
+    """Logs out an attendee by clearing session data"""
+    if "attendee_id" in request.session:
+        request.session.flush()  # clears all session data
+        messages.success(request, "You have been logged out successfully.")
+    return redirect("home")
 
 def dashboard(user):
     if is_admin(user): 
@@ -145,31 +173,6 @@ def admin_create_user(request):
     else:
         form = AdminUserCreationForm()
     return render(request, 'create_user.html', {'form': form})
-
-def register_for_event(request, event_id):
-    """Register an attendee for an event"""
-    event = get_object_or_404(Event,  id=event_id, status=Event.PUBLISHED)
-
-    can_register, message = event.can_register()
-    if not can_register:
-        messages.error(request, message)
-        return redirect('event_details', event_id=event_id)
-    
-    if request.method == 'POST':
-        form = EventAttendeeRegistrationForm(event=event, data=request.POST)
-        if form.is_valid():
-            try:
-                registration = form.save()
-                messages.success(request, f'Successfully registered for {event.title}')
-                return redirect('event_details')
-            except Exception as e:
-                messages.error(request, f'Registration failed: {str(e)}')
-        else:
-            messages.error(request, f'Please correct the errors below.')
-    else:
-        form = EventAttendeeRegistrationForm(event=event)
-    
-    return render(request, 'event_details.html', {'form': form, 'event': event})
 
 
 def event_attendees(request, event):
@@ -289,137 +292,18 @@ def organizer_overview(request):
 
     return render(request, 'organizer_dashboard.html', context)
 
-@login_required
-def create_event(request):
-    if request.method == "POST":
-        form = EventForm(request.POST, request.FILES)
-        if form.is_valid():
-            event = form.save(commit=False)
-            event.organizer = request.user  # attach logged-in user
-            event.save()
-            form.save_m2m()  # save tags/relations
-            return redirect("organizer_overview")  # redirect after success
-    else:
-        form = EventForm()
+def logout_view(request):
+    logout(request)
+    return redirect('home')
 
-    return render(request, "create_event.html", {"form": form})
+def logout_success(request):
+    return render(request, 'logout.html')
 
-def view_event(request, event_id):
-    """
-    View function for displaying details of a single event.
-    
-    Retrieves an event by its primary key (pk) and renders the event detail page.
-    
-    """
-    event = get_object_or_404(Event, id=event_id)
-    
-    organizer = event.organizer
-    organizer_name = event.organizer_name()  # This method already exists in your model
-    organizer_contact = organizer.contact_number
-    organizer_email = organizer.email
-
-    # user_contact = user.mobile_number
-    session_key = f'viewed_event_{event_id}'
-    if not request.session.get(session_key):
-        Event.objects.filter(id=event_id).update(views_count=F('views_count')+1)
-        event.refresh_from_db()
-        request.session[session_key] = True
-    
-    form = EventAttendeeRegistrationForm(event=event)
-
-    context = {
-        'event': event,
-        'organizer_name': organizer_name,
-        'organizer_email': organizer_email,
-        'organizer_contact': organizer_contact,
-        'form': form,
-    }
-    return render(request, 'event_details.html', context)
-
-@login_required
-def event_analytics(request, event_id):
-    user = request.user
-    event = get_object_or_404(Event, id=event_id)
-
-    # Ensure only organizer can see analytics
-    if user != event.organizer:
-        messages.error(request, 'You are not permitted to access this page.')
-        return redirect('event_details', event_id=event.id)
-
-    # Example: if you have a field `views` in Event
-    total_views = event.views_count 
-
-    # Total registrations (attendees linked via EventRegistration)
-    total_registrations = event.attendees.count()
-
-    # Conversion rate (avoid division by zero)
-    conversion_rate = 0
-    if total_views > 0:
-        conversion_rate = round((total_registrations / total_views) * 100, 1)
-
-    # List of registered attendees
-    registered_users = event.attendees.all()
-
-    # Group registrations by date
-    registrations_over_time = (
-        EventRegistration.objects.filter(event=event)
-        .annotate(date=TruncDate("registered_at"))
-        .values("date")
-        .annotate(count=Count("id"))
-        .order_by("date")
-    )
-
-    
-    context = {
-        'event': event,
-        'total_views': total_views,
-        'total_registrations': total_registrations,
-        'conversion_rate': conversion_rate,
-        'registered_users': registered_users,
-        'registrations_over_time': list(registrations_over_time),
-    }
-
-    return render(request, 'event_analytics.html', context)
-
-@login_required
-def cancel_event(request, event_id):
-    """Cancel an event and notify all attendees."""
-    event = get_object_or_404(Event, id=event_id, organizer=request.user)
-
-    # Update status
-    event.status = Event.CANCELLED
-    event.save()
-
-    # Notify attendees
-    subject = f"Event Cancelled: {event.title}"
-    notify_event_attendees(event, subject, "event_cancelled")
-
-    messages.success(request, f"The event '{event.title}' has been cancelled. Attendees notified.")
-    return redirect("event_analytics", event_id=event.id)
-
-def edit_event(request, event_id):
-    """Edit an event and notify attendees of updates."""
-    event = get_object_or_404(Event, id=event_id, organizer=request.user)
-
-    if request.method == "POST":
-        form = EventForm(request.POST, instance=event)
-        if form.is_valid():
-            form.save()
-
-            # Notify attendees
-            subject = f"Event Updated: {event.title}"
-            notify_event_attendees(event, subject, "event_updated")
-
-            messages.success(request, f"The event '{event.title}' was updated and attendees notified.")
-            return redirect("event_details", event_id=event.id)
-    else:
-        form = EventForm(instance=event)
-
-    return render(request, "events/edit_event.html", {"form": form, "event": event})
 
 def home_view(request):
     events = Event.objects.filter(status=Event.PUBLISHED)
     return render(request, 'home.html', {'events': events})
+
 
 def attendee_overview(request, attendee_id):
     attendee = get_object_or_404(Attendee, id=attendee_id)
@@ -491,8 +375,7 @@ def attendee_overview(request, attendee_id):
         'attendee_events': upcoming_events_ordered,  # or all events, if needed
         'category_chart_data': chart_data_json,
         'category_breakdown': category_data,
-        'favorited_events': favorited_events,
-        'favorited_events_count': favorited_events_count,
     }
 
     return render(request, 'attendee_dashboard.html', context)
+
