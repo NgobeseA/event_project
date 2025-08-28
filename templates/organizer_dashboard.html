@@ -151,6 +151,18 @@
 
 <!-- JavaScript chart -->
 <script>
+    const socket = new WebSocket("ws://" + window.location.host + "/ws/events/");
+
+    socket.onmessage = (e) => {
+        const data = JSON.parse(e.data);
+
+        alert(`Event "${data.title}" was ${data.status}!`);
+    }
+
+    socket.onclose = (e) => {
+        console.error("Websocket closed unexpectedly");
+    }
+
     {% if total_events > 0 %}
     document.addEventListener('DOMContentLoaded', function () {
         // Get chart data from Django context

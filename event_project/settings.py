@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'event_app',
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -71,6 +72,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'event_project.wsgi.application'
 
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {'hosts': [('127.0.0.1', 6379)],}
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
@@ -129,3 +136,7 @@ AUTH_USER_MODEL = 'event_app.CustomUser'
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 DEFAULT_FROM_EMAIL = "andilekngobese@gmail.com"
+
+
+ORGANIZER_WEBHOOK_URL = 'http://127.0.0.1:8000/webhooks/event-status/'
+ADMIN_WEBHOOK_URL = 'http://127.0.0.1:8000/webhooks/events/'

@@ -2,8 +2,10 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 from . import views, event_views
+from .admin import custom_admin_site
 
 urlpatterns = [
+    path('admin/', custom_admin_site.urls),
     path('', views.home_view, name='home'),
     path('register/', views.register_view, name='register'),
     path('login/', views.login_view, name='login'),

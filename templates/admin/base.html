@@ -1,0 +1,10 @@
+{% extends "admin/base.html" %}
+{% block sidebar %}
+{{ block.super }}
+<hr>
+<ul class="nav flex-column">
+  <li class="nav-item">
+    <a class="nav-link" href="{% url 'custom-admin:pending-events' %}">📌 Pending Events</a>
+  </li>
+</ul>
+{% endblock %}

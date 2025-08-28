@@ -1,0 +1,44 @@
+{% extends "admin/base_site.html" %}
+{% block title %}Preview Event{% endblock %}
+
+{% block content %}
+<div class="contianer">
+    <div class="card shadow-sm p-4" style="max-width: 800px; margin: auto;">
+        <h4 class="mb-3">{{ event.title }}</h4>
+
+        <p><strong>Organizer:</strong> {{ event.organizer }}</p>
+        <p><strong>Category:</strong> {{ event.get_category_display }}</p>
+        <p><strong>Status:</strong> 
+            {% if event.is_approved %}
+                <span class="badge bg-success">Approved</span>
+            {% else %}
+                <span class="badge bg-warning">Pending</span>
+            {% endif %}
+        </p>
+        <p><strong>Description:</strong></p>
+        <p>{{ event.description }}</p>
+
+        <p><strong>Venue:</strong> {{ event.venue }} ({{ event.city }})</p>
+        <p><strong>Start:</strong> {{ event.start_date }} {{ event.start_time }}</p>
+        <p><strong>End:</strong> {{ event.end_date }} {{ event.end_time }}</p>
+
+        {% if event.image %}
+        <div class="mt-3">
+            <img src="{{ event.image.url }}" alt="Event Image" class="img-fluid rounded">
+        </div>
+        {% endif %}
+
+        <form method="post" class="mt-4 d-flex gap-2">
+            {% csrf_token %}
+            <button type="submit" name="action" value="approve" class="btn btn-success">
+                ✅ Approve
+            </button>
+            <button type="submit" name="action" value="reject" class="btn btn-danger">
+                ❌ Reject
+            </button>
+            <a href=".." class="btn btn-secondary">⬅ Back</a>
+        </form>
+    </div>
+</div>
+
+{% endblock content %}

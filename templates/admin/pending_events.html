@@ -1,0 +1,29 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<h1>Pending Events for Approval</h1>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Start Date</th>
+      <th>Organizer</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for event in pending_events %}
+    <tr>
+      <td>{{ event.title }}</td>
+      <td>{{ event.start_date }}</td>
+      <td>{{ event.organizer }}</td>
+      <td>
+        <a href="{% url 'admin:event_app_event_change' event.id %}" class="button">Review</a>
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="4">No pending events 🎉</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

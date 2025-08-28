@@ -9,6 +9,9 @@ from datetime import datetime
 from django.utils import timezone
 from django.core.paginator import Paginator
 from django.utils.timezone import now
+import requests
+from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
 
 from .models import Event, Attendee
 from .forms import EventAttendeeRegistrationForm, EventForm, EventRegistration
@@ -210,3 +213,41 @@ def event_budget_view(request):
         'decor_formset': decor_formset,
         'program_formset': program_formset,
     })
+
+def publish_event(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+
+    event.status = Event.PUBLISHED
+    event.save()
+
+    payload = {
+        'event_id': event.id,
+        'title': event.title,
+        'organizer': event.organizer.username,
+        'status': 'PUBLISHED'
+    }
+
+    try:
+        requests.post(settings.ADMIN_WEBHOOK_URL, json=payload, timeout=5)
+    except request.exceptions.RequestException as e:
+        message.error(request, f'webhook failed: {e}. Contact system support.')
+        print('Webhook failed:', e)
+    
+    messages.success(request, f"Event '{event.title}' published and sent for approval!")
+    return redirect('event_analytics', event_id=event.id)
+
+@csrf_exempt
+def event_status_webhook(request):
+    if request.method == 'post':
+        try:
+            data = json.loads(request.body)
+            event_id = data.get('event_id')
+            status = data.get('status')
+
+            Event.objects.filter(id=event_id).update(is_approved=True if status == 'APPROVED' else False)
+
+            return JsonResponse({'message': 'Event status updated'}, status=200)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+    return JsonResponse({'error': 'Invalid method'}, status=405)
