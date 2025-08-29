@@ -53,7 +53,8 @@ def create_event(request):
             event.organizer = request.user  # attach logged-in user
             event.save()
             form.save_m2m()  # save tags/relations
-            return redirect("organizer_overview")  # redirect after success
+            return redirect('event_budget', event_id=event.id)
+            
     else:
         form = EventForm()
 
@@ -185,11 +186,11 @@ def upcoming_events_view(request):
     return render(request, 'upcoming_events.html', {'events': events})
 
 
-def event_budget_view(request):
+def event_budget_view(request, event_id):
     BudgetItemFormSet = formset_factory(BudgetItemForm, extra=4)
-
+    event = get_object_or_404(Event, event_id=event_id)
     if request.method == 'POST':
-        event_form = EventBudgetForm(request.POST)
+        event_form = EventBudgetForm(request.POST, event=event)
         venue_formset = BudgetItemFormSet(request.POST, prefix='venue')
         catering_formset = BudgetItemFormSet(request.POST, prefix='catering')
         decor_formset = BudgetItemFormSet(request.POST, prefix='decor')

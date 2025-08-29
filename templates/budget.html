@@ -100,6 +100,7 @@
     </style>
     <div class="content pt-1 pb-2">
     <div class="container">
+  {% include "partials/progress_bar.html" with step=2 %}
     <h1>Event Budget</h1>
     <form method="post">
         {% csrf_token %}
@@ -118,6 +119,8 @@
                     <td>{{ form.budget }}</td>
                 </tr>
                 {% endfor %}
+              
+
             </table>
         </div>
 
