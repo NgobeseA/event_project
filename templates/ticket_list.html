@@ -1,0 +1,12 @@
+<h1>My Tickets</h1>
+<ul>
+  {% for ticket in tickets %}
+    <li>
+      <a href="{% url 'ticket_detail' ticket.id %}">
+        {{ ticket.title }} — {{ ticket.get_status_display }}
+      </a>
+    </li>
+  {% empty %}
+    <li>No tickets yet.</li>
+  {% endfor %}
+</ul>

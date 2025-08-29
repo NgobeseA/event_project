@@ -1,4 +1,5 @@
 from django.contrib import admin
+from .models import Ticket
 from django.contrib.auth.admin import UserAdmin
 from .models import CustomUser, Attendee
 

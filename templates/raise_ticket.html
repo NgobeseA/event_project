@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Submit a Support Ticket</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f6fa;
+            padding: 40px;
+            
+        }
+
+        h1 {
+            text-align: center;
+            color: #2f3640;
+        }
+
+        form {
+            background: #ffffff;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #127f3a;
+            font-weight: bold;
+        }
+
+        select,
+        input[type="text"],
+        input[type="email"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        button {
+            background-color: #0c6514;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #077426;
+        }
+    </style>
+</head>
+<body>
+    <h1>Submit a Support Ticket</h1>
+    <form method="post" >
+      {% csrf_token %}
+        <label for="title">Title:</label>
+        <select name="title" id="title" required>
+            <option value="Mr">Mr</option>
+            <option value="Mrs">Mrs</option>
+        </select>
+
+        <label for="first_name">First Name:</label>
+        <input type="text" name="first_name" id="first_name" required>
+
+        <label for="last_name">Last Name:</label>
+        <input type="text" name="last_name" id="last_name" required>
+
+        <label for="email">Email:</label>
+        <input type="email" name="email" id="email" required>
+
+        <label for="message">Message:</label>
+        <textarea name="message" id="message" required></textarea>
+
+        <button type="submit" class="btn btn-outline-success">Submit</button>
+    </form>
+</body>
+</html>

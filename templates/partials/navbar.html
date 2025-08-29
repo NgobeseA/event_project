@@ -26,6 +26,11 @@
         <li class="nav-item">
           <a class="nav-link" href="{% url 'organizer_overview' %}">Overview</a>
         </li>
+
+         <li class="nav-item">
+          <a class="nav-link" href="{% url 'raise_ticket' %}">Log A Ticket</a>
+        </li>
+
         {%endif%}
         <li class="nav-item">
           <a class="nav-link" href="">Gallery</a>
@@ -47,6 +52,11 @@
               <li class="nav-item">
           <a class="nav-link" href="">My Events</a>
         </li>
+
+         <li class="nav-item">
+          <a class="nav-link" href="{% url 'upcoming_events' %}">Events</a>
+        </li>
+
             <li>
               <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
             </li>
