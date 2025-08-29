@@ -153,7 +153,7 @@ def attendee_logout(request):
 
 def dashboard(user):
     if is_admin(user): 
-      return redirect('home')
+      return redirect('admin/dashboard')
     else:
         return redirect('organizer_overview')
 
@@ -378,4 +378,3 @@ def attendee_overview(request, attendee_id):
     }
 
     return render(request, 'attendee_dashboard.html', context)
-

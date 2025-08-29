@@ -21,5 +21,5 @@ from event_app.admin import custom_admin_site
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('event_app.urls')),
-    path('custom-admin/', custom_admin_site.urls), 
+    path('custom-admin/', custom_admin_site.urls, name='custom_admin'), 
 ]

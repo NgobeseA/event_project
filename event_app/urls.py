@@ -5,7 +5,6 @@ from . import views, event_views
 from .admin import custom_admin_site
 
 urlpatterns = [
-    path('admin/', custom_admin_site.urls),
     path('', views.home_view, name='home'),
     path('register/', views.register_view, name='register'),
     path('login/', views.login_view, name='login'),
@@ -23,5 +22,4 @@ urlpatterns = [
     path('upcoming/', event_views.upcoming_events_view, name='upcoming_events'),
     path('attendee_overview/<int:attendee_id>/', views.attendee_overview, name='attendee_overview'),
     path('event-budget/', event_views.event_budget_view, name='event_budget'),
-    
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
