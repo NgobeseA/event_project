@@ -64,7 +64,7 @@
                     <tbody>
                         {% for event in attendee_events %}
                         <tr>
-                            <td><a href="{% url 'event_detail' event.pk %}">{{ event.title }}</a></td>
+                            <td><a href="{% url 'event_details' event.pk %}">{{ event.title }}</a></td>
                             <td>{{ event.venue }}</td>
                             <td>{{ event.start_date }}</td>
                         </tr>
