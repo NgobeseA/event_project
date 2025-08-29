@@ -1,0 +1,59 @@
+<div class="container my-4">
+  <div class="d-flex justify-content-between align-items-center position-relative">
+    <!-- Step 1 -->
+    <div class="text-center flex-fill position-relative">
+      <div class="step-circle {% if step >= 1 %}bg-success text-white{% else %}bg-light text-muted{% endif %}">
+        1
+      </div>
+      <small class="{% if step >= 1 %}text-success{% else %}text-muted{% endif %}">
+        Event Information
+      </small>
+    </div>
+
+    <!-- Line between step 1 and 2 -->
+    <div class="progress-line {% if step >= 2 %}bg-success{% else %}bg-light{% endif %}"></div>
+
+    <!-- Step 2 -->
+    <div class="text-center flex-fill position-relative">
+      <div class="step-circle {% if step >= 2 %}bg-success text-white{% else %}bg-light text-muted{% endif %}">
+        2
+      </div>
+      <small class="{% if step >= 2 %}text-success{% else %}text-muted{% endif %}">
+        Event Budget
+      </small>
+    </div>
+
+    <!-- Line between step 2 and 3 -->
+    <div class="progress-line {% if step >= 3 %}bg-success{% else %}bg-light{% endif %}"></div>
+
+    <!-- Step 3 -->
+    <div class="text-center flex-fill position-relative">
+      <div class="step-circle {% if step >= 3 %}bg-success text-white{% else %}bg-light text-muted{% endif %}">
+        3
+      </div>
+      <small class="{% if step >= 3 %}text-success{% else %}text-muted{% endif %}">
+        Summary
+      </small>
+    </div>
+  </div>
+</div>
+
+<style>
+.step-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto 5px;
+  font-weight: bold;
+}
+
+.progress-line {
+  flex: 1;
+  height: 4px;
+  margin: 0 5px;
+  border-radius: 2px;
+}
+</style>
