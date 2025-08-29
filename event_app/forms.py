@@ -1,10 +1,18 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
-
+from .models import Ticket
 from .models import Attendee, Event, EventRegistration
 
 User = get_user_model()
+
+class TicketForm(forms.ModelForm):
+    class Meta:
+        model = Ticket
+        fields = ['title', 'message']
+        widgets = {
+            'message': forms.Textarea(attrs={'rows': 4}),
+        }
 
 class UserRegistrationForm(UserCreationForm):
     first_name = forms.CharField(max_length=30, required=True, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'First Name'}))
@@ -198,6 +206,20 @@ class EventForm(forms.ModelForm):
             "status": forms.Select(attrs={"class": "form-select"}),
             "is_online": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
+
+
+class TicketForm(forms.ModelForm):
+    class Meta:
+        model = Ticket
+        fields = ['title', 'first_name', 'last_name', 'email', 'message']
+        widgets = {
+            'title': forms.Select(attrs={'class': 'form-control'}),
+            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'message': forms.Textarea(attrs={'class': 'form-control'}),
+        }
+
 class BudgetItemForm(forms.Form):
     name = forms.CharField(max_length=100, required=False, widget=forms.TextInput(attrs={'placeholder': 'Item'}))
     budget = forms.DecimalField(required=False, decimal_places=2, max_digits=10)

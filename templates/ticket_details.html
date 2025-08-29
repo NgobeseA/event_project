@@ -1,0 +1,7 @@
+<h1>{{ ticket.title }}</h1>
+<p>Status: {{ ticket.get_status_display }}</p>
+<p>{{ ticket.message }}</p>
+{% if ticket.admin_response %}
+  <h3>Response:</h3>
+  <p>{{ ticket.admin_response }}</p>
+{% endif %}

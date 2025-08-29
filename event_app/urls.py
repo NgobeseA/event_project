@@ -2,7 +2,7 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 from . import views, event_views
-from .admin import custom_admin_site
+from .views import raise_ticket, ticket_list, ticket_detail
 
 urlpatterns = [
     path('', views.home_view, name='home'),
@@ -21,5 +21,12 @@ urlpatterns = [
     path("attendee/logout/", views.attendee_logout, name="attendee_logout"),
     path('upcoming/', event_views.upcoming_events_view, name='upcoming_events'),
     path('attendee_overview/<int:attendee_id>/', views.attendee_overview, name='attendee_overview'),
+
+    path('raise/', raise_ticket, name='raise_ticket'),
+    path('my-tickets/', ticket_list, name='ticket_list'),
+    path('ticket/<int:ticket_id>/', ticket_detail, name='ticket_detail'),
+    path('submit-ticket/', views.submit_ticket, name='submit_ticket'),
+    path('ticket-success/', views.ticket_success, name='ticket_success'),
+    
     path('event-budget/', event_views.event_budget_view, name='event_budget'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

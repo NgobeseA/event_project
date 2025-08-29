@@ -10,6 +10,10 @@ from datetime import datetime
 from django.utils import timezone
 import json
 from django.utils.timezone import now
+from .models import Ticket
+from .forms import TicketForm
+from django.conf import settings
+from django.core.mail import send_mail
 
 
 from .forms import UserRegistrationForm, AdminUserCreationForm, EventAttendeeRegistrationForm, EventForm
@@ -378,3 +382,47 @@ def attendee_overview(request, attendee_id):
     }
 
     return render(request, 'attendee_dashboard.html', context)
+
+def raise_ticket(request):
+    if request.method == 'POST':
+        form = TicketForm(request.POST)
+        if form.is_valid():
+            ticket = form.save(commit=False)
+            ticket.user = request.user
+            ticket.save()
+            # Optional: send email notification
+            send_mail(
+                f"New ticket from {request.user.username}",
+                ticket.message,
+                settings.DEFAULT_FROM_EMAIL,
+                [settings.ADMIN_EMAIL]
+            )
+            return render(request, 'tickets/success.html')
+    else:
+        form = TicketForm()
+    return render(request, 'raise_ticket.html', {'form': form})
+
+def submit_ticket(request):
+    if request.method == 'POST':
+        form = TicketForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('ticket_success')
+    else:
+        form = TicketForm()
+    return render(request, 'submit_ticket.html', {'form': form})
+
+def ticket_success(request):
+    return render(request, 'ticket_success.html')
+
+@login_required
+def ticket_list(request):
+    tickets = Ticket.objects.filter(user=request.user)
+    return render(request, 'tickets/ticket_list.html', {'tickets': tickets})
+
+@login_required
+def ticket_detail(request, ticket_id):
+    ticket = get_object_or_404(Ticket, id=ticket_id, user=request.user)
+    return render(request, 'tickets/ticket_detail.html', {'ticket': ticket})
+
+

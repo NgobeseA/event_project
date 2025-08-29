@@ -1,4 +1,5 @@
 from django.contrib import admin
+from .models import Ticket
 from django.contrib.auth.admin import UserAdmin
 from django.urls import path
 from django.shortcuts import get_object_or_404, redirect, render
