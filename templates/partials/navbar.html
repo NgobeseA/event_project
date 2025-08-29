@@ -14,11 +14,7 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="{% url 'home' %}"
-            >Home</a
-          >
-        </li>
+       
         <li class="nav-item">
           <a class="nav-link" href="{% url 'upcoming_events' %}">Events</a>
         </li>
@@ -31,7 +27,8 @@
           <a class="nav-link" href="">Gallery</a>
         </li>
       </ul>
-      <div class="ms-auto">
+      <div class="ms-auto d-flex gap-3 align-items-center">
+      
         {% if user.is_authenticated%}
         <div class="dropdown text-end">
           <a
@@ -85,6 +82,10 @@
         </div>
         {% endif %}
         {%endif%}
+        <form class="d-flex" role="search" method="get" action="{% url 'search' %}">
+  <input class="form-control me-2" name="query" value="{{ request.GET.query }}" type="search" placeholder="Search events..." aria-label="Search" autofocus />
+  <button class="btn btn-success" type="submit">Search</button>
+</form>
       </div>
     </div>
   </div>

@@ -120,7 +120,7 @@ def login_view(request):
                 request.session["attendee_id"] = attendee.id
                 request.session["attendee_name"] = attendee.first_name
                 messages.success(request, f"Welcome back, {attendee.first_name}!")
-                return redirect("home")  # attendee homepage
+                return redirect("attendee_overview", attendee.id)  # attendee homepage
             else:
                 messages.error(request, "Attendee not found. Please register first.")
 
@@ -139,7 +139,7 @@ def attendee_login(request):
             # You might want to "log in" the attendee in session
             request.session['attendee_id'] = user.id
             messages.success(request, f"Welcome back, {user.first_name}!")
-            return redirect('home')
+            return redirect('attendee_overview')
         else:
             messages.error(request, "User not found!!")
     return render(request, 'login.html')
@@ -378,4 +378,7 @@ def attendee_overview(request, attendee_id):
     }
 
     return render(request, 'attendee_dashboard.html', context)
+
+
+
 
