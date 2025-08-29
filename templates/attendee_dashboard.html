@@ -45,13 +45,26 @@
             </div>
         </div>
 
+          <div class="col-md-4">
+            <div class="card border rounded-3 p-4 mb-3 shadow-sm">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h6 class="h6 text-muted mb-0">Liked Events</h6>
+                    <i class="bi bi-heart-fill (red) text-muted fs-5"></i>
+                </div>
+                <div>
+                    <p class="h2 fw-bold text-primary mb-1">{{ total_events }}</p>
+                    <p class="text-muted small mb-0">Events you've liked</p>
+                </div>
+            </div>
+        </div>
+
         
 
     <!-- Registered events list -->
     <div class="row g-3">
         <div class="col-md-6">
             <div class="bg-white rounded shadow p-3 mb-3">
-                <h5 class="mb-3">Your Upcoming Events</h5>
+                <h5 class="mb-3">Announcements & Updates</h5>
                 {% if attendee_events %}
                 <table class="table">
                     <thead>
@@ -79,11 +92,8 @@
 
         <div class="col-md-6">
             <div class="bg-white rounded shadow p-3 mb-3">
-                {% if total_events > 0 %}
-                <canvas id="categoryChart"></canvas>
-                {% else %}
-                <p class="text-muted">You haven't joined any events yet. Join some to see insights here!</p>
-                {% endif %}
+        
+                <p class="text-muted">Do you want to log a ticket? Click <a href="">here</a>to log a ticket!</p>
             </div>
         </div>
     </div>
