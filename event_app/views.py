@@ -379,3 +379,6 @@ def attendee_overview(request, attendee_id):
 
     return render(request, 'attendee_dashboard.html', context)
 
+
+
+

@@ -1,7 +1,6 @@
 {%extends 'base.html' %}
 {% block content %}
  <style>
-
         .container {
             background-color: white;
             border-radius: 12px;
@@ -15,50 +14,48 @@
             margin-left: auto;
             margin-right: auto;
             margin-top: 40px; 
-        
-
         }
-
         h1, h2 {
             text-align: center;
             color: #222;
         }
-
         form {
             width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
-
+        .row-sections {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            width: 100%;
+            justify-content: center;
+        }
+        .section {
+            margin-bottom: 20px;
+            width: 45%;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
         table {
-            width: 70%;
+            width: 90%;
             border-collapse: collapse;
             margin-bottom: 5px;
-           
         }
-
         th, td {
             border: 1px solid #ccc;
             padding: 6px 8px;
             text-align: center;
             font-size: 15px;
         }
-
         th {
             background-color: rgb(7, 109, 55);
             color: white;
             font-size: 16px;
         }
-
-        .section {
-            margin-bottom: 20px;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
         input[type="text"],
         input[type="number"] {
             width: 90%;
@@ -66,7 +63,6 @@
             box-sizing: border-box;
             text-align: center;
         }
-
         .event-details {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -74,18 +70,15 @@
             margin-bottom: 30px;
             justify-items: center;
         }
-
         label {
             font-weight: bold;
             display: block;
             margin-bottom: 5px;
             text-align: center;
         }
-
         .form-group {
             margin-bottom: 10px;
         }
-
         button {
             display: block;
             margin: 0 auto;
@@ -96,6 +89,16 @@
             font-size: 16px;
             cursor: pointer;
             color: white;
+        }
+        @media (max-width: 900px) {
+            .section {
+                width: 100%;
+                min-width: unset;
+            }
+            .row-sections {
+                flex-direction: column;
+                gap: 0;
+            }
         }
     </style>
     <div class="content pt-1 pb-2">
@@ -108,59 +111,59 @@
             {{ event_form.date.label_tag }} {{ event_form.date }}
         </div>
 
-        <div class="section">
-            <h2>Venue</h2>
-            <table>
-                <tr><th style="width: 60%;">Item</th><th style="width: 40%;">Budget</th></tr>
-                {% for form in venue_formset %}
-                <tr>
-                    <td>{{ form.name }}</td>
-                    <td>{{ form.budget }}</td>
-                </tr>
-                {% endfor %}
-            </table>
+        <div class="row-sections">
+            <div class="section">
+                <h2>Venue</h2>
+                <table>
+                    <tr><th style="width: 60%;">Item</th><th style="width: 40%;">Budget</th></tr>
+                    {% for form in venue_formset %}
+                    <tr>
+                        <td>{{ form.name }}</td>
+                        <td>{{ form.budget }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            <div class="section">
+                <h2>Catering</h2>
+                <table>
+                    <tr><th style="width: 60%;">Item</th><th style="width: 40%;">Budget</th></tr>
+                    {% for form in catering_formset %}
+                    <tr>
+                        <td>{{ form.name }}</td>
+                        <td>{{ form.budget }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
         </div>
 
-        <div class="section">
-            <h2>Catering</h2>
-            <table>
-                <tr><th style="width: 60%;">Item</th><th style="width: 40%;">Budget</th></tr>
-                {% for form in catering_formset %}
-                <tr>
-                    <td>{{ form.name }}</td>
-                    <td>{{ form.budget }}</td>
-                </tr>
-                {% endfor %}
-            </table>
+        <div class="row-sections">
+            <div class="section">
+                <h2>Décor & Tools</h2>
+                <table>
+                    <tr><th style="width: 60%;">Item</th><th style="width: 40%;">Budget</th></tr>
+                    {% for form in decor_formset %}
+                    <tr>
+                        <td>{{ form.name }}</td>
+                        <td>{{ form.budget }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            <div class="section">
+                <h2>Program</h2>
+                <table>
+                    <tr><th style="width: 60%;">Item</th><th style="width: 40%;">Budget</th></tr>
+                    {% for form in program_formset %}
+                    <tr>
+                        <td>{{ form.name }}</td>
+                        <td>{{ form.budget }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
         </div>
-
-        <div class="section">
-            <h2>Décor & Tools</h2>
-            <table>
-                <tr><th style="width: 60%;">Item</th><th style="width: 40%;">Budget</th></tr>
-                {% for form in decor_formset %}
-                <tr>
-                    <td>{{ form.name }}</td>
-                    <td>{{ form.budget }}</td>
-                </tr>
-                {% endfor %}
-            </table>
-        </div>
-
-        <div class="section">
-            <h2>Program</h2>
-            <table>
-                <tr><th style="width: 60%;">Item</th><th style="width: 40%;">Budget</th></tr>
-                {% for form in program_formset %}
-                <tr>
-                    <td>{{ form.name }}</td>
-                    <td>{{ form.budget }}</td>
-                </tr>
-                {% endfor %}
-            </table>
-        </div>
-
-     
     </form>
 
     <div class="section">
@@ -224,5 +227,4 @@ document.addEventListener('input', function(e) {
 });
 document.addEventListener('DOMContentLoaded', updateTotals);
 </script>
-
 {% endblock %}

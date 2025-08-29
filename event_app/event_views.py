@@ -251,3 +251,14 @@ def event_status_webhook(request):
             return JsonResponse({'error': str(e)}, status=400)
 
     return JsonResponse({'error': 'Invalid method'}, status=405)
+
+def search_events(request):
+    query = request.GET.get('query', '')
+    print(query)
+    events = Event.objects.filter(title=query.strip())
+ 
+    print(f"about to print events: {events}")
+    for event in events:
+        print(event.title)
+    
+    return render(request,'upcoming_events.html', {'events': events})

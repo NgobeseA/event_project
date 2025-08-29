@@ -3,46 +3,40 @@
 {% load static %}
 
 <div class="container p-4">
-<h2 class="h2" style="text-align:center">Upcoming Events</h2>
+<h2 class="h2" style="text-align:center">Our Events</h2>
 
 <div class="row">
   {% for event in events %}
-  <div class="col-md-3 p-3">
-    <div class="card" style="width: 18rem; border-radius: 5px;">
+  <div class="col-md-4 p-4">
+    <div class="card h-100 shadow-lg border-0 rounded-4" style="overflow: hidden; min-height: 430px;">
       {% if event.image %}
-      <img src="{{ event.image.url }}" class="card-img-top" height="160px" alt="{{ event.title }}">
+        <img src="{{ event.image.url }}" class="card-img-top" style="height: 220px; object-fit: cover;" alt="{{ event.title }}">
       {% else %}
-      <img src="{% static 'images/default1.jpg' %}" class="card-img-top" alt="Default Event Image">
+        <img src="{% static 'images/default1.jpg' %}" class="card-img-top" style="height: 220px; object-fit: cover;" alt="Default Event Image">
       {% endif %}
-      <div class="card-body text-center bg-light text-dark">
-        <h5 class="card-title">{{ event.title }}</h5>
-        <p class="card-text">{{ event.start_date }}</p>
-        <a href="{% url 'event_details' event.pk %}" class="btn btn-primary">View More</a>
+      <div class="card-header text-white text-center" style="background: linear-gradient(90deg, #1f7032 0%, #45d279 100%);">
+        <h4 class="mb-0 font-weight-bold" style="letter-spacing: 1px;">{{ event.title }}</h4>
       </div>
-    </div>
-  </div>
-
-  <!-- Modal -->
-  <div class="modal fade" id="eventModal{{ event.id }}" tabindex="-1" aria-labelledby="eventModalLabel{{ event.id }}"
-    aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
-      <div class="modal-content bg-modal">
-        <div class="modal-header">
-          <h5 class="modal-title" id="eventModalLabel{{ event.id }}">{{ event.title }}</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      <div class="card-body bg-opacity-10text-dark py-4 text-center">
+        <div class="d-flex justify-content-center align-items-center mb-3" style="gap: 18px;">
+          <p class="card-text mb-2" style="font-size: 1rem; font-weight: 600; display: flex; align-items: center;">
+            <i class="far fa-calendar-alt mr-2 text-success"></i>{{ event.start_date }}
+          </p>
+          <p class="card-text mb-2" style="font-size: 1rem; font-weight: 600; display: flex; align-items: center;">
+            <i class="far fa-clock mr-2 text-success"></i>{{ event.start_time }}
+          </p>
         </div>
-        <div class="modal-body">
-          <p><strong>Organizer:</strong> {{ event.organizer}}</p>
-          <p><strong>Date:</strong> {{ event.start_date }}</p>
-          <p><strong>Time:</strong> {{ event.time }}</p>
-          <p><strong>Location:</strong> {{ event.city }}</p>
-          <p><strong>Description:</strong> {{ event.description }}</p>
-
+        <div class="d-flex justify-content-center align-items-center mb-3" style="gap: 18px;">
+          <p class="card-text mb-3" style="font-size: 1rem; font-weight: 600; display: flex; align-items: center;">
+            <i class="fas fa-map-marker-alt mr-2 text-success"></i>{{ event.city }}
+          </p>
+          <p class="card-text mb-3" style="font-size: 1rem; font-weight: 600; display: flex; align-items: center;">
+            <i class="fas fa-tag mr-2 text-success"></i>{{ event.category }}
+          </p>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Close</button>
-        </div>
+        <a href="{% url 'event_details' event.pk %}" class="btn btn-success btn-block py-2" style="font-size: 1.1rem; font-weight: 600;">View More</a>
       </div>
+      
     </div>
   </div>
   {% endfor %}

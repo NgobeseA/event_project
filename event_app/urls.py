@@ -23,5 +23,6 @@ urlpatterns = [
     path('upcoming/', event_views.upcoming_events_view, name='upcoming_events'),
     path('attendee_overview/<int:attendee_id>/', views.attendee_overview, name='attendee_overview'),
     path('event-budget/', event_views.event_budget_view, name='event_budget'),
+    path('search/', event_views.search_events, name='search'),
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -2,7 +2,7 @@
 {%load static%}
 {% block title %}Home | EMS{% endblock title %}
 {%block content %}
-<section id="hero" class="container-fluid mt-4">
+<section id="hero" class="container-fluid mt-4 p-4">
   <!-- <div class="container text-start">
     <h1 class="hero-title">Plan, Execute, <br>And Enjoy events</h1>
     <p class="hero-subtitle">
@@ -29,7 +29,7 @@
   </div>
 {% endif %}
     <div class="row align-items-center flex-md-row flex-column-reverse text-center text-md-start">
-      <div class="col-md-6 hero-content">
+      <div class="col-md-6 hero-content ">
         <h1 class="mb-3">Plan, Execute, <br>And Enjoy events</h1>
         <p class="mb-4">Create, manage, and promote events with our intuitive event management
       system. From conferences to weddings, we've got you covered.
@@ -55,13 +55,13 @@
 </section>
 <section id="upcoming-events">
   <div class="container">
-    <div class="py-5 text-center">
-      <h1 class="category-title" >Upcoming Events</h1>
+    <div class="py-3 text-center">
       <p>
         Join us for exciting events! Exhibition, career expo, workshops, live
         music and more.
       </p>
-      <hr class="section-divider">
+      <h1 class="category-title mb-2">Upcoming Events</h1>
+      <hr class="section-divider mb-3">
     </div>
     <!-- filter form in events -->
     <div>
@@ -72,28 +72,25 @@
     <!-- list of events -->
     <div class="row">
       {% for event in events %}
-      <div class="col-md-3 p-3">
-    <div class="card" style="width: 18rem; border-radius: 5px;">
-      {% if event.image %}
-      <img src="{{ event.image.url }}" class="card-img-top" height="160px" alt="{{ event.title }}">
-      {% else %}
-      <img src="{% static 'images/default1.jpg' %}" class="card-img-top" alt="Default Event Image">
-      {% endif %}
-      <div class="card-body text-center bg-light text-dark">
-        <h5 class="card-title">{{ event.title }}</h5>
-        <p class="card-text">{{ event.start_date }}</p>
-        <a href="{% url 'event_details' event.pk %}" class="btn btn-primary">View More</a>
+      <div class="col-md-3 d-flex align-items-stretch">
+        <div class="card w-100 h-100" style="border-radius: 8px; min-height: 320px;">
+          {% if event.image %}
+            <img src="{{ event.image.url }}" class="card-img-top" style="height: 160px; object-fit: cover; border-top-left-radius: 8px; border-top-right-radius: 8px;" alt="{{ event.title }}">
+          {% else %}
+            <img src="{% static 'images/default1.jpg' %}" class="card-img-top" style="height: 160px; object-fit: cover; border-top-left-radius: 8px; border-top-right-radius: 8px;" alt="Default Event Image">
+          {% endif %}
+          <div class="card-body text-center bg-light text-dark d-flex flex-column justify-content-between" style="height: 160px;">
+            <h5 class="card-title" style="font-size: 1.1rem;">{{ event.title }}</h5>
+            <p class="card-text mb-2">{{ event.start_date }}</p>
+            <a href="{% url 'event_details' event.pk %}" class="btn btn-success mt-auto">View More</a>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
       {% empty %}
       <p class="text-muted">No events found.</p>
       {% endfor %}
     </div>
     <!-- end list of events -->
-
-</div>
-
   </div>
 </section>
 {% endblock content %}
