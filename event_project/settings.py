@@ -140,3 +140,6 @@ DEFAULT_FROM_EMAIL = "andilekngobese@gmail.com"
 
 ORGANIZER_WEBHOOK_URL = 'http://127.0.0.1:8000/webhooks/event-status/'
 ADMIN_WEBHOOK_URL = 'http://127.0.0.1:8000/webhooks/events/'
+
+LOGIN_URL = 'login'
+#LOGIN_REDIRECT_URL = 'dashboard'

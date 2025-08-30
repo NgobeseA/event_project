@@ -1,0 +1,54 @@
+{% extends "admin/base.html" %}
+{% block title %}All Users | SMAAG {% endblock title %}
+{% block content %}
+<!-- I want to have a heading on the rigth -->
+<div class="d-flex p-2">
+    <div>
+        <h3>System Users</h3>
+        <p class="text-muted">Total Result: {{total_result}}</p>
+    </div>
+    <a href="{% url 'register' %}">Add User</a>
+    <div>
+        <h6>Filter by:</h6>
+        <form action="" method="get">
+            <label for="email">Email:</label>
+            {{filter.form.email}}
+            <label for="role">Role:</label>
+            {{filter.form.role}}
+            <label for="registered_month">Register Month</label>
+            {{filter.form.registered_month}}
+            <button type="submit" class="btn btn-primary w-100">Filter</button>
+            <a href="{% url 'users' %}" class="btn btn-secondary w-100">Reset</a>
+        </form>
+    </div>
+</div>
+
+<div>
+    {% if page_obj %}
+    <table class="table">
+        <thead>
+            <tr>
+            <th scope="col">#</th>
+            <th scope="col">First Name</th>
+            <th scope="col">Last Name</th>
+            <th scope="col">Email</th>
+            <th scope="col">Role</th>
+            <th scope="col">Joined At</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in page_obj %}
+            <tr>
+                <th scope="row"></th>
+                <td>{{user.first_name}}</td>
+                <td>{{user.last_name}}</td>
+                <td>{{user.email}}</td>
+                <td>{{user.role}}</td>
+                <td>{{user.joined_at}}</td>
+            </tr>
+            {%endfor%}
+        </tbody>
+    </table>
+    {%endif%}
+</div>
+{% endblock content %}

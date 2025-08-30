@@ -66,7 +66,26 @@
             <div class="bg-white rounded shadow p-3 mb-3">
                 <h5 class="mb-3">Announcements & Updates</h5>
                 {% if attendee_events %}
-                <p class="text-muted">You have no updates for any events.</p>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Title</th>
+                            <th scope="col">Venue</th>
+                            <th scope="col">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for event in attendee_events %}
+                        <tr>
+                            <td><a href="{% url 'event_details' event.pk %}">{{ event.title }}</a></td>
+                            <td>{{ event.venue }}</td>
+                            <td>{{ event.start_date }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-muted">You're not registered for any upcoming events.</p>
                 {% endif %}
             </div>
         </div>
