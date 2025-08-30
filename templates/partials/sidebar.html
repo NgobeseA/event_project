@@ -1,0 +1,35 @@
+<div class="d-flex flex-column p-3 bg-light vh-100" style="width: 250px;">
+    <h4 class="text-center">SMAAG</h4>
+    <hr>
+    <ul class="nav nav-pills flex-column mb-auto">
+        <li class="nav-item">
+            <a href="{% url 'admin_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_dashboard' %} active {% endif %}">
+                <i class="bi bi-speedometer2"></i> Dashboard
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a href="{% url 'admin_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_dashboard' %} active {% endif %}">
+                <i class="bi bi-calender-events"></i> Events
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a href="{% url 'users' %}" class="nav-link {% if request.resolver_match.url_name == 'users' %} active {% endif %}">
+                <i class="bi bi-people"></i> Users
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a href="{% url 'admin_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_dashboard' %} active {% endif %}">
+                <i class="bi bi-bell"></i> Notifications
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a href="{% url 'logout' %}" class="nav-link">
+                <i class="bi bi-bell"></i> Logout
+            </a>
+        </li>
+    </ul>
+</div>

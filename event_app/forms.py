@@ -182,7 +182,7 @@ class EventForm(forms.ModelForm):
             "title", "description", "category", "status",
             "start_date", "end_date", "start_time", "end_time",
             "venue", "city", "is_online", "online_link", "image", "tags",
-            "max_attendee", "registration_deadline",
+            "max_attendees", "registration_deadline",
         ]
         widgets = {
             "start_date": forms.DateInput(attrs={"type": "date", "class": "form-control"}),
@@ -198,7 +198,7 @@ class EventForm(forms.ModelForm):
             "category": forms.Select(attrs={"class": "form-select"}),
             "status": forms.Select(attrs={"class": "form-select"}),
             "is_online": forms.CheckboxInput(attrs={"class": "form-check-input"}),
-            "max_attendee": forms.NumberInput(attrs={"type": "date", "class": "form-control"}),
+            "max_attendees": forms.NumberInput(attrs={"type": "date", "class": "form-control"}),
             "registration_deadline": forms.DateInput(attrs={"type": "date", "class": "form-control"}),
 
         }
