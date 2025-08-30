@@ -181,7 +181,8 @@ class EventForm(forms.ModelForm):
         fields = [
             "title", "description", "category", "status",
             "start_date", "end_date", "start_time", "end_time",
-            "venue", "city", "is_online", "online_link", "image", "tags"
+            "venue", "city", "is_online", "online_link", "image", "tags",
+            "max_attendees", "registration_deadline",
         ]
         widgets = {
             "start_date": forms.DateInput(attrs={"type": "date", "class": "form-control"}),
@@ -197,6 +198,9 @@ class EventForm(forms.ModelForm):
             "category": forms.Select(attrs={"class": "form-select"}),
             "status": forms.Select(attrs={"class": "form-select"}),
             "is_online": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+            "max_attendees": forms.NumberInput(attrs={"type": "date", "class": "form-control"}),
+            "registration_deadline": forms.DateInput(attrs={"type": "date", "class": "form-control"}),
+
         }
 class BudgetItemForm(forms.Form):
     name = forms.CharField(max_length=100, required=False, widget=forms.TextInput(attrs={'placeholder': 'Item'}))

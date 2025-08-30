@@ -16,10 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from event_app.admin import custom_admin_site
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('event_app.urls')),
-    path('custom-admin/', custom_admin_site.urls), 
+    path('', include('event_app.urls')), 
 ]

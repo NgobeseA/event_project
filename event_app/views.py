@@ -1,9 +1,9 @@
 from django.shortcuts import render,redirect, get_object_or_404
 from django.contrib.auth import login, authenticate
-from django.contrib.auth import logout
+from django.contrib.auth import logout, get_user_model
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.forms import AuthenticationForm
 from django.db.models import Count, F, Avg, Sum
 from datetime import datetime
@@ -14,8 +14,9 @@ from django.utils.timezone import now
 
 from .forms import UserRegistrationForm, AdminUserCreationForm, EventAttendeeRegistrationForm, EventForm
 from .models import Event, Attendee, EventRegistration, CustomUser
+from .filters import UserFilter
 
-
+User = get_user_model()
 # Create your views here.
 def admin_dashboard(request):
     # Stats
@@ -120,7 +121,7 @@ def login_view(request):
                 request.session["attendee_id"] = attendee.id
                 request.session["attendee_name"] = attendee.first_name
                 messages.success(request, f"Welcome back, {attendee.first_name}!")
-                return redirect("home")  # attendee homepage
+                return redirect("attendee_overview", attendee.id)  # attendee homepage
             else:
                 messages.error(request, "Attendee not found. Please register first.")
 
@@ -139,7 +140,7 @@ def attendee_login(request):
             # You might want to "log in" the attendee in session
             request.session['attendee_id'] = user.id
             messages.success(request, f"Welcome back, {user.first_name}!")
-            return redirect('home')
+            return redirect('attendee_overview')
         else:
             messages.error(request, "User not found!!")
     return render(request, 'login.html')
@@ -153,7 +154,7 @@ def attendee_logout(request):
 
 def dashboard(user):
     if is_admin(user): 
-      return redirect('home')
+      return redirect('admin_dashboard')
     else:
         return redirect('organizer_overview')
 
@@ -379,3 +380,32 @@ def attendee_overview(request, attendee_id):
 
     return render(request, 'attendee_dashboard.html', context)
 
+@login_required
+def users_list_view(request):
+    user = request.user
+
+    if is_admin(user):
+        users = User.objects.select_related('attendee_profile').all()
+        user_filter = UserFilter(request.GET, queryset=users)
+
+        paginator = Paginator(user_filter.qs, 20)
+        page_number = request.GET.get('page')
+
+        try:
+            page_obj = paginator.page(page_number)
+        except PageNotAnInteger:
+            page_obj = paginator.page(1)
+        except EmptyPage:
+            page_obj = paginator.page(paginator.number_pages)
+        
+        context = {
+            'total_result': user_filter.qs.count(),
+            'filter': user_filter,
+            'page_obj': page_obj
+        }
+
+
+        return render(request, 'admin/users.html', context)
+    else:
+        messages.warning(request, 'Only admin can access this page. Please contact the admin')
+        return redirect('home')

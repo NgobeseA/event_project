@@ -110,6 +110,6 @@ class EventAdmin(admin.ModelAdmin):
         )
         return render(request, 'admin/preview.html', context)
 
-custom_admin_site.register(CustomUser, CustomUserAdmin)
-custom_admin_site.register(Attendee)
-custom_admin_site.register(Event, EventAdmin)
+admin.register(CustomUser, CustomUserAdmin)
+admin.register(Attendee)
+admin.register(Event, EventAdmin)
