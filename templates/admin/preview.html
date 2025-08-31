@@ -1,44 +1,545 @@
-{% extends "admin/base_site.html" %}
-{% block title %}Preview Event{% endblock %}
-
+{% extends "admin/base.html" %}
+{% block title %}Preview Event{% endblock title %}
 {% block content %}
-<div class="contianer">
-    <div class="card shadow-sm p-4" style="max-width: 800px; margin: auto;">
-        <h4 class="mb-3">{{ event.title }}</h4>
+<style>
+    .preview-container {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
 
-        <p><strong>Organizer:</strong> {{ event.organizer }}</p>
-        <p><strong>Category:</strong> {{ event.get_category_display }}</p>
-        <p><strong>Status:</strong> 
-            {% if event.is_approved %}
-                <span class="badge bg-success">Approved</span>
-            {% else %}
-                <span class="badge bg-warning">Pending</span>
-            {% endif %}
-        </p>
-        <p><strong>Description:</strong></p>
-        <p>{{ event.description }}</p>
+    .preview-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+    }
 
-        <p><strong>Venue:</strong> {{ event.venue }} ({{ event.city }})</p>
-        <p><strong>Start:</strong> {{ event.start_date }} {{ event.start_time }}</p>
-        <p><strong>End:</strong> {{ event.end_date }} {{ event.end_time }}</p>
+    .event-image {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
 
-        {% if event.image %}
-        <div class="mt-3">
-            <img src="{{ event.image.url }}" alt="Event Image" class="img-fluid rounded">
+    .status-pending {
+        background-color: #0d6efd !important;
+    }
+
+    .status-draft {
+        background-color: #6c757d !important;
+    }
+
+    .info-card {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1.5rem;
+        border-left: 4px solid #667eea;
+    }
+
+    .budget-card {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        border-radius: 8px;
+        padding: 1.5rem;
+    }
+
+    .budget-item {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 6px;
+        padding: 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .approval-section {
+        background: #fff;
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        border: 2px solid #e9ecef;
+    }
+
+    .approval-section.pending {
+        border-color: #ffc107;
+        background: #fff9e6;
+    }
+
+    .organizer-card {
+        background: white;
+        border-radius: 8px;
+        padding: 1rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .organizer-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 1.2rem;
+    }
+
+    .detail-section {
+        padding: 2rem;
+    }
+
+    .section-title {
+        color: #495057;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .tag-item {
+        background: #e7f3ff;
+        color: #0066cc;
+        border-radius: 20px;
+        padding: 0.25rem 0.75rem;
+        font-size: 0.875rem;
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+        display: inline-block;
+    }
+
+    .rejection-form {
+        background: #fff5f5;
+        border: 1px solid #feb2b2;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 1rem;
+        display: none;
+    }
+
+    .notification-toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        min-width: 300px;
+    }
+</style>
+
+<div class="row">
+    <!-- Main Event Preview -->
+    <div class="col-lg-8">
+        <div class="preview-container">
+            <!-- Header -->
+            <div class="preview-header">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h1 class="mb-2">{{ event.title }}</h1>
+                        <div class="d-flex gap-2 align-items-center">
+                            {% if event.status == 'pending' %}
+                            <span class="badge status-pending px-3 py-2">
+                                <i class="fas fa-clock me-1"></i>
+                                Pending Approval
+                            </span>
+                            {% elif event.status == 'draft' %}
+                            <span class="badge status-draft px-3 py-2">
+                                <i class="fas fa-edit me-1"></i>
+                                Draft
+                            </span>
+                            {% endif %}
+
+                            {% if event.category == 'music-arts' %}
+                            <span class="badge bg-purple" style="background-color: #6f42c1 !important;">Music &
+                                Arts</span>
+                            {% elif event.category == 'business' %}
+                            <span class="badge bg-primary">Business & Professional</span>
+                            {% elif event.category == 'sports' %}
+                            <span class="badge bg-warning text-dark">Sports & Fitness</span>
+                            {% elif event.category == 'technology' %}
+                            <span class="badge bg-info">Technology</span>
+                            {% elif event.category == 'food-drink' %}
+                            <span class="badge bg-orange" style="background-color: #fd7e14 !important;">Food &
+                                Drink</span>
+                            {% elif event.category == 'health-wellness' %}
+                            <span class="badge bg-success">Health & Wellness</span>
+                            {% elif event.category == 'education' %}
+                            <span class="badge bg-dark">Education & Learning</span>
+                            {% elif event.category == 'community' %}
+                            <span class="badge bg-secondary">Community & Culture</span>
+                            {% elif event.category == 'charity' %}
+                            <span class="badge bg-pink" style="background-color: #d63384 !important;">Charity &
+                                Fundraising</span>
+                            {% elif event.category == 'government' %}
+                            <span class="badge bg-indigo" style="background-color: #6610f2 !important;">Government &
+                                Politics</span>
+                            {% elif event.category == 'tourism' %}
+                            <span class="badge bg-teal" style="background-color: #20c997 !important;">Tourism &
+                                Hospitality</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <small class="opacity-75">Submitted on</small>
+                        <div>{{ event.created_at|date:"M d, Y g:i A" }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Event Details -->
+            <div class="detail-section">
+                <!-- Event Image -->
+                {% if event.image %}
+                <div class="mb-4">
+                    <img src="{{ event.image.url }}" alt="{{ event.title }}" class="event-image">
+                </div>
+                {% endif %}
+
+                <!-- Description -->
+                <div class="mb-4">
+                    <h4 class="section-title">
+                        <i class="fas fa-align-left me-2"></i>
+                        Event Description
+                    </h4>
+                    <p class="lead">{{ event.description|linebreaks }}</p>
+                </div>
+
+                <!-- Event Information Grid -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6">
+                        <div class="info-card">
+                            <h5>
+                                <i class="fas fa-calendar-alt text-primary me-2"></i>
+                                Date & Time
+                            </h5>
+                            <div class="mb-2">
+                                <strong>Start:</strong> {{ event.start_date|date:"l, M d, Y" }} at {{
+                                event.start_time|time:"g:i A" }}
+                            </div>
+                            <div class="mb-2">
+                                <strong>End:</strong> {{ event.end_date|date:"l, M d, Y" }} at {{
+                                event.end_time|time:"g:i A" }}
+                            </div>
+                            {% if event.registration_deadline %}
+                            <div class="text-warning">
+                                <i class="fas fa-clock me-1"></i>
+                                <strong>Registration Deadline:</strong> {{ event.registration_deadline|date:"M d, Y g:i
+                                A" }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-card">
+                            <h5>
+                                <i class="fas fa-map-marker-alt text-danger me-2"></i>
+                                Location
+                            </h5>
+                            {% if event.is_online %}
+                            <div class="mb-2">
+                                <span class="badge bg-info mb-2">
+                                    <i class="fas fa-globe me-1"></i>
+                                    Online Event
+                                </span>
+                            </div>
+                            {% if event.online_link %}
+                            <div>
+                                <strong>Meeting Link:</strong><br>
+                                <a href="{{ event.online_link }}" target="_blank" class="text-break">
+                                    {{ event.online_link }}
+                                </a>
+                            </div>
+                            {% endif %}
+                            {% else %}
+                            <div class="mb-2">
+                                <strong>Venue:</strong> {{ event.venue }}
+                            </div>
+                            <div>
+                                <strong>City:</strong> {{ event.city }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Capacity & Registration -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6">
+                        <div class="info-card">
+                            <h5>
+                                <i class="fas fa-users text-success me-2"></i>
+                                Capacity & Registration
+                            </h5>
+                            {% if event.max_attendees %}
+                            <div class="mb-2">
+                                <strong>Max Attendees:</strong> {{ event.max_attendees }}
+                            </div>
+                            {% else %}
+                            <div class="mb-2">
+                                <strong>Capacity:</strong> <span class="text-success">Unlimited</span>
+                            </div>
+                            {% endif %}
+                            <div>
+                                <strong>Current Registrations:</strong> {{ event.attendees.count }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-card">
+                            <h5>
+                                <i class="fas fa-eye text-info me-2"></i>
+                                Engagement
+                            </h5>
+                            <div class="mb-2">
+                                <strong>Views:</strong> {{ event.views_count }}
+                            </div>
+                            <div>
+                                <strong>Last Updated:</strong> {{ event.updated_at|date:"M d, Y g:i A" }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tags -->
+                {% if event.tags %}
+                <div class="mb-4">
+                    <h4 class="section-title">
+                        <i class="fas fa-tags me-2"></i>
+                        Tags
+                    </h4>
+                    
+                </div>
+                {% endif %}
+            </div>
         </div>
-        {% endif %}
+    </div>
 
-        <form method="post" class="mt-4 d-flex gap-2">
-            {% csrf_token %}
-            <button type="submit" name="action" value="approve" class="btn btn-success">
-                ✅ Approve
-            </button>
-            <button type="submit" name="action" value="reject" class="btn btn-danger">
-                ❌ Reject
-            </button>
-            <a href=".." class="btn btn-secondary">⬅ Back</a>
-        </form>
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <!-- Organizer Information -->
+        <div class="organizer-card mb-4">
+            <h5 class="section-title">
+                <i class="fas fa-user-tie me-2"></i>
+                Event Organizer
+            </h5>
+            <div class="d-flex align-items-center mb-3">
+                <div class="organizer-avatar me-3">
+                    {% if event.organizer.first_name %}
+                    {{ event.organizer.first_name|first|upper }}{{ event.organizer.last_name|first|upper }}
+                    {% else %}
+                    {{ event.organizer.username|first|upper }}
+                    {% endif %}
+                </div>
+                <div>
+                    <h6 class="mb-1">
+                        {% if event.organizer.first_name or event.organizer.last_name %}
+                        {{ event.organizer.first_name }} {{ event.organizer.last_name }}
+                        {% else %}
+                        {{ event.organizer.username }}
+                        {% endif %}
+                    </h6>
+                    <small class="text-muted">@{{ event.organizer.username }}</small>
+                </div>
+            </div>
+            <div class="mb-2">
+                <i class="fas fa-envelope text-muted me-2"></i>
+                {{ event.organizer.email }}
+            </div>
+            <div class="mb-2">
+                <i class="fas fa-calendar text-muted me-2"></i>
+                Member since {{ event.organizer.date_joined|date:"M Y" }}
+            </div>
+            <div>
+                <a href="" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-user me-1"></i>
+                    View Profile
+                </a>
+            </div>
+        </div>
+
+        <!-- Budget Information -->
+        <div class="budget-card mb-4">
+            <h5 class="mb-3">
+                <i class="fas fa-dollar-sign me-2"></i>
+                Event Budget
+            </h5>
+
+            {% if event.budget %}
+            <div class="budget-item">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span><strong>Total Budget:</strong></span>
+                    <span class="h5 mb-0">${{ event.budget.total_amount|floatformat:2 }}</span>
+                </div>
+            </div>
+
+            {% if event.budget.venue_cost %}
+            <div class="budget-item">
+                <div class="d-flex justify-content-between">
+                    <span>Venue Cost:</span>
+                    <span>${{ event.budget.venue_cost|floatformat:2 }}</span>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if event.budget.catering_cost %}
+            <div class="budget-item">
+                <div class="d-flex justify-content-between">
+                    <span>Catering:</span>
+                    <span>${{ event.budget.catering_cost|floatformat:2 }}</span>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if event.budget.equipment_cost %}
+            <div class="budget-item">
+                <div class="d-flex justify-content-between">
+                    <span>Equipment:</span>
+                    <span></span>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if event.budget.marketing_cost %}
+            <div class="budget-item">
+                <div class="d-flex justify-content-between">
+                    <span>Marketing:</span>
+                    <span></span>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if event.budget.other_costs %}
+            <div class="budget-item">
+                <div class="d-flex justify-content-between">
+                    <span>Other Costs:</span>
+                    <span>${{ event.budget.other_costs|floatformat:2 }}</span>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if event.budget.notes %}
+            <div class="budget-item">
+                <small>
+                    <strong>Budget Notes:</strong><br>
+                    {{ event.budget.notes }}
+                </small>
+            </div>
+            {% endif %}
+            {% else %}
+            <div class="budget-item text-center">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                No budget information provided
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Approval Section -->
+        <div class="approval-section {% if event.status == 'pending' %}pending{% endif %}">
+            <h5 class="section-title">
+                <i class="fas fa-gavel me-2"></i>
+                Admin Decision
+            </h5>
+
+            {% if event.status == 'pending' %}
+            <div class="alert alert-warning">
+                <i class="fas fa-clock me-2"></i>
+                <strong>Awaiting Approval</strong><br>
+                This event is pending your review and decision.
+            </div>
+
+            <div class="d-grid gap-2">
+                <button type="button" class="btn btn-success btn-lg">
+                    <i class="fas fa-check-circle me-2"></i>
+                    Approve Event
+                </button>
+                <button type="button" class="btn btn-danger btn-lg">
+                    <i class="fas fa-times-circle me-2"></i>
+                    Reject Event
+                </button>
+            </div>
+
+            <!-- Rejection Form -->
+            <div class="rejection-form" id="rejectionForm">
+                <h6 class="text-danger mb-3">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Reason for Rejection
+                </h6>
+                <form id="rejectEventForm">
+                    <div class="mb-3">
+                        <label for="rejectionReason" class="form-label">Please provide a reason:</label>
+                        <textarea class="form-control" id="rejectionReason" rows="3"
+                            placeholder="Explain why this event cannot be approved..." required></textarea>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-ban me-1"></i>
+                            Confirm Rejection
+                        </button>
+                        <button type="button" class="btn btn-secondary">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+            {% elif event.status == 'published' %}
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle me-2"></i>
+                <strong>Event Approved</strong><br>
+                This event has been approved and is now live.
+            </div>
+            <div class="d-grid">
+                <a href="" class="btn btn-primary">
+                    <i class="fas fa-external-link-alt me-2"></i>
+                    View Live Event
+                </a>
+            </div>
+            {% elif event.status == 'rejected' %}
+            <div class="alert alert-danger">
+                <i class="fas fa-times-circle me-2"></i>
+                <strong>Event Rejected</strong><br>
+                This event has been rejected.
+            </div>
+            <div class="d-grid">
+                <button type="button" class="btn btn-success">
+                    <i class="fas fa-redo me-2"></i>
+                    Reconsider & Approve
+                </button>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-tools me-2"></i>
+                    Quick Actions
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-edit me-2"></i>
+                        Edit Event
+                    </a>
+                    <a href="" class="btn btn-outline-info btn-sm">
+                        <i class="fas fa-list me-2"></i>
+                        View Registrations
+                    </a>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="contactOrganizer()">
+                        <i class="fas fa-envelope me-2"></i>
+                        Contact Organizer
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
+
+<!-- Navigation -->
+<div class="position-fixed bottom-0 end-0 p-3">
+    <a href="{% url 'events' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left me-2"></i>
+        Back to Events List
+    </a>
+</div>
 {% endblock content %}

@@ -43,7 +43,7 @@ class NotificationConsumer(WebsocketConsumer):
         
     def disconnect(self, close_code):
         if hasattr(self, 'group_name'):
-            self.channel_laye.group_discard(self.group_name, self.channel_name)
+            self.channel_layer.group_discard(self.group_name, self.channel_name)
 
     def receive(self, text_data):
         pass

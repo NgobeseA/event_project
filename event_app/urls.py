@@ -26,5 +26,6 @@ urlpatterns = [
 
     path('users/', views.users_list_view, name='users'),
     path('events/', event_views.events_list_view, name='events'),
+    path('events/<int:event_id>/preview', event_views.preview_event, name='preview')
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
