@@ -1,145 +1,497 @@
 {% extends "admin/base.html" %}
 {% block title %}All Users | SMAAG {% endblock title %}
 {% block content %}
+<style>
+    .users-container {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+
+    .users-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+    }
+
+    .filter-section {
+        background: #f8f9fa;
+        border-bottom: 1px solid #e9ecef;
+        padding: 1.5rem;
+    }
+
+    .filter-form {
+        background: white;
+        border-radius: 8px;
+        padding: 1rem;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .table th {
+        background-color: #f8f9fa;
+        border-top: none;
+        font-weight: 600;
+        color: #495057;
+        padding: 1rem 0.75rem;
+    }
+
+    .table td {
+        padding: 1rem 0.75rem;
+        vertical-align: middle;
+    }
+
+    .role-admin {
+        background-color: #dc3545 !important;
+        color: white;
+    }
+
+    .role-organizer {
+        background-color: #0d6efd !important;
+        color: white;
+    }
+
+    .role-attendee {
+        background-color: #198754 !important;
+        color: white;
+    }
+
+    .action-buttons {
+        white-space: nowrap;
+    }
+
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 1rem;
+    }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .user-details h6 {
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .user-details small {
+        color: #6c757d;
+    }
+
+    .stats-card {
+        background: white;
+        border-radius: 8px;
+        padding: 1rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        text-align: center;
+    }
+
+    .filter-label {
+        font-weight: 500;
+        color: #495057;
+        margin-bottom: 0.25rem;
+    }
+
+    .form-control,
+    .form-select {
+        border-radius: 6px;
+        border: 1px solid #dee2e6;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+</style>
 <!-- I want to have a heading on the rigth -->
-<div class="d-flex justify-content-between align-items-center p-2">
-    <div>
-        <h3>System Users</h3>
-        <p class="text-muted">Total Result: {{total_result}}</p>
+<div class="users-container">
+    <!-- Header Section -->
+    <div class="users-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="mb-1">
+                    <i class="fas fa-users me-2"></i>
+                    System Users
+                </h2>
+                <p class="mb-0 opacity-75">Total Result: {{total_result}} users</p>
+            </div>
+            <button type="button" class="btn btn-light btn-lg" data-bs-toggle="modal" data-bs-target="#AddUserModal">
+                <i class="fas fa-user-plus me-2"></i>
+                Add User
+            </button>
+        </div>
     </div>
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#AddUserModal">Add User</button>
-    <div class="d-flex gap-2">
-        <h6>Filter by:</h6>
-        <form action="" method="get" class="d-flex justify-content-between align-items-center gap-2">
-            <label for="email">Email:</label>
-            {{filter.form.email}}
-            <label for="role">Role:</label>
-            {{filter.form.role}}
-            <label for="registered_month">Register Month</label>
-            {{filter.form.registered_month}}
-            <button type="submit" class="btn btn-primary w-100">Filter</button>
-            <a href="{% url 'users' %}" class="btn btn-secondary w-100">Reset</a>
-        </form>
+
+    <!-- Filter Section -->
+    <div class="filter-section">
+        <div class="row">
+            <div class="col-md-8">
+                <form action="" method="get" class="filter-form">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-4">
+                            <label for="email" class="form-label filter-label">
+                                <i class="fas fa-envelope me-1"></i>
+                                Email
+                            </label>
+                            {{filter.form.email}}
+                        </div>
+                        <div class="col-md-4">
+                            <label for="role" class="form-label filter-label">
+                                <i class="fas fa-user-tag me-1"></i>
+                                Role
+                            </label>
+                            {{filter.form.role}}
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary flex-fill">
+                                    <i class="fas fa-filter me-1"></i>
+                                    Filter
+                                </button>
+                                <a href="{% url 'users' %}" class="btn btn-outline-secondary flex-fill">
+                                    <i class="fas fa-times me-1"></i>
+                                    Reset
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-4">
+                <div class="row g-2">
+                    <div class="col-4">
+                        <div class="stats-card">
+                            <div class="h5 mb-1 text-danger">
+                                <i class="fas fa-user-shield"></i>
+                            </div>
+                            <div class="small text-muted">Admins</div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="stats-card">
+                            <div class="h5 mb-1 text-primary">
+                                <i class="fas fa-user-cog"></i>
+                            </div>
+                            <div class="small text-muted">Organizers</div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="stats-card">
+                            <div class="h5 mb-1 text-success">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="small text-muted">Attendees</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Modal -->
-<div class="modal fade" id="AddUserModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="exampleModalLabel">Create New Account</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form action="" method="post">
-            {% csrf_token %}
-            <div class="mb-3">
-                <label for="first_name" class="form-label">First Name</label>
-                <input type="text" class="form-control" id="first_name" name="first_name" required>
-                {% if form.first_name.errors %}
-                    <div class="text-danger small mt-1">
-                        {{ form.first_name.errors }}
-                    </div>
-                {% endif %}
+    <div class="modal fade" id="AddUserModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Create New Account</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="" method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="first_name" class="form-label">First Name</label>
+                            <input type="text" class="form-control" id="first_name" name="first_name" required>
+                            {% if form.first_name.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ form.first_name.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            <label for="last_name" class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="last_name" name="last_name" required>
+                            {% if form.last_name.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ form.last_name.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" required>
+                            {% if form.username.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ form.username.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                            {% if form.email.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ form.email.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            <label for="contact_number" class="form-label">Mobile Number</label>
+                            <input type="text" class="form-control" id="contact_number" name="contact_number" required>
+                            {% if form.contact_number.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ form.contact_number.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            <label for="password1" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password1" name="password1" required>
+                            {% if form.password1.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ form.password1.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            <label for="password2" class="form-label">Confirm Password</label>
+                            <input type="password" class="form-control" id="password2" name="password2" required>
+                            {% if form.password2.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ form.password2.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <!-- Footer with actions -->
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                                Cancel
+                            </button>
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-check-circle me-1"></i> Add New User
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
             </div>
-            <div class="mb-3">
-                <label for="last_name" class="form-label">Last Name</label>
-                <input type="text" class="form-control" id="last_name" name="last_name" required>
-                {% if form.last_name.errors %}
-                    <div class="text-danger small mt-1">
-                        {{ form.last_name.errors }}
-                    </div>
-                {% endif %}
-            </div>
-            <div class="mb-3">
-                <label for="username" class="form-label">Username</label>
-                <input type="text" class="form-control" id="username" name="username" required>
-                {% if form.username.errors %}
-                    <div class="text-danger small mt-1">
-                        {{ form.username.errors }}
-                    </div>
-                {% endif %}
-            </div>
-            <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="email" name="email" required>
-                {% if form.email.errors %}
-                    <div class="text-danger small mt-1">
-                        {{ form.email.errors }}
-                    </div>
-                {% endif %}
-            </div>
-            <div class="mb-3">
-                <label for="contact_number" class="form-label">Mobile Number</label>
-                <input type="text" class="form-control" id="contact_number" name="contact_number" required>
-                {% if form.contact_number.errors %}
-                    <div class="text-danger small mt-1">
-                        {{ form.contact_number.errors }}
-                    </div>
-                {% endif %}
-            </div>
-            <div class="mb-3">
-                <label for="password1" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password1" name="password1" required>
-                {% if form.password1.errors %}
-                    <div class="text-danger small mt-1">
-                        {{ form.password1.errors }}
-                    </div>
-                {% endif %}
-            </div>
-            <div class="mb-3">
-                <label for="password2" class="form-label">Confirm Password</label>
-                <input type="password" class="form-control" id="password2" name="password2" required>
-                {% if form.password2.errors %}
-                    <div class="text-danger small mt-1">
-                        {{ form.password2.errors }}
-                    </div>
-                {% endif %}
-            </div>
-            <!-- Footer with actions -->
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary"
-                    data-bs-dismiss="modal">
-                    Cancel
-                </button>
-                <button type="submit" class="btn btn-success">
-                    <i class="bi bi-check-circle me-1"></i> Add New User
-                </button>
-            </div>
-        </form>
-      </div>
-      
+        </div>
     </div>
-  </div>
-</div>
 </div>
 
-<div>
+<!-- Table Section -->
+<div class="table-responsive">
     {% if page_obj %}
-    <table class="table">
+    <table class="table table-hover mb-0">
         <thead>
             <tr>
-            <th scope="col">#</th>
-            <th scope="col">First Name</th>
-            <th scope="col">Last Name</th>
-            <th scope="col">Email</th>
-            <th scope="col">Role</th>
-            <th scope="col">Joined At</th>
+                <th scope="col" style="width: 60px;">#</th>
+                <th scope="col">User</th>
+                <th scope="col">Email</th>
+                <th scope="col">Role</th>
+                <th scope="col">Joined Date</th>
+                <th scope="col" style="width: 150px;">Actions</th>
             </tr>
         </thead>
         <tbody>
             {% for user in page_obj %}
             <tr>
-                <th scope="row"></th>
-                <td>{{user.first_name}}</td>
-                <td>{{user.last_name}}</td>
-                <td>{{user.email}}</td>
-                <td>{{user.role}}</td>
-                <td>{{user.joined_at}}</td>
+                <td>
+                    <span class="text-muted">{{ forloop.counter }}</span>
+                </td>
+                <td>
+                    <div class="user-info">
+                        <div class="user-avatar">
+                            {% if user.first_name %}
+                            {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+                            {% else %}
+                            {{ user.username|first|upper }}
+                            {% endif %}
+                        </div>
+                        <div class="user-details">
+                            <h6>
+                                {% if user.first_name or user.last_name %}
+                                {{ user.first_name }} {{ user.last_name }}
+                                {% else %}
+                                {{ user.username }}
+                                {% endif %}
+                            </h6>
+                            <small>@{{ user.username }}</small>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-envelope text-muted me-2"></i>
+                        {{ user.email }}
+                    </div>
+                </td>
+                <td>
+                    {% if user.role == 'admin' %}
+                    <span class="badge role-admin px-3 py-2">
+                        <i class="fas fa-user-shield me-1"></i>
+                        Admin
+                    </span>
+                    {% elif user.role == 'organizer' %}
+                    <span class="badge role-organizer px-3 py-2">
+                        <i class="fas fa-user-cog me-1"></i>
+                        Organizer
+                    </span>
+                    {% elif user.role == 'attendee' %}
+                    <span class="badge role-attendee px-3 py-2">
+                        <i class="fas fa-user me-1"></i>
+                        Attendee
+                    </span>
+                    {% else %}
+                    <span class="badge bg-secondary px-3 py-2">
+                        <i class="fas fa-user-question me-1"></i>
+                        {{ user.role|title }}
+                    </span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div>
+                        <i class="fas fa-calendar text-muted me-2"></i>
+                        {{ user.joined_at|date:"M d, Y" }}
+                    </div>
+                    <small class="text-muted">{{ user.joined_at|timesince }} ago</small>
+                </td>
+                <td>
+                    <div class="action-buttons">
+                        <a href="" class="btn btn-sm btn-outline-info me-1"
+                            title="View Details">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="" class="btn btn-sm btn-outline-primary me-1"
+                            title="Edit User">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        {% if user.role != 'admin' or user != request.user %}
+                        <button type="button" class="btn btn-sm btn-outline-danger"
+                            
+                            title="Delete User">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                        {% endif %}
+                    </div>
+                </td>
             </tr>
-            {%endfor%}
+            {% endfor %}
         </tbody>
     </table>
-    {%endif%}
+    {% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-users fa-3x text-muted mb-3"></i>
+        <h5 class="text-muted">No users found</h5>
+        <p class="text-muted">Try adjusting your filters or add a new user.</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Pagination -->
+{% if page_obj.has_other_pages %}
+<div class="d-flex justify-content-between align-items-center p-3 border-top">
+    <div class="text-muted">
+        Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }} users
+    </div>
+    <nav aria-label="Users pagination">
+        <ul class="pagination mb-0">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link"
+                    href="?page=1{% if request.GET.email %}&email={{ request.GET.email }}{% endif %}{% if request.GET.role %}&role={{ request.GET.role }}{% endif %}">
+                    <i class="fas fa-angle-double-left"></i>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link"
+                    href="?page={{ page_obj.previous_page_number }}{% if request.GET.email %}&email={{ request.GET.email }}{% endif %}{% if request.GET.role %}&role={{ request.GET.role }}{% endif %}">
+                    <i class="fas fa-angle-left"></i>
+                </a>
+            </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+            <li class="page-item active">
+                <span class="page-link">{{ num }}</span>
+            </li>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %} <li class="page-item">
+                <a class="page-link"
+                    href="?page={{ num }}{% if request.GET.email %}&email={{ request.GET.email }}{% endif %}{% if request.GET.role %}&role={{ request.GET.role }}{% endif %}">{{
+                    num }}</a>
+                </li>
+                {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link"
+                        href="?page={{ page_obj.next_page_number }}{% if request.GET.email %}&email={{ request.GET.email }}{% endif %}{% if request.GET.role %}&role={{ request.GET.role }}{% endif %}">
+                        <i class="fas fa-angle-right"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link"
+                        href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.email %}&email={{ request.GET.email }}{% endif %}{% if request.GET.role %}&role={{ request.GET.role }}{% endif %}">
+                        <i class="fas fa-angle-double-right"></i>
+                    </a>
+                </li>
+                {% endif %}
+        </ul>
+    </nav>
+</div>
+{% endif %}
+</div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteUserModalLabel">
+                    <i class="fas fa-exclamation-triangle text-danger me-2"></i>
+                    Confirm User Deletion
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Warning:</strong> This action cannot be undone.
+                </div>
+                <p>Are you sure you want to delete the user:</p>
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-title mb-1" id="userToDeleteName"></h6>
+                        <p class="card-text text-muted" id="userToDeleteEmail"></p>
+                    </div>
+                </div>
+                <p class="text-muted mt-3">All associated data, events, and registrations will also be affected.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>
+                    Cancel
+                </button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteUser">
+                    <i class="fas fa-trash me-1"></i>
+                    Delete User
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock content %}

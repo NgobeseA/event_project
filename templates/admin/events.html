@@ -1,0 +1,211 @@
+{% extends "admin/base.html" %}
+{% block title %}All Events | SMAAG{% endblock title %}
+{% block content %}
+<style>
+    .table-container {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    .table-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1.5rem;
+        margin: 0;
+    }
+    .event-title {
+        color: #0066cc;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .event-title:hover {
+        color: #0052a3;
+        text-decoration: underline;
+    }
+    .badge-rejected {
+        background-color: #000000 !important;
+        color: white;
+    }
+    .table th {
+        background-color: #f8f9fa;
+        border-top: none;
+        font-weight: 600;
+        color: #495057;
+    }
+    .action-buttons {
+        white-space: nowrap;
+    }
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+</style>
+
+<!-- table -->
+<div class="table-container">
+    <div class="table-header">
+        <h2 class="mb-0">
+            <i class="fas fa-calendar-alt me-2"></i>
+            Events Management
+        </h2>
+        <p class="mb-0 mt-1 opacity-75">Manage and monitor all events in the system</p>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th scope="col">Event Details</th>
+                    <th scope="col">Category</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Date & Time</th>
+                    <th scope="col">Location</th>
+                    <th scope="col">Organizer</th>
+                    <th scope="col">Attendees</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Loop through events here -->
+                {% for event in events %}
+                <tr>
+                    <td>
+                        <div>
+                            <a href="" class="event-title">
+                                {{ event.title }}
+                            </a>
+                            <div class="text-muted small mt-1">
+                                {{ event.description|truncatechars:80 }}
+                            </div>
+                        
+                        </div>
+                    </td>
+                    <td>
+                        {% if event.category == 'music-arts' %}
+                            <span class="badge bg-purple" style="background-color: #6f42c1 !important;">Music & Arts</span>
+                        {% elif event.category == 'business' %}
+                            <span class="badge bg-primary">Business & Professional</span>
+                        {% elif event.category == 'sports' %}
+                            <span class="badge bg-warning text-dark">Sports & Fitness</span>
+                        {% elif event.category == 'technology' %}
+                            <span class="badge bg-info">Technology</span>
+                        {% elif event.category == 'food-drink' %}
+                            <span class="badge bg-orange" style="background-color: #fd7e14 !important;">Food & Drink</span>
+                        {% elif event.category == 'health-wellness' %}
+                            <span class="badge bg-success">Health & Wellness</span>
+                        {% elif event.category == 'education' %}
+                            <span class="badge bg-dark">Education & Learning</span>
+                        {% elif event.category == 'community' %}
+                            <span class="badge bg-secondary">Community & Culture</span>
+                        {% elif event.category == 'charity' %}
+                            <span class="badge bg-pink" style="background-color: #d63384 !important;">Charity & Fundraising</span>
+                        {% elif event.category == 'government' %}
+                            <span class="badge bg-indigo" style="background-color: #6610f2 !important;">Government & Politics</span>
+                        {% elif event.category == 'tourism' %}
+                            <span class="badge bg-teal" style="background-color: #20c997 !important;">Tourism & Hospitality</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if event.status == 'pending' %}
+                            <span class="badge bg-primary">Pending</span>
+                        {% elif event.status == 'draft' %}
+                            <span class="badge bg-secondary">Draft</span>
+                        {% elif event.status == 'cancelled' %}
+                            <span class="badge bg-danger">Cancelled</span>
+                        {% elif event.status == 'rejected' %}
+                            <span class="badge badge-rejected">Rejected</span>
+                        {% elif event.status == 'published' %}
+                            <span class="badge bg-success">Published</span>
+                        {% endif %}
+                        
+                        {% if event.is_approved %}
+                            <div class="mt-1">
+                                <span class="badge bg-success small">
+                                    <i class="fas fa-check-circle"></i> Approved
+                                </span>
+                            </div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div>
+                            <strong>{{ event.start_date|date:"M d, Y" }}</strong>
+                            {% if event.end_date != event.start_date %}
+                                - {{ event.end_date|date:"M d, Y" }}
+                            {% endif %}
+                        </div>
+                        <div class="text-muted small">
+                            {{ event.start_time|time:"g:i A" }} - {{ event.end_time|time:"g:i A" }}
+                        </div>
+                        {% if event.registration_deadline %}
+                        <div class="text-muted small">
+                            <i class="fas fa-clock"></i> Reg. deadline: {{ event.registration_deadline|date:"M d, g:i A" }}
+                        </div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if event.is_online %}
+                            <span class="badge bg-info mb-1">
+                                <i class="fas fa-globe"></i> Online
+                            </span>
+                            {% if event.online_link %}
+                            <div class="small">
+                                <a href="{{ event.online_link }}" target="_blank" class="text-decoration-none">
+                                    <i class="fas fa-external-link-alt"></i> Join Link
+                                </a>
+                            </div>
+                            {% endif %}
+                        {% else %}
+                            <div>
+                                <i class="fas fa-map-marker-alt text-muted"></i>
+                                {{ event.venue }}
+                            </div>
+                            <div class="text-muted small">{{ event.city }}</div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div>{{ event.organizer.get_full_name|default:event.organizer.username }}</div>
+                        <div class="text-muted small">{{ event.organizer.email }}</div>
+                    </td>
+                    <td>
+                        <div>
+                            <span class="badge bg-info">
+                                {{ event.attendees.count }}
+                                {% if event.max_attendees %}
+                                    / {{ event.max_attendees }}
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="text-muted small mt-1">
+                            <i class="fas fa-eye"></i> {{ event.views_count }} views
+                        </div>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <a href="" class="btn btn-sm btn-outline-primary me-1" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="" class="btn btn-sm btn-outline-info me-1" title="View">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <button type="button" class="btn btn-sm btn-outline-danger" 
+                                    title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="text-center py-4 text-muted">
+                        <i class="fas fa-calendar-times fa-2x mb-2"></i>
+                        <div>No events found</div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock content %}

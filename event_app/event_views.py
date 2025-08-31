@@ -42,12 +42,6 @@ def notify_admins(message, url=None):
             }
         )
 
-def fetching_upcoming_events(paginator_number=0):
-    events = Event.objects.filter(start_date__gte=now(),status=Event.PUBLISHED).order_by('start_date')
-    paginator = Paginator(events, paginator_number)  # Show 5 events per page
-    page_number = request.GET.get('page')
-    return paginator.get_page(page_number)
-
 def register_for_event(request, event_id):
     """Register an attendee for an event"""
     event = get_object_or_404(Event,  id=event_id, status=Event.PUBLISHED)
@@ -212,7 +206,10 @@ def edit_event(request, event_id):
     return render(request, "create_event.html", {"form": form, "event": event})
 
 def upcoming_events_view(request):
-    events = fetching_upcoming_events(8)
+    events = Event.objects.filter(start_date__gte=now(),status=Event.PUBLISHED).order_by('start_date')
+    paginator = Paginator(events, 8)  # Show 5 events per page
+    page_number = request.GET.get('page')
+    events = paginator.get_page(page_number)
     return render(request, 'upcoming_events.html', {'events': events})
 
 
@@ -311,3 +308,9 @@ def search_events(request):
         print(event.title)
     
     return render(request,'upcoming_events.html', {'events': events})
+
+@login_required
+def events_list_view(request):
+    events = Event.objects.exclude(status=Event.DRAFT).order_by('-created_at')
+
+    return render(request, 'admin/events.html', {'events': events})

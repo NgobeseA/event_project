@@ -66,6 +66,12 @@ def admin_dashboard(request):
                 Event.TOURISM: '#FFCE56'
             }.get(c["category"], "#999999"),
         })
+    
+    # Fetching upcomming events
+    events = Event.objects.filter(start_date__gte=now(), status=Event.PUBLISHED).order_by('start_date')
+    paginator = Paginator(events, 10)
+    page_number =  request.GET.get('page')
+    upcoming_events = paginator.get_page(page_number)
 
     context = {
         "total_users": total_users,
@@ -74,6 +80,7 @@ def admin_dashboard(request):
         "avg_conversion_rate": avg_conversion_rate,
         "top_organizers": top_organizers,
         "category_data": category_data,
+        "upcoming_events": upcoming_events
     }
     return render(request, "adminDashboard.html", context)
 

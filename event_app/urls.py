@@ -25,5 +25,6 @@ urlpatterns = [
     path('search/', event_views.search_events, name='search'),
 
     path('users/', views.users_list_view, name='users'),
+    path('events/', event_views.events_list_view, name='events'),
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -88,13 +88,14 @@ class Event(models.Model):
     DRAFT = 'draft'
     PUBLISHED = 'published'
     CANCELLED = 'cancelled'
-    COMPLETED = 'completed'
+    PENDING = 'pending'
+    REJECTED = 'rejected'
     
     STATUS_CHOICES = [
         (DRAFT, 'Draft'),
         (PUBLISHED, 'Published'),
         (CANCELLED, 'Cancelled'),
-        (COMPLETED, 'Completed'),
+        (PENDING, 'Pending'),
     ]
 
     title = models.CharField(max_length=200)
