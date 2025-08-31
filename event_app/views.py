@@ -387,6 +387,7 @@ def users_list_view(request):
     if is_admin(user):
         users = User.objects.select_related('attendee_profile').all()
         user_filter = UserFilter(request.GET, queryset=users)
+        form = UserRegistrationForm()
 
         paginator = Paginator(user_filter.qs, 20)
         page_number = request.GET.get('page')
@@ -401,7 +402,8 @@ def users_list_view(request):
         context = {
             'total_result': user_filter.qs.count(),
             'filter': user_filter,
-            'page_obj': page_obj
+            'page_obj': page_obj,
+            'form': form,
         }
 
 

@@ -12,12 +12,41 @@ from django.utils.timezone import now
 import requests
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+from django.contrib.auth import get_user_model
 
-from .models import Event, Attendee
+from .models import Event, Attendee, Notification
 from .forms import EventAttendeeRegistrationForm, EventForm, EventRegistration
 from .utils import notify_event_attendees
 from django.forms import formset_factory
 from .forms import EventBudgetForm, BudgetItemForm
+
+User = get_user_model()
+
+def notify_admins(message, url=None):
+    channel_layer = get_channel_layer()
+    admins = User.objects.filter(is_staff=True)
+    print('Tis is running ', len(admins))
+
+    for admin in admins:
+        notify = Notification.objects.create(user=admin, message=message, url=url)
+
+        async_to_sync(channel_layer.group_send)(
+            f'user_{admin.id}',
+            {
+                'type': 'send_notification',
+                'message': notify.message,
+                'url': notify.url,
+                'created_at': notify.created_at.strftime("%Y-%m-%d %H:%M"),
+            }
+        )
+
+def fetching_upcoming_events(paginator_number=0):
+    events = Event.objects.filter(start_date__gte=now(),status=Event.PUBLISHED).order_by('start_date')
+    paginator = Paginator(events, paginator_number)  # Show 5 events per page
+    page_number = request.GET.get('page')
+    return paginator.get_page(page_number)
 
 def register_for_event(request, event_id):
     """Register an attendee for an event"""
@@ -53,7 +82,11 @@ def create_event(request):
             event.organizer = request.user  # attach logged-in user
             event.save()
             form.save_m2m()  # save tags/relations
-            return redirect('event_budget', event_id=event.id)
+
+            if event.status == Event.PUBLISHED:
+                notify_admins(f'New event "{event.title}" awaiting approval', url=f'/admin/events/{event.id}/preview/')
+
+            return redirect('organizer_overview')
             
     else:
         form = EventForm()
@@ -179,10 +212,7 @@ def edit_event(request, event_id):
     return render(request, "create_event.html", {"form": form, "event": event})
 
 def upcoming_events_view(request):
-    events = Event.objects.filter(start_date__gte=now(),status=Event.PUBLISHED).order_by('start_date')
-    paginator = Paginator(events, 8)  # Show 5 events per page
-    page_number = request.GET.get('page')
-    events = paginator.get_page(page_number)
+    events = fetching_upcoming_events(8)
     return render(request, 'upcoming_events.html', {'events': events})
 
 

@@ -32,6 +32,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -40,8 +42,17 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'event_app',
-    'channels',
+    'daphne'
+    
 ]
+
+ASGI_APPLICATION = 'event_project.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer'
+    }
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -70,14 +81,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'event_project.wsgi.application'
 
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {'hosts': [('127.0.0.1', 6379)],}
-    },
-}
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases

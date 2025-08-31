@@ -1,20 +1,6 @@
 {% extends "admin/base.html" %}
 {% block title %}Admin Dashboard | EMS {% endblock title %}
-{% block content %}
-        <div class="d-flex justify-content-between">
-            <h3>Dashboard Overview</h3>
-
-            <!-- User Info -->
-            <div class="d-flex align-items-center">
-                <i class="bi bi-bell me-3 position-relative">
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                        {{total_users}}
-                    </span>
-                </i>
-                <span class="me-2">{{ request.user.username }}</span>
-                <i class="bi bi-person-circle fs-4"></i>
-            </div>
-        </div>
+{% block content %} 
 
         <!-- Stats Cards -->
     <div class="row g-3">
