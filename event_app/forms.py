@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
 
-from .models import Attendee, Event, EventRegistration
+from .models import Attendee, Event, EventRegistration, Budget, BudgetItem
 
 User = get_user_model()
 
@@ -202,12 +202,16 @@ class EventForm(forms.ModelForm):
             "registration_deadline": forms.DateInput(attrs={"type": "date", "class": "form-control"}),
 
         }
-class BudgetItemForm(forms.Form):
-    name = forms.CharField(max_length=100, required=False, widget=forms.TextInput(attrs={'placeholder': 'Item'}))
-    budget = forms.DecimalField(required=False, decimal_places=2, max_digits=10)
-    
+class EventBudgetForm(forms.ModelForm):
+    class Meta:
+        model = Budget
+        fields = ['total_amount']
 
-class EventBudgetForm(forms.Form):
-    event_name = forms.CharField(max_length=255)
-    date = forms.CharField(max_length=100)
-    total_budget = forms.DecimalField(decimal_places=2, max_digits=10)
+
+class BudgetItemForm(forms.ModelForm):
+    class Meta:
+        model = BudgetItem
+        fields = ['description', 'budget']
+        widgets = {
+            'description': forms.TextInput(attrs={'placeholder': 'Item'}),
+        }

@@ -261,8 +261,15 @@ class Budget(models.Model):
         return f"Budget for {self.event.title} - {self.total_amount}"
     
 class BudgetItem(models.Model):
+    CATEGORY_CHOICES = [
+        ('venue', 'Venue'),
+        ('catering', 'Catering'),
+        ('decor', 'Decor'),
+        ('program', 'Program'),
+    ]
+
     budget = models.ForeignKey(Budget, on_delete=models.CASCADE, related_name='items')
-    category = models.CharField(max_length=100)
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
     description = models.TextField(blank=True, null=True)
     amount = models.DecimalField(max_digits=12, decimal_places=2)
 
