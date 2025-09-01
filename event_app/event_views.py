@@ -9,6 +9,7 @@ from datetime import datetime
 from django.utils import timezone
 from django.core.paginator import Paginator
 from django.utils.timezone import now
+from .models import Budget, BudgetItem 
 
 from .models import Event, Attendee
 from .forms import EventAttendeeRegistrationForm, EventForm, EventRegistration
@@ -210,3 +211,15 @@ def event_budget_view(request):
         'decor_formset': decor_formset,
         'program_formset': program_formset,
     })
+
+def event_summary_view(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+    budget = Budget.objects.filter(event=event).first()
+    budget_items = BudgetItem.objects.filter(budget=budget) if budget else []
+
+    context = {
+        'event': event,
+        'budget': budget,
+        'budget_items': budget_items,
+    }
+    return render(request, 'summary.html', context)

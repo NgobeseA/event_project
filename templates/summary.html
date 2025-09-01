@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Event Summary{% endblock title %}
+{% block content %}
+<style>
+    .container {
+        max-width: 700px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .container h2, .container h4 {
+        text-align: center;
+    }
+</style>
+
+
+
+
+<div class="container mt-4">
+    <h2>Event Summary</h2>
+    <div class="card mb-4 ">
+        <div class="card-body">
+            <h4>{{ event.title }}</h4>
+            <p><strong>Date:</strong> {{ event.start_date }} to {{ event.end_date }}</p>
+            <p><strong>Venue:</strong> {{ event.venue }}</p>
+            <p><strong>Category:</strong> {{ event.get_category_display }}</p>
+            <p><strong>Description:</strong> {{ event.description }}</p>
+            <p><strong>Status:</strong> {{ event.get_status_display }}</p>
+            <p><strong>Organizer:</strong> {{ event.organizer }}</p>
+            <!-- Add other event fields as needed -->
+        </div>
+    </div>
+    <h4>Budget</h4>
+    {% if budget %}
+        <div class="card mb-4">
+            <div class="card-body">
+                <p><strong>Total Budget:</strong> {{ budget.total_amount }}</p>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in budget_items %}
+                        <tr>
+                            <td>{{ item.name }}</td>
+                            <td>R {{ item.amount }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% else %}
+        <p>No budget information available for this event.</p>
+    {% endif %}
+</div>
+{% endblock content %}

@@ -12,6 +12,7 @@ import json
 from django.utils.timezone import now
 
 
+
 from .forms import UserRegistrationForm, AdminUserCreationForm, EventAttendeeRegistrationForm, EventForm
 from .models import Event, Attendee, EventRegistration, CustomUser
 
