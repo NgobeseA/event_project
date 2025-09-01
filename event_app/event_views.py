@@ -16,7 +16,7 @@ from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from django.contrib.auth import get_user_model
 
-from .models import Event, Attendee, Notification
+from .models import Event, Attendee, Notification, Budget, BudgetItem
 from .forms import EventAttendeeRegistrationForm, EventForm, EventRegistration
 from .utils import notify_event_attendees
 from django.forms import formset_factory
@@ -213,52 +213,34 @@ def upcoming_events_view(request):
     return render(request, 'upcoming_events.html', {'events': events})
 
 
-def event_budget_view(request, event_id):
-    """
-    Handles budget management for a specific event using multiple formsets.
-    """
+def event_budget_view(request):
     BudgetItemFormSet = formset_factory(BudgetItemForm, extra=4)
-    event = get_object_or_404(Event, pk=event_id)
 
-    # Define prefixes for each category of budget items
-    formset_prefixes = ['venue', 'catering', 'decor', 'program']
-    
     if request.method == 'POST':
         event_form = EventBudgetForm(request.POST)
-        formsets = {
-            prefix: BudgetItemFormSet(request.POST, prefix=prefix)
-            for prefix in formset_prefixes
-        }
+        venue_formset = BudgetItemFormSet(request.POST, prefix='venue')
+        catering_formset = BudgetItemFormSet(request.POST, prefix='catering')
+        decor_formset = BudgetItemFormSet(request.POST, prefix='decor')
+        program_formset = BudgetItemFormSet(request.POST, prefix='program')
 
-        # Validate all forms and formsets
-        if event_form.is_valid() and all(fs.is_valid() for fs in formsets.values()):
-            # Process and save data
-            # Example: Save budget items from formsets
-            for formset in formsets.values():
-                for form in formset:
-                    if form.has_changed():
-                        # form.save()  # Uncomment and implement your saving logic
-                        pass
-
-            # Assuming you get a budget ID after processing
-            # budget_id = ...
-            # return redirect('event_summary', budget_id=budget_id)
-            return redirect('some_success_page')
-
+        if all([event_form.is_valid(), venue_formset.is_valid(), catering_formset.is_valid(), 
+                decor_formset.is_valid(), program_formset.is_valid()]):
+            # Save or process data here
+            return redirect('budget_success')  # Redirect to a success page
     else:
         event_form = EventBudgetForm()
-        formsets = {
-            prefix: BudgetItemFormSet(prefix=prefix)
-            for prefix in formset_prefixes
-        }
-        
-    context = {
-        'event_form': event_form,
-        **formsets,  # Unpack the formsets dictionary into the context
-        'event': event,
-    }
+        venue_formset = BudgetItemFormSet(prefix='venue')
+        catering_formset = BudgetItemFormSet(prefix='catering')
+        decor_formset = BudgetItemFormSet(prefix='decor')
+        program_formset = BudgetItemFormSet(prefix='program')
 
-    return render(request, 'budget.html', context)
+    return render(request, 'budget.html', {
+        'event_form': event_form,
+        'venue_formset': venue_formset,
+        'catering_formset': catering_formset,
+        'decor_formset': decor_formset,
+        'program_formset': program_formset,
+    })
 
 def publish_event(request, event_id):
     event = get_object_or_404(Event, id=event_id)
