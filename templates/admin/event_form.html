@@ -1,0 +1,120 @@
+{% extends "admin/base.html" %}
+{% block title %}Event Form{% endblock title %}
+{% block content %}
+<div class="container">
+  {% if messages %}
+  <div class="messages">
+    {% for message in messages %}
+      <div class="alert 
+        {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}" 
+        role="alert">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+    {%endif%}
+    {% include "partials/progress_bar.html" with step=1 %}
+
+ 
+
+
+  <div class="">
+    <div class="bg-white rounded p-3">
+        <h6 class="h4 text-success, text-center">Create New Event</h6>
+        <p class="text-muted, text-center">Fill in the details below about the event</p>
+    <form method="post" enctype="multipart/form-data" class="row g-3 pt-2">
+    {% csrf_token %}
+
+    <h6 class="mb-0 text-muted">Basic Information</h6>
+    <div class="col-md-6">
+      <label class="form-label">Event Title</label>
+      {{ form.title }}
+    </div>
+
+    <div class="col-md-12">
+      <label class="form-label">Description</label>
+      {{ form.description }}
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">Category</label>
+      {{ form.category }}
+    </div>
+<div class="col-md-6">
+      <label class="form-label">Status</label>
+      {{ form.status }}
+    </div>
+    <h6 class="mb-0 text-muted">Date & Time</h6>
+    
+
+    <div class="col-md-6">
+      <label class="form-label">Start Date</label>
+      {{ form.start_date }}
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">End Date</label>
+      {{ form.end_date }}
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">Start Time</label>
+      {{ form.start_time }}
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">End Time</label>
+      {{ form.end_time }}
+    </div>
+
+    <h6 class="text-muted mb-0">Location</h6>
+    <div class="col-md-6">
+      <label class="form-label">Venue</label>
+      {{ form.venue }}
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">City</label>
+      {{ form.city }}
+    </div>
+
+    <div class="col-md-6 form-check">
+      {{ form.is_online }}
+      <label class="form-check-label">Is Online Event?</label>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">Online Link (if online)</label>
+      {{ form.online_link }}
+    </div>
+
+    <h6 class="text-muted">Additional Information</h6>
+    <div class="col-md-6">
+      <label class="form-label">Image</label>
+      {{ form.image }}
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">Tags</label>
+      {{ form.tags }}
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">Maximum Attendence</label>
+      {{ form.max_attendees }}
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">Registration Deadline</label>
+      {{ form.registration_deadline}}
+    </div>
+
+    <div class="col-12">
+      <button type="submit" class="btn btn-primary">Next</button>
+      <a href="{% url 'organizer_overview' %}" class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
+  </div>
+  </div>
+</div>
+{% endblock content %}

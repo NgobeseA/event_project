@@ -309,13 +309,5 @@ def search_events(request):
     
     return render(request,'upcoming_events.html', {'events': events})
 
-@login_required
-def events_list_view(request):
-    events = Event.objects.exclude(status=Event.DRAFT).order_by('-created_at')
 
-    return render(request, 'admin/events.html', {'events': events})
 
-def preview_event(request, event_id):
-    event = get_object_or_404(Event, id=event_id)
-
-    return render(request, 'admin/preview.html', {'event': event})

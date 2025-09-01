@@ -1,7 +1,7 @@
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
-from . import views, event_views
+from . import views, event_views, admin_views
 
 urlpatterns = [
     path('', views.home_view, name='home'),
@@ -21,11 +21,13 @@ urlpatterns = [
     path("attendee/logout/", views.attendee_logout, name="attendee_logout"),
     path('upcoming/', event_views.upcoming_events_view, name='upcoming_events'),
     path('attendee_overview/<int:attendee_id>/', views.attendee_overview, name='attendee_overview'),
-    path('event-budget/', event_views.event_budget_view, name='event_budget'),
+    path('event-budget/<int:event_id>/', event_views.event_budget_view, name='event_budget'),
     path('search/', event_views.search_events, name='search'),
 
     path('users/', views.users_list_view, name='users'),
-    path('events/', event_views.events_list_view, name='events'),
-    path('events/<int:event_id>/preview', event_views.preview_event, name='preview')
+    path('events/', admin_views.events_list_view, name='events'),
+    path('events/<int:event_id>/preview', admin_views.preview_event, name='preview'),
+    path('events/<int:event_id>/approve/', admin_views.event_approval_view, name='approval'),
+    #path('events/<int:event_id>/edit', admin_views.admin_edit_event, name='admin_edit_event'),
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

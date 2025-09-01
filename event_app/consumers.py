@@ -14,7 +14,7 @@ class EventStatusConsumer(WebsocketConsumer):
     
     async def receive(self, text_data):
         # handle message from frontend
-        password
+        pass
     
     async def event_status_update(self, event):
         await self.send(text_data=json.dumps(event))
