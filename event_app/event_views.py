@@ -291,5 +291,14 @@ def search_events(request):
     
     return render(request,'upcoming_events.html', {'events': events})
 
+def event_summary_view(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+    budget = Budget.objects.filter(event=event).first()
+    budget_items = BudgetItem.objects.filter(budget=budget) if budget else []
 
-
+    context = {
+        'event': event,
+        'budget': budget,
+        'budget_items': budget_items,
+    }
+    return render(request, 'summary.html', context)

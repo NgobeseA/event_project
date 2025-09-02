@@ -419,3 +419,8 @@ def users_list_view(request):
     else:
         messages.warning(request, 'Only admin can access this page. Please contact the admin')
         return redirect('home')
+
+def get_user_profile_view(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+
+    return render(request, 'admin/user_profile.html', {'user': user})

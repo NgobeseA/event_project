@@ -288,3 +288,12 @@ class Notification(models.Model):
 
     def __str__(self):
         return f'Notification for {self.user.username}: {self.message}'
+    
+class Rejection(models.Model):
+    admin = models.ForeignKey(User, on_delete=models.CASCADE, related_name='rejection')
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='event')
+    message = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Rejection message for {self.event.title}'

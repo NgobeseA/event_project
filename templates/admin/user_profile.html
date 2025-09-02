@@ -1,0 +1,145 @@
+{% extends "admin/base.html" %}
+{% block title %}User Profile{% endblock title %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-user me-2"></i>User Profile
+                </h4>
+            </div>
+            <div class="card-body">
+                <!-- Profile Picture Section -->
+                <div class="text-center mb-4">
+                    <div class="position-relative d-inline-block">
+                        <img src="https://via.placeholder.com/120x120/6c757d/ffffff?text=User" 
+                                alt="Profile Picture" 
+                                class="rounded-circle border border-3 border-primary"
+                                width="120" height="120">
+                        <!-- Role Badge -->
+                        <span class="position-absolute bottom-0 end-0 badge bg-success rounded-pill">
+                            {{ user.get_role_display }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- User Information -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-muted">
+                                <i class="fas fa-user me-2"></i>Username
+                            </label>
+                            <div class="border rounded p-2 bg-light">
+                                {{ user.username }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-muted">
+                                <i class="fas fa-envelope me-2"></i>Email Address
+                            </label>
+                            <div class="border rounded p-2 bg-light">
+                                {{ user.email|default:"Not provided" }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-muted">
+                                <i class="fas fa-user-tag me-2"></i>First Name
+                            </label>
+                            <div class="border rounded p-2 bg-light">
+                                {{ user.first_name|default:"Not provided" }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-muted">
+                                <i class="fas fa-user-tag me-2"></i>Last Name
+                            </label>
+                            <div class="border rounded p-2 bg-light">
+                                {{ user.last_name|default:"Not provided" }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-muted">
+                                <i class="fas fa-phone me-2"></i>Contact Number
+                            </label>
+                            <div class="border rounded p-2 bg-light">
+                                {{ user.contact_number|default:"Not provided" }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-muted">
+                                <i class="fas fa-shield-alt me-2"></i>Role
+                            </label>
+                            <div class="border rounded p-2 bg-light">
+                                <span class="badge bg-{% if user.role == 'admin' %}danger{% elif user.role == 'organizer' %}warning{% else %}info{% endif %} fs-6">
+                                    {{ user.get_role_display }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-muted">
+                                <i class="fas fa-calendar-alt me-2"></i>Date Joined
+                            </label>
+                            <div class="border rounded p-2 bg-light">
+                                {{ user.date_joined|date:"F d, Y" }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-muted">
+                                <i class="fas fa-clock me-2"></i>Last Login
+                            </label>
+                            <div class="border rounded p-2 bg-light">
+                                {{ user.last_login|date:"F d, Y g:i A"|default:"Never" }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-muted">
+                                <i class="fas fa-check-circle me-2"></i>Account Status
+                            </label>
+                            <div class="border rounded p-2 bg-light">
+                                {% if user.is_active %}
+                                    <span class="badge bg-success">Active</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Inactive</span>
+                                {% endif %}
+                                
+                                {% if user.is_staff %}
+                                    <span class="badge bg-warning ms-2">Staff</span>
+                                {% endif %}
+                                
+                                {% if user.is_superuser %}
+                                    <span class="badge bg-danger ms-2">Superuser</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-flex gap-2 mt-4">
+                    <a href="" class="btn btn-primary">
+                        <i class="fas fa-edit me-2"></i>Edit Profile
+                    </a>
+                    <a href="" class="btn btn-outline-secondary">
+                        <i class="fas fa-key me-2"></i>Change Password
+                    </a>
+                    <a href="" class="btn btn-outline-dark">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Users
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock content %}

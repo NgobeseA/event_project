@@ -211,18 +211,15 @@
                                 Date & Time
                             </h5>
                             <div class="mb-2">
-                                <strong>Start:</strong> {{ event.start_date|date:"l, M d, Y" }} at {{
-                                event.start_time|time:"g:i A" }}
+                                <p><strong>Start:</strong> {{ event.start_date|date:"l, M d, Y" }} at {{event.start_time|time:"g:i A" }}</p>
                             </div>
                             <div class="mb-2">
-                                <strong>End:</strong> {{ event.end_date|date:"l, M d, Y" }} at {{
-                                event.end_time|time:"g:i A" }}
+                                <p><strong>End:</strong> {{ event.end_date|date:"l, M d, Y" }} at {{event.end_time|time:"g:i A" }}</p>
                             </div>
                             {% if event.registration_deadline %}
                             <div class="text-warning">
                                 <i class="fas fa-clock me-1"></i>
-                                <strong>Registration Deadline:</strong> {{ event.registration_deadline|date:"M d, Y g:i
-                                A" }}
+                                <strong>Registration Deadline:</strong> {{ event.registration_deadline|date:"M d, Y g:iA" }}
                             </div>
                             {% endif %}
                         </div>
@@ -348,7 +345,7 @@
                 Member since {{ event.organizer.date_joined|date:"M Y" }}
             </div>
             <div>
-                <a href="" class="btn btn-sm btn-outline-primary">
+                <a href="{% url 'user_profile' event.organizer.id %}" class="btn btn-sm btn-outline-primary">
                     <i class="fas fa-user me-1"></i>
                     View Profile
                 </a>
@@ -446,11 +443,13 @@
             </div>
 
             <div class="d-grid gap-2">
-                <button type="button" class="btn btn-success btn-lg">
-                    <i class="fas fa-check-circle me-2"></i>
-                    Approve Event
-                </button>
-                <button type="button" class="btn btn-danger btn-lg">
+                <form action="{% url 'approval' event.id %}" method="post">
+                    <button type="submit" class="btn btn-success btn-lg">
+                        <i class="fas fa-check-circle me-2"></i>
+                        Approve Event
+                    </button>
+                </form>
+                <button type="button" class="btn btn-danger btn-lg" onclick="toggleRejectForm()">
                     <i class="fas fa-times-circle me-2"></i>
                     Reject Event
                 </button>
@@ -462,7 +461,8 @@
                     <i class="fas fa-exclamation-triangle me-2"></i>
                     Reason for Rejection
                 </h6>
-                <form id="rejectEventForm">
+                <form action="{% url 'reject_event' event.id %}" method="post">
+                    {% csrf_token %}
                     <div class="mb-3">
                         <label for="rejectionReason" class="form-label">Please provide a reason:</label>
                         <textarea class="form-control" id="rejectionReason" rows="3"
@@ -498,10 +498,13 @@
                 This event has been rejected.
             </div>
             <div class="d-grid">
-                <button type="button" class="btn btn-success">
-                    <i class="fas fa-redo me-2"></i>
-                    Reconsider & Approve
-                </button>
+                <form action="{% url 'approval' event.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-redo me-2"></i>
+                        Reconsider & Approve
+                    </button>
+                </form>
             </div>
             {% endif %}
         </div>
@@ -537,9 +540,17 @@
 
 <!-- Navigation -->
 <div class="position-fixed bottom-0 end-0 p-3">
-    <a href="{% url 'events' %}" class="btn btn-secondary">
+    <a href="../" class="btn btn-secondary">
         <i class="fas fa-arrow-left me-2"></i>
         Back to Events List
     </a>
 </div>
+
+<script>
+    
+    function toggleRejectForm() {
+        const form = document.getElementById('rejectionForm');
+        form.style.display = form.style.display === 'none' || form.style.display === '' ? 'block' : 'none';
+    }
+</script>
 {% endblock content %}
