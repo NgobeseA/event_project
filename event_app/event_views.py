@@ -302,3 +302,6 @@ def event_summary_view(request, event_id):
         'budget_items': budget_items,
     }
     return render(request, 'summary.html', context)
+
+def form_builder_view(request):
+    return render(request, 'build_form.html')

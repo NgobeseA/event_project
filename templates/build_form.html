@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+{% block title %}Build Your Own Registration Form {% endblock title %}
+{% block content %}
+<div class="container mt-4">
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h3>Registration Form Builder</h3>
+                <small class="text-muted">{{ event.title }}</small>
+            </div>
+
+            <div class="card-body">
+                <!-- Always present information First Name, Last Name, and email -->
+                <div class="mb-4">
+                    <h4>Default Fields</h4>
+                    <!-- First Name -->
+                    <div class="form-field-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>First Name</strong>
+                                <span class="badge bg-danger ms-2">Required</span>
+                                <br>
+                                <small class="text-muted">Text input form</small>
+                            </div>
+                            <span class="text-muted">Build-in</span>
+                        </div>
+                    </div>
+                    <div class="form-field-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>Last Name</strong>
+                                <span class="badge bg-danger ms-2">Required</span>
+                                <br>
+                                <small class="text-muted">Text input form</small>
+                            </div>
+                            <span class="text-muted">Build-in</span>
+                        </div>
+                    </div>
+                    <div class="form-field-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>Email Address</strong>
+                                <span class="badge bg-danger ms-2">Required</span>
+                                <br>
+                                <small class="text-muted">Text input form</small>
+                            </div>
+                            <span class="text-muted">Build-in</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Custom Fields -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5>Custom Fields</h5>
+                    <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addFieldModal"><i class="fas fa-plus me-1"></i>Add Field</button>
+                </div>
+
+                <div id="form-fields-container">
+                    {%for field in form_fields%}
+                        <div class="form-field-item" data-field-id="{{ field.id }}">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="fas fa-grip-vertical drag-handle text-muted me-2"></i>
+                                        <p class="text-bold text-muted">{{field.label}}</p>
+                                        {% if field.is_required %}
+                                            <span class="badge bg-danger ms-2">Required</span>
+                                        {% endif %}
+                                        <span class="badge bg-info ms-2">{{ field.get_field_type_display }}</span>
+                                    </div>
+                                    {% if field.help_text %}
+                                        <small class="text-muted">{{ field.help_text}}</small>
+                                    {% endif %}
+
+                                    {% if field.choices %}
+                                        <div class="mt-2">
+                                            <small class="text-muted">
+                                                <strong>Options:</strong>
+                                                {% for choice in field.get_choices_list %}
+                                                    {{choice}} {% if not forloop.last %}, {% endif %}
+                                                {% endfor %}
+                                            </small>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="btn-group">
+                                    <!-- Edit and Delete later -->
+                                </div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="text-center py-4 text-muted">
+                           
+                            <p>
+                                No custom fields added yet. <br>Click "Add Field" to create your 
+                                own custom field
+                            </p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Form Preview</h5>
+            </div>
+            <div class="card-body">
+                <h6>Form Statistics</h6>
+                <p class="mb-1"><strong>Total Fields:</strong> {{ form_fields.count|add:3 }}</p>
+                <p class="mb-1"><strong>Required Fields:</strong> {{ form_fields|length|add:3}}</p>
+                <p class="mb-1"><strong>Registrations:</strong> {{event.registrations.count}}</p>
+
+                {% if event.registrations.count > 0 %}
+                    <hr>
+                    <a href="" class="btn btn-info w-100 mb-2">
+                        <i class="fas fa-users me-2"></i>View Registrations
+                    </a>
+                    <!-- Export as csv later -->
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Fiel Modal -->
+<div class="modal fade" id="addFieldModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Form Field</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="add-field-form">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="field-label" class="form-label">Field Label</label>
+                        <input type="text" class="form-control" id="field-label" name="label" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="field-type" class="form-label">Field Type</label>
+                        <select class="form-select" id="field-type" name="field_type" required>
+                            <option value="">-- Select field type --</option>
+                            <option value="text">Text Input</option>
+                            <option value="textarea">Text Area</option>
+                            <option value="email">Email</option>
+                            <option value="phone">Phone Number</option>
+                            <option value="number">Number</option>
+                            <option value="date">Date</option>
+                            <option value="datetime">Date and Time</option>
+                            <option value="select">Dropdown Select</option>
+                            <option value="radio">Radio Buttons</option>
+                            <option value="checkbox">Checkboxes</option>
+                            <option value="boolean">Yes/No Checkbox</option>
+                            <option value="file">File Upload</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="field-placeholder" class="form-label">Placeholder Text</label>
+                        <input type="text" class="form-control" id="field-placeholder" name="placeholder">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="field-help-text" class="form-label">Help Text</label>
+                        <input type="text" class="form-control" id="field-help-text" name="help_text">
+                    </div>
+                    
+                    <div class="mb-3" id="choices-container" style="display: none;">
+                        <label for="field-choices" class="form-label">Choices (one per line)</label>
+                        <textarea class="form-control" id="field-choices" name="choices" rows="4" 
+                                  placeholder="Option 1&#10;Option 2&#10;Option 3"></textarea>
+                        <div class="form-text">Enter each option on a new line</div>
+                    </div>
+                    
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="field-required" name="is_required">
+                        <label class="form-check-label" for="field-required">
+                            Required field
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="addFormField()">Add Field</button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock content %}
+
+{% block extra_js %}
+<script>
+// Show/hide choices field based on field type
+document.getElementById('field-type').addEventListener('change', function() {
+    const choicesContainer = document.getElementById('choices-container');
+    const needsChoices = ['select', 'radio', 'checkbox'].includes(this.value);
+    choicesContainer.style.display = needsChoices ? 'block' : 'none';
+    
+    if (needsChoices) {
+        document.getElementById('field-choices').setAttribute('required', 'required');
+    } else {
+        document.getElementById('field-choices').removeAttribute('required');
+    }
+});
+
+// Make fields sortable
+const container = document.getElementById('form-fields-container');
+if (container) {
+    new Sortable(container, {
+        handle: '.drag-handle',
+        animation: 150,
+        onEnd: function(evt) {
+            // Update field order via AJAX
+            const fieldIds = Array.from(container.children).map(item => item.dataset.fieldId);
+            updateFieldOrder(fieldIds);
+        }
+    });
+}
+</script>
+
+{% endblock extra_js %}
