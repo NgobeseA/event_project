@@ -444,6 +444,7 @@
 
             <div class="d-grid gap-2">
                 <form action="{% url 'approval' event.id %}" method="post">
+                    {% csrf_token %}
                     <button type="submit" class="btn btn-success btn-lg">
                         <i class="fas fa-check-circle me-2"></i>
                         Approve Event

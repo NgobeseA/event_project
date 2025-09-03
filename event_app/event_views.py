@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db import DatabaseError
+from django.db import DatabaseError, transaction
 from django.db.models.functions import TruncDate
 from django.utils.safestring import mark_safe
 from django.db.models import Count, F, Avg, Sum
@@ -216,34 +216,48 @@ def upcoming_events_view(request):
     return render(request, 'upcoming_events.html', {'events': events})
 
 
+CATEGORIES = ['venue', 'catering', 'decor', 'program']  # centralize categories
+
 def event_budget_view(request, event_id):
-    BudgetItemFormSet = formset_factory(BudgetItemForm, extra=4)
+    BudgetItemFormSet = formset_factory(BudgetItemForm, extra=1)
     event = get_object_or_404(Event, id=event_id, organizer=request.user)
+    budget, created = Budget.objects.get_or_create(event=event)
+
+    formsets = {}  # dictionary to hold formsets per category
 
     if request.method == 'POST':
-        event_form = EventBudgetForm(request.POST)
-        venue_formset = BudgetItemFormSet(request.POST, prefix='venue')
-        catering_formset = BudgetItemFormSet(request.POST, prefix='catering')
-        decor_formset = BudgetItemFormSet(request.POST, prefix='decor')
-        program_formset = BudgetItemFormSet(request.POST, prefix='program')
+        event_form = EventBudgetForm(request.POST, instance=budget)
 
-        if all([event_form.is_valid(), venue_formset.is_valid(), catering_formset.is_valid(), 
-                decor_formset.is_valid(), program_formset.is_valid()]):
-            # Save or process data here
-            return redirect('budget_success')  # Redirect to a success page
+        # Build formsets dynamically
+        formsets = {
+            category: BudgetItemFormSet(request.POST, prefix=category)
+            for category in CATEGORIES
+        }
+
+        if event_form.is_valid() and all(fs.is_valid() for fs in formsets.values()):
+            with transaction.atomic():
+                event_form.save()
+
+                for category, fs in formsets.items():
+                    for form in fs:
+                        if form.cleaned_data and not form.cleaned_data.get("DELETE", False):
+                            item = form.save(commit=False)
+                            item.budget = budget
+                            item.category = category
+                            item.save()
+
+                budget.calculate_total()
+
+            messages.success(request, "Budget updated successfully!")
+            return redirect('budget_success')
+
     else:
-        event_form = EventBudgetForm()
-        venue_formset = BudgetItemFormSet(prefix='venue')
-        catering_formset = BudgetItemFormSet(prefix='catering')
-        decor_formset = BudgetItemFormSet(prefix='decor')
-        program_formset = BudgetItemFormSet(prefix='program')
+        event_form = EventBudgetForm(instance=budget)
+        formsets = {category: BudgetItemFormSet(prefix=category) for category in CATEGORIES}
 
     return render(request, 'budget.html', {
         'event_form': event_form,
-        'venue_formset': venue_formset,
-        'catering_formset': catering_formset,
-        'decor_formset': decor_formset,
-        'program_formset': program_formset,
+        'venue_formset': formsets,  # pass dict instead of 4 variables
         'event': event,
     })
 
