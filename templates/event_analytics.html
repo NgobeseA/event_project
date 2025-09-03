@@ -18,7 +18,8 @@
         <!-- Left side (you can add filters, dropdown, title later) -->
         <div>
             <a href="{% url 'organizer_overview' %}" class="btn btn-primary">Overview</a>
-            <a href="" class="btn btn-secondary">Manage Events</a>
+            <a href="{% url 'form_builder' event.id %}" class="btn btn-secondary">Edit Registration Form</a>
+            <p class="text-muted">{{event.status}}</p>
         </div>
 
         <!-- Right side: Export PDF button -->

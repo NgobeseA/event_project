@@ -224,6 +224,38 @@ if (container) {
         }
     });
 }
+
+// Add form field via AJAX
+function addFormField() {
+    const form = document.getElementById('add-field-form');
+    const formData = new FormData(form);
+    
+    // Convert choices from textarea to JSON
+    const choicesText = formData.get('choices');
+    if (choicesText) {
+        const choicesArray = choicesText.split('\n').filter(line => line.trim());
+        formData.set('choices', JSON.stringify(choicesArray));
+    }
+    const event_id = {{event.id}}
+    fetch(`http://127.0.0.1:8000/api/event/${event_id}/add-field/`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload(); // Refresh page to show new field
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        alert('Error adding field: ' + error);
+    });
+}
 </script>
 
 {% endblock extra_js %}

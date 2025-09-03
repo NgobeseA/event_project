@@ -24,10 +24,11 @@ urlpatterns = [
     path('event-budget/<int:event_id>/', event_views.event_budget_view, name='event_budget'),
     path('search/', event_views.search_events, name='search'),
     path('events/<int:event_id>/summary/', event_views.event_summary_view, name='event_summary'),
-    path('events/form-builder/', event_views.form_builder_view, name='form_builder'),
+    path('events/<int:event_id>/form-builder/', event_views.form_builder_view, name='form_builder'),
+    path('events/<int:event_id>/publish/', event_views.publish_event, name="publish_event"),
 
     # AJAX endpoint
-    #path('api/event/<int:event_id>/add-field/', views.create_form_field, name='create_form_field'),
+    path('api/event/<int:event_id>/add-field/', event_views.create_form_field, name='create_form_field'),
 
     #admin endpoint
     path('users/', views.users_list_view, name='users'),

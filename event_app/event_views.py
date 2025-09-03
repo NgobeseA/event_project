@@ -22,7 +22,7 @@ from .forms import EventAttendeeRegistrationForm, EventForm
 from .utils import notify_event_attendees
 from django.forms import formset_factory
 from .forms import EventBudgetForm, BudgetItemForm, DynamicEventRegistrationForm
-from .form_models import FormField
+from .form_models import FormField, EventRegistrations
 
 User = get_user_model()
 
@@ -54,18 +54,18 @@ def register_for_event(request, event_id):
         return redirect('event_details', event_id=event_id)
     
     if request.method == 'POST':
-        form = EventAttendeeRegistrationForm(event=event, data=request.POST)
+        form = DynamicEventRegistrationForm(event, request.POST, request.FILES)
         if form.is_valid():
             try:
-                registration = form.save()
+                registration = form.save_registration(user=request.user if request.user.is_authenticated else None)
                 messages.success(request, f'Successfully registered for {event.title}')
-                return redirect('event_details')
+                return redirect('event_details', event_id=event_id)
             except Exception as e:
                 messages.error(request, f'Registration failed: {str(e)}')
         else:
             messages.error(request, f'Please correct the errors below.')
     else:
-        form = EventAttendeeRegistrationForm(event=event)
+        form = DynamicEventRegistrationForm(event)
     
     return render(request, 'event_details.html', {'form': form, 'event': event})
 
@@ -110,7 +110,7 @@ def view_event(request, event_id):
         event.refresh_from_db()
         request.session[session_key] = True
     
-    form = EventAttendeeRegistrationForm(event=event)
+    form = DynamicEventRegistrationForm(event)
 
     context = {
         'event': event,
@@ -147,7 +147,7 @@ def event_analytics(request, event_id):
 
     # Group registrations by date
     registrations_over_time = (
-        EventRegistration.objects.filter(event=event)
+        EventRegistrations.objects.filter(event=event)
         .annotate(date=TruncDate("registered_at"))
         .values("date")
         .annotate(count=Count("id"))
@@ -247,15 +247,16 @@ def event_budget_view(request):
 def publish_event(request, event_id):
     event = get_object_or_404(Event, id=event_id)
 
-    event.status = Event.PUBLISHED
-    event.save()
+    if request.method == 'POST':
+        event.status = Event.PENDING
+        event.save(update_fields=['status'])
 
-    payload = {
-        'event_id': event.id,
-        'title': event.title,
-        'organizer': event.organizer.username,
-        'status': 'PUBLISHED'
-    }
+        payload = {
+            'event_id': event.id,
+            'title': event.title,
+            'organizer': event.organizer.username,
+            'status': 'PUBLISHED'
+        }
 
     try:
         requests.post(settings.ADMIN_WEBHOOK_URL, json=payload, timeout=5)
@@ -305,8 +306,15 @@ def event_summary_view(request, event_id):
     }
     return render(request, 'summary.html', context)
 
-def form_builder_view(request):
-    return render(request, 'build_form.html')
+def form_builder_view(request, event_id):
+    '''Allow organizers to edit their event registration form'''
+    event = get_object_or_404(Event, id=event_id)
+    form_fields = event.form_fields.all().order_by('order')
+    context = {
+        'event': event,
+        'form_fields': form_fields
+    }
+    return render(request, 'build_form.html', context)
 
 def create_form_field(request, event_id):
     '''AJAX endpoint for organizers to add form fields'''

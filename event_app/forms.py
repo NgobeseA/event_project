@@ -226,7 +226,7 @@ class DynamicEventRegistrationForm(forms.Form):
 
         # Built in fields
         self.fields['email'] = forms.EmailField(label='Email Address', required=True, widget=forms.EmailInput(attrs={'class': 'form-control'}))
-        self.fields['first_name'] = forms.CharField(label='First Name', required=True, widget=forms.TextInput(attr={'class': 'form-control'}))
+        self.fields['first_name'] = forms.CharField(label='First Name', required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
         self.fields['last_name'] = forms.CharField(label='Last Name', required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
 
         # dynamic fields
