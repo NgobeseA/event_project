@@ -76,13 +76,14 @@ def create_event(request):
         if form.is_valid():
             event = form.save(commit=False)
             event.organizer = request.user  # attach logged-in user
+            event.status = Event.PENDING  # default status
             event.save()
             form.save_m2m()  # save tags/relations
 
-            if event.status == Event.PUBLISHED:
+            if event.status == Event.PENDING:
                 notify_admins(f'New event "{event.title}" awaiting approval', url=f'/admin/events/{event.id}/preview/')
 
-            return redirect('organizer_overview')
+            return redirect('event_budget', event_id=event.id)
             
     else:
         form = EventForm()
@@ -215,8 +216,9 @@ def upcoming_events_view(request):
     return render(request, 'upcoming_events.html', {'events': events})
 
 
-def event_budget_view(request):
+def event_budget_view(request, event_id):
     BudgetItemFormSet = formset_factory(BudgetItemForm, extra=4)
+    event = get_object_or_404(Event, id=event_id, organizer=request.user)
 
     if request.method == 'POST':
         event_form = EventBudgetForm(request.POST)
@@ -242,6 +244,7 @@ def event_budget_view(request):
         'catering_formset': catering_formset,
         'decor_formset': decor_formset,
         'program_formset': program_formset,
+        'event': event,
     })
 
 def publish_event(request, event_id):

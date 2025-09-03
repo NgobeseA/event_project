@@ -9,7 +9,7 @@
         overflow: hidden;
     }
     .table-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #11945d 0%, #9ce2ac 100%);
         color: white;
         padding: 1.5rem;
         margin: 0;
@@ -43,8 +43,8 @@
 </style>
 
 <!-- table -->
-<div class="table-container">
-    <div class="table-header">
+<div class="table-container mt-3">
+    <div class="table-header bg-danger">
         <h2 class="mb-0">
             <i class="fas fa-calendar-alt me-2"></i>
             Events Management
@@ -72,12 +72,9 @@
                 <tr>
                     <td>
                         <div>
-                            <a href="{% url 'preview' event.id %}" class="event-title">
-                                {{ event.title }}
-                            </a>
-                            <div class="text-muted small mt-1">
-                                {{ event.description|truncatechars:80 }}
-                            </div>
+                           <h5> {{ event.title }}</h5>
+                               
+                           
                         
                         </div>
                     </td>
