@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import get_user_model
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 import json
 
@@ -24,7 +24,7 @@ class FormField(models.Model):
         ('file', 'File Upload'),
     ]
 
-    event = models.Foreingkey(Event, on_delete=models.CASCADE, related_name='form_fields')
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='form_fields')
     label = models.CharField(max_length=200, help_text='Field label shown to users')
     field_type = models.CharField(max_length=30, choices=FIELD_TYPES)
     placeholder = models.CharField(max_length=200, blank=True, help_text="Placeholder text for input fields")
@@ -74,9 +74,9 @@ class FormField(models.Model):
     class Meta:
         ordering = ['order', 'id']
 
-class EventRegistration(models.Model):
+class EventRegistrations(models.Model):
     '''User registration for event'''
-    event = models.Foreingkey(Event, on_delete=models.CASCADE, related_name='registrations')
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='event_registrations')
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)  # Allow anonymous registrations
     email = models.EmailField()  # Always capture email for contact
     registered_at = models.DateTimeField(auto_now_add=True)
@@ -95,7 +95,7 @@ class EventRegistration(models.Model):
     
 class RegistrationFieldValue(models.Model):
     """Store dynamic field values for each registration"""
-    registration = models.ForeignKey(EventRegistration, on_delete=models.CASCADE, related_name='field_values')
+    registration = models.ForeignKey(EventRegistrations, on_delete=models.CASCADE, related_name='field_values')
     form_field = models.ForeignKey(FormField, on_delete=models.CASCADE)
     
     # Store different value types

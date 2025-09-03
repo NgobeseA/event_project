@@ -2,7 +2,8 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
 
-from .models import Attendee, Event, EventRegistration, Budget, BudgetItem
+from .models import Attendee, Event, Budget, BudgetItem
+from .form_models import FormField, EventRegistrations, RegistrationFieldValue
 
 User = get_user_model()
 
@@ -215,3 +216,122 @@ class BudgetItemForm(forms.ModelForm):
         widgets = {
             'description': forms.TextInput(attrs={'placeholder': 'Item'}),
         }
+
+class DynamicEventRegistrationForm(forms.Form):
+    '''Dynamically generated form based on event's form fields '''
+
+    def __init__(self, event, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.event = event
+
+        # Built in fields
+        self.fields['email'] = forms.EmailField(label='Email Address', required=True, widget=forms.EmailInput(attrs={'class': 'form-control'}))
+        self.fields['first_name'] = forms.CharField(label='First Name', required=True, widget=forms.TextInput(attr={'class': 'form-control'}))
+        self.fields['last_name'] = forms.CharField(label='Last Name', required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
+
+        # dynamic fields
+        for form_field in event.form_fields.all().order_by('order'):
+            field_name = f'field_{form_field.id}'
+            django_field = self.create_django_field(form_field)
+            self.fields[field_name] = django_field
+
+    def create_django_field(self, form_field):
+        '''Create appropriate Django form field based on FormField type'''
+        common_attrs = {'class': 'form-control'}
+
+        if form_field.placeholder:
+            common_attrs['placeholder'] = form_field.placeholder
+
+        field_kwargs = {'label': form_field.label, 'required': form_field.is_required, 'help_text': form_field.help_text,}
+        
+        if form_field.field_type == 'text':
+            field_kwargs['widget'] = forms.TextInput(attrs=common_attrs)
+            if form_field.max_length:
+                field_kwargs['max_length'] = form_field.max_length
+            return forms.CharField(**field_kwargs)
+            
+        elif form_field.field_type == 'textarea':
+            field_kwargs['widget'] = forms.Textarea(attrs={**common_attrs, 'rows': 4})
+            return forms.CharField(**field_kwargs)
+            
+        elif form_field.field_type == 'email':
+            field_kwargs['widget'] = forms.EmailInput(attrs=common_attrs)
+            return forms.EmailField(**field_kwargs)
+            
+        elif form_field.field_type == 'phone':
+            field_kwargs['widget'] = forms.TextInput(attrs=common_attrs)
+            return forms.CharField(**field_kwargs)
+            
+        elif form_field.field_type == 'number':
+            field_kwargs['widget'] = forms.NumberInput(attrs=common_attrs)
+            if form_field.min_value is not None:
+                field_kwargs['min_value'] = form_field.min_value
+            if form_field.max_value is not None:
+                field_kwargs['max_value'] = form_field.max_value
+            return forms.FloatField(**field_kwargs)
+            
+        elif form_field.field_type == 'date':
+            field_kwargs['widget'] = forms.DateInput(attrs={**common_attrs, 'type': 'date'})
+            return forms.DateField(**field_kwargs)
+            
+        elif form_field.field_type == 'datetime':
+            field_kwargs['widget'] = forms.DateTimeInput(attrs={**common_attrs, 'type': 'datetime-local'})
+            return forms.DateTimeField(**field_kwargs)
+            
+        elif form_field.field_type == 'select':
+            choices = [(choice, choice) for choice in form_field.get_choices_list()]
+            field_kwargs['choices'] = [('', '-- Select --')] + choices
+            field_kwargs['widget'] = forms.Select(attrs=common_attrs)
+            return forms.ChoiceField(**field_kwargs)
+            
+        elif form_field.field_type == 'radio':
+            choices = [(choice, choice) for choice in form_field.get_choices_list()]
+            field_kwargs['choices'] = choices
+            field_kwargs['widget'] = forms.RadioSelect()
+            return forms.ChoiceField(**field_kwargs)
+            
+        elif form_field.field_type == 'checkbox':
+            choices = [(choice, choice) for choice in form_field.get_choices_list()]
+            field_kwargs['choices'] = choices
+            field_kwargs['widget'] = forms.CheckboxSelectMultiple()
+            field_kwargs['required'] = False  # MultipleChoiceField handles required differently
+            return forms.MultipleChoiceField(**field_kwargs)
+            
+        elif form_field.field_type == 'boolean':
+            field_kwargs['widget'] = forms.CheckboxInput()
+            return forms.BooleanField(**field_kwargs)
+            
+        elif form_field.field_type == 'file':
+            field_kwargs['widget'] = forms.FileInput(attrs=common_attrs)
+            return forms.FileField(**field_kwargs)
+        
+        # Default fallback
+        return forms.CharField(**field_kwargs)
+    
+    def save_registration(self, user=None):
+        """Save the registration and field values"""
+        # Create registration
+        registration = EventRegistrations.objects.create(
+            event=self.event,
+            user=user,
+            email=self.cleaned_data['email'],
+            first_name=self.cleaned_data['first_name'],
+            last_name=self.cleaned_data['last_name']
+        )
+        
+        # Save dynamic field values
+        for field_name, value in self.cleaned_data.items():
+            if field_name.startswith('field_'):
+                field_id = int(field_name.replace('field_', ''))
+                try:
+                    form_field = FormField.objects.get(id=field_id, event=self.event)
+                    field_value = RegistrationFieldValue.objects.create(
+                        registration=registration,
+                        form_field=form_field
+                    )
+                    field_value.set_value(value)
+                    field_value.save()
+                except FormField.DoesNotExist:
+                    continue
+        
+        return registration

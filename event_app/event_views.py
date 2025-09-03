@@ -15,12 +15,14 @@ from django.views.decorators.csrf import csrf_exempt
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from django.contrib.auth import get_user_model
+from django.http import JsonResponse
 
 from .models import Event, Attendee, Notification, Budget, BudgetItem
-from .forms import EventAttendeeRegistrationForm, EventForm, EventRegistration
+from .forms import EventAttendeeRegistrationForm, EventForm
 from .utils import notify_event_attendees
 from django.forms import formset_factory
-from .forms import EventBudgetForm, BudgetItemForm
+from .forms import EventBudgetForm, BudgetItemForm, DynamicEventRegistrationForm
+from .form_models import FormField
 
 User = get_user_model()
 
@@ -258,27 +260,27 @@ def publish_event(request, event_id):
     try:
         requests.post(settings.ADMIN_WEBHOOK_URL, json=payload, timeout=5)
     except request.exceptions.RequestException as e:
-        message.error(request, f'webhook failed: {e}. Contact system support.')
+        messages.error(request, f'webhook failed: {e}. Contact system support.')
         print('Webhook failed:', e)
     
     messages.success(request, f"Event '{event.title}' published and sent for approval!")
     return redirect('event_analytics', event_id=event.id)
 
-@csrf_exempt
-def event_status_webhook(request):
-    if request.method == 'post':
-        try:
-            data = json.loads(request.body)
-            event_id = data.get('event_id')
-            status = data.get('status')
+#@csrf_exempt
+# def event_status_webhook(request):
+#     if request.method == 'post':
+#         try:
+#             data = json.loads(request.body)
+#             event_id = data.get('event_id')
+#             status = data.get('status')
 
-            Event.objects.filter(id=event_id).update(is_approved=True if status == 'APPROVED' else False)
+#             Event.objects.filter(id=event_id).update(is_approved=True if status == 'APPROVED' else False)
 
-            return JsonResponse({'message': 'Event status updated'}, status=200)
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=400)
+#             return JsonResponse({'message': 'Event status updated'}, status=200)
+#         except Exception as e:
+#             return JsonResponse({'error': str(e)}, status=400)
 
-    return JsonResponse({'error': 'Invalid method'}, status=405)
+#     return JsonResponse({'error': 'Invalid method'}, status=405)
 
 def search_events(request):
     query = request.GET.get('query', '')
@@ -305,3 +307,35 @@ def event_summary_view(request, event_id):
 
 def form_builder_view(request):
     return render(request, 'build_form.html')
+
+def create_form_field(request, event_id):
+    '''AJAX endpoint for organizers to add form fields'''
+
+    if request.method == 'POST' and request.user.is_authenticated:
+        event = get_object_or_404(Event, id=event_id, organizer=request.user)
+
+        try:
+            field_data = {
+                'label': request.POST.get('label'),
+                'field_type': request.POST.get('field_type'),
+                'placeholder': request.POST.get('placeholder', ''),
+                'help_text': request.POST.get('help_text', ''),
+                'is_required': request.POST.get('is_required') == 'true',
+                'choices': request.POST.get('choices', ''),
+                'order': int(request.POST.get('order', 0)),
+            }
+
+            form_field = FormField.objects.create(event=event, **field_data)
+
+            return JsonResponse({
+                'success': True,
+                'field_id': form_field.id,
+                'message': 'Field added successfully'
+            })
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': str(e)
+            })
+        
+    return JsonResponse({'success': False, 'message': 'Invalid request'})

@@ -33,7 +33,7 @@ def event_approval_view(request, event_id):
         messages.success(request, f'{event.title} has been successfully approved!!')
         return redirect('preview', event_id)
     
-    message.warning(request, 'event only approved by via POST')
+    messages.warning(request, 'event only approved by via POST')
     return render(request, 'admin/preview.html', {'event': event})
     
 
