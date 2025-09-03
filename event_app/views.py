@@ -291,6 +291,7 @@ def organizer_overview(request):
         'total_events': total_events,
         'published_events_count': published_events_count,
         'draft_events_count': draft_events_count,
+        'events': events,
         'upcoming_events_count': upcoming_events_count,
         'total_attendees': total_attendees,
         'organizer_events': organizer_events,  # List of events ordered by attendee count
