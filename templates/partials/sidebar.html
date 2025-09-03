@@ -3,31 +3,24 @@
     <hr>
     <ul class="nav nav-pills flex-column mb-auto">
         <li class="nav-item">
-            <a href="{% url 'admin_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_dashboard' %} active {% endif %}">
+            <a href="{% url 'admin_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_dashboard' %} active bg-success {% else %} text-success {% endif %}}">
                 <i class="bi bi-speedometer2"></i> Dashboard
             </a>
         </li>
 
         <li class="nav-item">
-            <a href="{% url 'events' %}" class="nav-link {% if request.resolver_match.url_name == 'events' %} active {% endif %}">
+            <a href="{% url 'events' %}" class="nav-link {% if request.resolver_match.url_name == 'events' %} active bg-success {% else %} text-success {% endif %}">
                 <i class="bi bi-calender-events"></i> Events
             </a>
         </li>
 
         <li class="nav-item">
-            <a href="{% url 'users' %}" class="nav-link {% if request.resolver_match.url_name == 'users' %} active {% endif %}">
+            <a href="{% url 'users' %}" class="nav-link {% if request.resolver_match.url_name == 'users' %} active bg-success {% else %} text-success {% endif %}">
                 <i class="bi bi-people"></i> Users
             </a>
         </li>
-
         <li class="nav-item">
-            <a href="{% url 'admin_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_dashboard' %} active {% endif %}">
-                <i class="bi bi-bell"></i> Notifications
-            </a>
-        </li>
-
-        <li class="nav-item">
-            <a href="{% url 'logout' %}" class="nav-link">
+            <a href="{% url 'logout' %}" class="nav-link text-success">
                 <i class="bi bi-bell"></i> Logout
             </a>
         </li>

@@ -83,8 +83,12 @@
         </div>
     </div>
 
-    <!-- Quick action -->
-    <div class="bg-white rounded shadow p-4 mb-4" style="width: 100%;">
+
+
+    <!-- Highligh of the report -->
+    <div class="row g-3">
+            <!-- Quick action -->
+    <div class="bg-white rounded shadow p-4 mb-4" style="width: 50%">
         <div class="">
             <h4>Quick Action</h4>
 
@@ -98,42 +102,10 @@
             <div class="col-md-3 card text-center bg-success py-3">
                 <p><a href="#" class="text-white" style="text-decoration: none;"> Manage Event</a></p>
             </div>
-            <div class="col-md-3 card bg-success text-center">
-
-            </div>
         </div>
 
     </div>
-
-    <!-- Highligh of the report -->
-    <div class="row g-3">
-        <div class="col-md-6">
-            <div class="bg-white rounded shadow p-3 mb-3">
-                {% if organizer_events %}
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th scope="col">Title</th>
-                            <th scope="col">Venue</th>
-                            <th scope="col">Views</th>
-                        </tr>
-
-                    </thead>
-                    <tbody>
-                        {% for event in organizer_events %}
-                        <tr>
-                            <td><a href="{% url 'event_analytics' event.pk %}">{{event.title}}</a></td>
-                            <td>{{event.venue}}</td>
-                            <td>{{event.views_count}}</td>
-                        </tr>
-                        {%endfor%}
-                    </tbody>
-                </table>
-                {% else %}
-                <p class="text-muted">No events found.</p>
-                {% endif %}
-            </div>
-        </div>
+        
 
         <div class="col-md-6">
             <div class="bg-white rounded shadow p-3 mb-3">
