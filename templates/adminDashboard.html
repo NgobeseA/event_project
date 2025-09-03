@@ -3,7 +3,7 @@
 {% block content %} 
 
     <!-- Stats Cards -->
-    <div class="row g-3">
+    <div class="row g-3 bg-success border rounded-3 mt-3">
         <div class="col-md-3">
             <div class="card border rounded-3 p-4 mb-3 shadow-sm">
                 <div class="d-flex align-items-center justify-content-between mb-3">
@@ -99,7 +99,7 @@
     <div class="row g-3">
         <!-- Top organizers -->
         <div class="col-md-6">
-            <div class="card shadow-sm">
+            <div class="card shadow-sm mt-3">
                 <div class="card-body">
                     <h6>Top Organizers</h6>
                     <p class="text-muted small">Most successful event organizers</p>
@@ -108,7 +108,7 @@
                         {% for organizer in top_organizers %}
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             <div>
-                                <span class="badge bg-primary me-2">{{ forloop.counter }}</span>
+                                <span class="badge bg-success me-2">{{ forloop.counter }}</span>
                                 <strong>{{ organizer.organizer__username }}</strong>
                                 <small class="text-muted">{{ organizer.total_events }} events</small>
                             </div>
@@ -127,7 +127,7 @@
 
         <!-- Events by Category -->
         <div class="col-md-6">
-            <div class="card">
+            <div class="card mt-3">
                 <div class="card-body">
                     <h6 class="card-title fw-bold">Events by Category</h6>
                     <p class="text-muted small">Distribution of event categories</p>
@@ -139,7 +139,7 @@
     </div>
 
     <!-- Upcoming events -->
-    <div class="card shadow-sm">
+    <div class="card shadow-sm mt-3 border success">
         <div class="card-body">
             <h6>Upcoming Events</h6>
             <p class="text-muted small">Browse the upcoming events</p>
