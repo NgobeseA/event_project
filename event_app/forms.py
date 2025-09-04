@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.contrib.auth import get_user_model
 
 from .models import Attendee, Event, Budget, BudgetItem
@@ -12,25 +12,25 @@ class UserRegistrationForm(UserCreationForm):
     last_name = forms.CharField(
         max_length=30,
         required=True,
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Last Name'})
+        widget=forms.TextInput(attrs={'class': 'form-control border rounded p-2 bg-light', 'placeholder': 'Last Name'})
     )
     email = forms.EmailField(
         required=True,
-        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'})
+        widget=forms.EmailInput(attrs={'class': 'foorm-control border rounded p-2 bg-light', 'placeholder': 'Email'})
     )
     contact_number = forms.CharField(
         max_length=15,
         required=True,
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Contact Number'})
+        widget=forms.TextInput(attrs={'class': 'form-control border rounded p-2 bg-light', 'placeholder': 'Contact Number'})
     )
     username = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Username'})
+        widget=forms.TextInput(attrs={'class': 'border rounded p-2 bg-light w-100 form-control', 'placeholder': 'Username'})
     )
     password1 = forms.CharField(
-        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password'})
+        widget=forms.PasswordInput(attrs={'class': 'form-control border rounded p-2 bg-light', 'placeholder': 'Password'})
     )
     password2 = forms.CharField(
-        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirm Password'})
+        widget=forms.PasswordInput(attrs={'class': 'form-control border rounded p-2 bg-light', 'placeholder': 'Confirm Password'})
     )
 
     class Meta:
@@ -52,25 +52,28 @@ class AdminUserCreationForm(UserCreationForm):
     first_name = forms.CharField(
         max_length=30,
         required=True,
-        widget=forms.TextInput(attrs={'class': 'form-control'})
+        widget=forms.TextInput(attrs={'class': 'form-control border rounded p-2 bg-light'})
     )
     last_name = forms.CharField(
         max_length=30,
         required=True,
-        widget=forms.TextInput(attrs={'class': 'form-control'})
+        widget=forms.TextInput(attrs={'class': 'form-control border rounded p-2 bg-light'})
+    )
+    username = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'border rounded p-2 bg-light w-100 form-control', 'placeholder': 'Username'})
     )
     email = forms.EmailField(
         required=True,
-        widget=forms.EmailInput(attrs={'class': 'form-control'})
+        widget=forms.EmailInput(attrs={'class': 'form-control border rounded p-2 bg-light'})
     )
     contact_number = forms.CharField(
         max_length=15,
         required=True,
-        widget=forms.TextInput(attrs={'class': 'form-control'})
+        widget=forms.TextInput(attrs={'class': 'form-control border rounded p-2 bg-light'})
     )
     role = forms.ChoiceField(
         choices=User.ROLE_CHOICES,
-        widget=forms.Select(attrs={'class': 'form-control'})
+        widget=forms.Select(attrs={'class': 'form-control border rounded p-2 bg-light'})
     )
 
     class Meta:
@@ -87,6 +90,38 @@ class AdminUserCreationForm(UserCreationForm):
         if commit:
             user.save()
         return user
+
+class AdminUserChangeForm(UserChangeForm):
+    class Meta:
+        model = User
+        fields = ('username', 'first_name', 'last_name', 'email', 'contact_number', 'role',)
+
+    first_name = forms.CharField(
+        max_length=30,
+        required=True,
+        widget=forms.TextInput(attrs={'class': 'form-control border rounded p-2 bg-light'})
+    )
+    last_name = forms.CharField(
+        max_length=30,
+        required=True,
+        widget=forms.TextInput(attrs={'class': 'form-control border rounded p-2 bg-light'})
+    )
+    username = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'border rounded p-2 bg-light w-100 form-control', 'placeholder': 'Username'})
+    )
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={'class': 'form-control border rounded p-2 bg-light'})
+    )
+    contact_number = forms.CharField(
+        max_length=15,
+        required=True,
+        widget=forms.TextInput(attrs={'class': 'form-control border rounded p-2 bg-light'})
+    )
+    role = forms.ChoiceField(
+        choices=User.ROLE_CHOICES,
+        widget=forms.Select(attrs={'class': 'form-control border rounded p-2 bg-light'})
+    )
 
 class AttendeeRegistrationForm(forms.ModelForm):
     """Form for attendee registration"""

@@ -155,7 +155,10 @@ def event_analytics(request, event_id):
         .order_by("date")
     )
 
-    
+    # Rejected event
+    if event.status == Event.Rejected:
+        reject = Rejection.objects.filter(event=event)
+
     context = {
         'event': event,
         'total_views': total_views,
@@ -163,6 +166,7 @@ def event_analytics(request, event_id):
         'conversion_rate': conversion_rate,
         'registered_users': registered_users,
         'registrations_over_time': list(registrations_over_time),
+        'reject': reject,
     }
 
     return render(request, 'event_analytics.html', context)
@@ -267,7 +271,7 @@ def publish_event(request, event_id):
     if request.method == 'POST':
         event.status = Event.PENDING
         event.save(update_fields=['status'])
-
+        notify_admins(f'New event "{event.title}" awaiting approval', url=f'/admin/events/{event.id}/preview/')
         payload = {
             'event_id': event.id,
             'title': event.title,

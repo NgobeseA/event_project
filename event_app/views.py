@@ -13,7 +13,7 @@ from django.utils.timezone import now
 
 
 
-from .forms import UserRegistrationForm, AdminUserCreationForm, EventAttendeeRegistrationForm, EventForm
+from .forms import UserRegistrationForm, AdminUserCreationForm, EventAttendeeRegistrationForm, EventForm, AdminUserChangeForm
 from .models import Event, Attendee, EventRegistration, CustomUser
 from .filters import UserFilter
 
@@ -425,3 +425,19 @@ def get_user_profile_view(request, user_id):
     user = get_object_or_404(User, id=user_id)
 
     return render(request, 'admin/user_profile.html', {'user': user})
+
+def edit_user_view(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    if request.method == 'POST':
+        form = AdminUserChangeForm(request.POST, instance=user)
+
+        if form.is_valid():
+            user = form.save()
+            messages.success(request, f'User {user.first_name} has successfully updated!!!')
+            print(user.first_name)
+            return redirect('user_profile', user_id=user.id)
+        else:
+            print('The form is not valid')
+    else:
+        form = AdminUserChangeForm(instance=user)
+    return render(request, 'admin/edit_user.html', {'user': user, 'form': form})

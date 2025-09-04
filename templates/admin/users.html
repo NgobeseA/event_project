@@ -365,7 +365,7 @@
                         <i class="fas fa-calendar text-muted me-2"></i>
                         {{ user.joined_at|date:"M d, Y" }}
                     </div>
-                    <small class="text-muted">{{ user.joined_at|timesince }} ago</small>
+                    <small class="text-muted">{{ user.joined_date|timesince }} ago</small>
                 </td>
                 <td>
                     <div class="action-buttons">
@@ -373,7 +373,7 @@
                             title="View Details">
                             <i class="fas fa-eye"></i>
                         </a>
-                        <a href="" class="btn btn-sm btn-outline-primary me-1"
+                        <a href="{% url 'edit_user' user.id %}" class="btn btn-sm btn-outline-primary me-1"
                             title="Edit User">
                             <i class="fas fa-edit"></i>
                         </a>

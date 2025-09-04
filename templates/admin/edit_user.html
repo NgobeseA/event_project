@@ -1,0 +1,79 @@
+{% extends "admin/base.html" %}
+{% block title %}User Account{% endblock title %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header">
+                <h4><i class="fas fa-user me-2"></i>User Profile</h4>
+            </div>
+
+            <div class="card-body">
+                <form method="post" class="row">
+                    {% csrf_token %}
+                    <div class="col-12">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-muted">
+                                <i class="fas fa-user-tag me-2"></i>First Name
+                            </label>
+                            <div class="">
+                                {{ form.first_name }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-muted">
+                                <i class="fas fa-user-tag me-2"></i>Last Name
+                            </label>
+                            <div class="">
+                                {{ form.last_name }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-muted">
+                                <i class="fas fa-user me-2"></i>Username
+                            </label>
+                            <div class="">
+                                {{ form.username }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-muted">
+                                <i class="fas fa-envelope me-2"></i>Email
+                            </label>
+                            <div class="">
+                                {{ form.email }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-muted">
+                                <i class="fas fa-phone me-2"></i>Contact Number
+                            </label>
+                            <div class="">
+                                {{ form.contact_number }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-muted">
+                                <i class="fas fa-shield-alt me-2"></i>Role
+                            </label>
+                            <div class="">
+                                {{ form.role }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <button type="submit" class="btn btn-success w-100">Update User Profile</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
