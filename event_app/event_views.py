@@ -56,6 +56,7 @@ def register_for_event(request, event_id):
     if request.method == 'POST':
         form = DynamicEventRegistrationForm(event, request.POST, request.FILES)
         if form.is_valid():
+            print('form is valid')
             try:
                 registration = form.save_registration(user=request.user if request.user.is_authenticated else None)
                 messages.success(request, f'Successfully registered for {event.title}')
