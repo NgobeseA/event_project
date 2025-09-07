@@ -81,7 +81,7 @@
         <div class="col-md-3">
             <div class="card border rounded-3 p-4 mb-3 shadow-sm">
                 <div class="d-flex align-items-center justify-content-between mb-3">
-                    <h6 class="h6 text-muted mb-0">Total Attendees</h6>
+                    <h6 class="h6 text-muted mb-0">Total Registered people</h6>
                     <!-- Bootstrap + icon -->
                     <i class="bi bi-calender-lg text-muted fs-5"></i>
                 </div>
@@ -115,14 +115,19 @@
         </div>
 
         <div class="col-md-3">
-            <div class="card border rounded-3 p-4 shadow-sm h-100 d-flex flex-column justify-content-center">
-                <h6 class="h6 text-muted mb-0">Quick Action</h6>
-                <div class="row justify-content-center flex-grow-1 align-items-center">
-                    <div class="col-12">
-                        <a href="{% url 'create_event' %}" class="btn btn-success w-100">
-                            Create Event
+            <div class="card border rounded-3 p-4 shadow-sm">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h6 class="h6 text-muted mb-0">Quick Action</h6>
+                    <!-- Bootstrap + icon -->
+                    <i class="bi bi-calender-lg text-muted fs-5"></i>
+                </div>
+
+                <div>
+                    <a href="{% url 'create_event' %}" class="btn btn-success w-100">
+                            Create New Event
                         </a>
-                    </div>
+                    <p class="text-muted small mb-0 mt-1">Bring that idea into life! </p>
+
                 </div>
             </div>
         </div>
@@ -242,7 +247,7 @@
                     </td>
                     <td>
                         <div class="action-buttons">
-                            <a href="" class="btn btn-sm btn-outline-primary me-1" title="Edit">
+                            <a href="{% url 'edit_event' event.id %}" class="btn btn-sm btn-outline-primary me-1" title="Edit">
                                 <i class="fas fa-edit"></i>
                             </a>
                             <a href="{% url 'event_analytics' event.id %}" class="btn btn-sm btn-outline-info me-1" title="View">

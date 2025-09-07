@@ -17,7 +17,7 @@ from asgiref.sync import async_to_sync
 from django.contrib.auth import get_user_model
 from django.http import JsonResponse
 
-from .models import Event, Attendee, Notification, Budget, BudgetItem
+from .models import Event, Attendee, Notification, Budget, BudgetItem, Rejection
 from .forms import EventAttendeeRegistrationForm, EventForm
 from .utils import notify_event_attendees
 from django.forms import formset_factory
@@ -155,9 +155,10 @@ def event_analytics(request, event_id):
         .annotate(count=Count("id"))
         .order_by("date")
     )
+    reject = None
 
     # Rejected event
-    if event.status == Event.Rejected:
+    if event.status == Event.REJECTED:
         reject = Rejection.objects.filter(event=event)
 
     context = {
@@ -193,9 +194,13 @@ def cancel_event(request, event_id):
         messages.error(request, f"Something went wrong: {str(e)}")
     return redirect("event_analytics", event_id=event.id)
 
+@login_required
 def edit_event(request, event_id):
     """Edit an event and notify attendees of updates."""
     event = get_object_or_404(Event, id=event_id, organizer=request.user)
+    if event.organizer != request.user:
+        messages.error('You are not permited to that page.')
+        return redirect('home')
 
     if request.method == "POST":
         form = EventForm(request.POST, instance=event)
