@@ -1,81 +1,98 @@
 {% extends "admin/base.html" %}
 {% block title %}Admin Dashboard | EMS {% endblock title %}
-{% block content %} 
+{% block content %}
+<style>
+    .upcoming-event {
+        padding: 1rem;
+        border-left: 4px solid #198754;
+        background: #f8f9ff;
+        margin-bottom: 0.5rem;
+        border-radius: 0 8px 8px 0;
+    }
 
-    <!-- Stats Cards -->
-    <div class="row g-3 bg-success border rounded-3 mt-3">
-        <div class="col-md-3">
-            <div class="card border rounded-3 p-4 mb-3 shadow-sm">
-                <div class="d-flex align-items-center justify-content-between mb-3">
-                    <h6 class="h6 text-muted mb-0">Total Users</h6>
-                    <!-- Bootstrap + icon -->
-                    <i class="bi bi-calender-lg text-muted fs-5"></i>
-                </div>
-
-                <div>
-                    <p class="h2 fw-bold text-success mb-1">
-                        {{ total_users }}
-                    </p>
-                    <p class="text-muted small mb-0">Across all the events</p>
-
-                </div>
+    .event-date {
+        background: #198754;
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        font-weight: bold;
+    }
+</style>
+<!-- Stats Cards -->
+<div class="row g-3 bg-success border rounded-3 mt-3">
+    <div class="col-md-3">
+        <div class="card border rounded-3 p-4 mb-3 shadow-sm">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h6 class="h6 text-muted mb-0">Total Users</h6>
+                <!-- Bootstrap + icon -->
+                <i class="bi bi-calender-lg text-muted fs-5"></i>
             </div>
-        </div>
 
-        <div class="col-md-3">
-            <div class="card border rounded-3 p-4 mb-3 shadow-sm">
-                <div class="d-flex align-items-center justify-content-between mb-3">
-                    <h6 class="h6 text-muted mb-0">Total Published Events</h6>
-                    <!-- Bootstrap + icon -->
-                    <i class="bi bi-calender-lg text-muted fs-5"></i>
-                </div>
+            <div>
+                <p class="h2 fw-bold text-success mb-1">
+                    {{ total_users }}
+                </p>
+                <p class="text-muted small mb-0">Across all the events</p>
 
-                <div>
-                    <p class="h2 fw-bold text-success mb-1">
-                        {{ total_published_events }}
-                    </p>
-                    <p class="text-muted small mb-0">Across all the events</p>
-
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card border rounded-3 p-4 mb-3 shadow-sm">
-                <div class="d-flex align-items-center justify-content-between mb-3">
-                    <h6 class="h6 text-muted mb-0">Total Registration</h6>
-                    <!-- Bootstrap + icon -->
-                    <i class="bi bi-calender-lg text-muted fs-5"></i>
-                </div>
-
-                <div>
-                    <p class="h2 fw-bold text-success mb-1">
-                        {{ total_registrations }}
-                    </p>
-                    <p class="text-muted small mb-0">Across all the events</p>
-
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card border rounded-3 p-4 mb-3 shadow-sm">
-                <div class="d-flex align-items-center justify-content-between mb-3">
-                    <h6 class="h6 text-muted mb-0">Conversion Rate</h6>
-                    <!-- Bootstrap + icon -->
-                    <i class="bi bi-calender-lg text-muted fs-5"></i>
-                </div>
-
-                <div>
-                    <p class="h2 fw-bold text-success mb-1">
-                        {{ avg_conversion_rate }}
-                    </p>
-                    <p class="text-muted small mb-0">Across all the events</p>
-
-                </div>
             </div>
         </div>
     </div>
+
+    <div class="col-md-3">
+        <div class="card border rounded-3 p-4 mb-3 shadow-sm">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h6 class="h6 text-muted mb-0">Total Published Events</h6>
+                <!-- Bootstrap + icon -->
+                <i class="bi bi-calender-lg text-muted fs-5"></i>
+            </div>
+
+            <div>
+                <p class="h2 fw-bold text-success mb-1">
+                    {{ total_published_events }}
+                </p>
+                <p class="text-muted small mb-0">Across all the events</p>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card border rounded-3 p-4 mb-3 shadow-sm">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h6 class="h6 text-muted mb-0">Total Registration</h6>
+                <!-- Bootstrap + icon -->
+                <i class="bi bi-calender-lg text-muted fs-5"></i>
+            </div>
+
+            <div>
+                <p class="h2 fw-bold text-success mb-1">
+                    {{ total_registrations }}
+                </p>
+                <p class="text-muted small mb-0">Across all the events</p>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card border rounded-3 p-4 mb-3 shadow-sm">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h6 class="h6 text-muted mb-0">Conversion Rate</h6>
+                <!-- Bootstrap + icon -->
+                <i class="bi bi-calender-lg text-muted fs-5"></i>
+            </div>
+
+            <div>
+                <p class="h2 fw-bold text-success mb-1">
+                    {{ avg_conversion_rate }}
+                </p>
+                <p class="text-muted small mb-0">Across all the events</p>
+
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- End content main -->
 
@@ -129,44 +146,197 @@
             <h6>Upcoming Events</h6>
             <p class="text-muted small">Browse the upcoming events</p>
 
-            <ul class="list-group list-group-flush">
-                {% for organizer in top_organize %}
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <div>
-                        <span class="badge bg-primary me-2">{{ forloop.counter }}</span>
-                        <strong>{{ organizer.organizer__username }}</strong>
-                        <small class="text-muted">{{ organizer.total_events }} events</small>
-                    </div>
-                    <div class="text-end">
-                        <small class="text-muted">{{ organizer.total_attendees }} attendees</small>
-                    </div>
-                </li>
-                {% empty %}
-                <li class="list-group-item">No organizers found</li>
-                {% endfor %}
-            </ul>
+            <div class="chart-card">
+                <h5 class="mb-3">
+                    <i class="bi bi-calendar-plus me-2"></i>
+                    Upcoming Events
+                </h5>
+
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th scope="col">Event Details</th>
+                                <th scope="col">Category</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Date & Time</th>
+                                <th scope="col">Location</th>
+                                <th scope="col">Organizer</th>
+                                <th scope="col">Attendees</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Loop through events here -->
+                            {% for event in upcoming_events %}
+                            <tr>
+                                <td>
+                                    <div>
+                                        <h5> {{ event.title }}</h5>
+
+
+
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if event.category == 'music-arts' %}
+                                    <span class="badge bg-purple" style="background-color: #6f42c1 !important;">Music &
+                                        Arts</span>
+                                    {% elif event.category == 'business' %}
+                                    <span class="badge bg-primary">Business & Professional</span>
+                                    {% elif event.category == 'sports' %}
+                                    <span class="badge bg-warning text-dark">Sports & Fitness</span>
+                                    {% elif event.category == 'technology' %}
+                                    <span class="badge bg-info">Technology</span>
+                                    {% elif event.category == 'food-drink' %}
+                                    <span class="badge bg-orange" style="background-color: #fd7e14 !important;">Food &
+                                        Drink</span>
+                                    {% elif event.category == 'health-wellness' %}
+                                    <span class="badge bg-success">Health & Wellness</span>
+                                    {% elif event.category == 'education' %}
+                                    <span class="badge bg-dark">Education & Learning</span>
+                                    {% elif event.category == 'community' %}
+                                    <span class="badge bg-secondary">Community & Culture</span>
+                                    {% elif event.category == 'charity' %}
+                                    <span class="badge bg-pink" style="background-color: #d63384 !important;">Charity &
+                                        Fundraising</span>
+                                    {% elif event.category == 'government' %}
+                                    <span class="badge bg-indigo"
+                                        style="background-color: #6610f2 !important;">Government & Politics</span>
+                                    {% elif event.category == 'tourism' %}
+                                    <span class="badge bg-teal" style="background-color: #20c997 !important;">Tourism &
+                                        Hospitality</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if event.status == 'pending' %}
+                                    <span class="badge bg-primary">Pending</span>
+                                    {% elif event.status == 'draft' %}
+                                    <span class="badge bg-secondary">Draft</span>
+                                    {% elif event.status == 'cancelled' %}
+                                    <span class="badge bg-danger">Cancelled</span>
+                                    {% elif event.status == 'rejected' %}
+                                    <span class="badge badge-rejected">Rejected</span>
+                                    {% elif event.status == 'published' %}
+                                    <span class="badge bg-success">Published</span>
+                                    {% endif %}
+
+                                    {% if event.is_approved %}
+                                    <div class="mt-1">
+                                        <span class="badge bg-success small">
+                                            <i class="fas fa-check-circle"></i> Approved
+                                        </span>
+                                    </div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div>
+                                        <strong>{{ event.start_date|date:"M d, Y" }}</strong>
+                                        {% if event.end_date != event.start_date %}
+                                        - {{ event.end_date|date:"M d, Y" }}
+                                        {% endif %}
+                                    </div>
+                                    <div class="text-muted small">
+                                        {{ event.start_time|time:"g:i A" }} - {{ event.end_time|time:"g:i A" }}
+                                    </div>
+                                    {% if event.registration_deadline %}
+                                    <div class="text-muted small">
+                                        <i class="fas fa-clock"></i> Reg. deadline: {{event.registration_deadline|date:"M d, g:i A" }}
+                                    </div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if event.is_online %}
+                                    <span class="badge bg-info mb-1">
+                                        <i class="fas fa-globe"></i> Online
+                                    </span>
+                                    {% if event.online_link %}
+                                    <div class="small">
+                                        <a href="{{ event.online_link }}" target="_blank" class="text-decoration-none">
+                                            <i class="fas fa-external-link-alt"></i> Join Link
+                                        </a>
+                                    </div>
+                                    {% endif %}
+                                    {% else %}
+                                    <div>
+                                        <i class="fas fa-map-marker-alt text-muted"></i>
+                                        {{ event.venue }}
+                                    </div>
+                                    <div class="text-muted small">{{ event.city }}</div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div>{{ event.organizer.get_full_name|default:event.organizer.username }}</div>
+                                    <div class="text-muted small">{{ event.organizer.email }}</div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <span class="badge bg-info">
+                                            {{ event.attendees.count }}
+                                            {% if event.max_attendees %}
+                                            / {{ event.max_attendees }}
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                    <div class="text-muted small mt-1">
+                                        <i class="fas fa-eye"></i> {{ event.views_count }} views
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a href="" class="btn btn-sm btn-outline-primary me-1" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'preview' event.id %}" class="btn btn-sm btn-outline-info me-1"
+                                            title="View">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-outline-danger"
+                                            data-bs-toggle="modal" data-bs-target="#deleteEventModal{{event.id}}"
+                                            title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+
+
+                            {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center py-4 text-muted">
+                                    <i class="fas fa-calendar-times fa-2x mb-2"></i>
+                                    <div>No events found</div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
 
 <script>
-  const ctx = document.getElementById('categoryPieChart').getContext('2d');
-  new Chart(ctx, {
-    type: 'pie',
-    data: {
-      labels: {{ chart_labels|safe }},
-      datasets: [{
-        data: {{ chart_data|safe }},
-        backgroundColor: {{ chart_colors|safe }},
+    const ctx = document.getElementById('categoryPieChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: {{ chart_labels| safe }},
+        datasets: [{
+            data: {{ chart_data| safe }},
+        backgroundColor: {{ chart_colors| safe }},
       }]
     },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: {
-          position: 'bottom'
+        options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
         }
-      }
     }
   });
 </script>
