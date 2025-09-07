@@ -38,6 +38,7 @@ urlpatterns = [
     #path('events/<int:event_id>/edit', admin_views.admin_edit_event, name='admin_edit_event'),
     path('users/<int:user_id>/profile/', views.get_user_profile_view, name='user_profile'),
     path('users/<int:user_id>/edit/', views.edit_user_view, name='edit_user'),
-    path('events/<int:event_id>/reject/', admin_views.reject_event_view, name='reject_event')
+    path('events/<int:event_id>/reject/', admin_views.reject_event_view, name='reject_event'),
+    path('events/<int:event_id>/views-attendee/', admin_views.registered_user_in_event, name='registered_users'),
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

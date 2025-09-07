@@ -184,128 +184,147 @@
                 </div>
             </div>
 
-            <!-- Event Details -->
-            <div class="detail-section">
-                <!-- Event Image -->
-                {% if event.image %}
-                <div class="mb-4">
-                    <img src="{{ event.image.url }}" alt="{{ event.title }}" class="event-image">
-                </div>
-                {% endif %}
-
-                <!-- Description -->
-                <div class="mb-4">
-                    <h4 class="section-title">
-                        <i class="fas fa-align-left me-2"></i>
-                        Event Description
-                    </h4>
-                    <p class="lead">{{ event.description|linebreaks }}</p>
-                </div>
-
-                <!-- Event Information Grid -->
-                <div class="row g-4 mb-4">
-                    <div class="col-md-6">
-                        <div class="info-card">
-                            <h5>
-                                <i class="fas fa-calendar-alt text-primary me-2"></i>
-                                Date & Time
-                            </h5>
-                            <div class="mb-2">
-                                <p><strong>Start:</strong> {{ event.start_date|date:"l, M d, Y" }} at {{event.start_time|time:"g:i A" }}</p>
-                            </div>
-                            <div class="mb-2">
-                                <p><strong>End:</strong> {{ event.end_date|date:"l, M d, Y" }} at {{event.end_time|time:"g:i A" }}</p>
-                            </div>
-                            {% if event.registration_deadline %}
-                            <div class="text-warning">
-                                <i class="fas fa-clock me-1"></i>
-                                <strong>Registration Deadline:</strong> {{ event.registration_deadline|date:"M d, Y g:iA" }}
-                            </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="info-card">
-                            <h5>
-                                <i class="fas fa-map-marker-alt text-danger me-2"></i>
-                                Location
-                            </h5>
-                            {% if event.is_online %}
-                            <div class="mb-2">
-                                <span class="badge bg-info mb-2">
-                                    <i class="fas fa-globe me-1"></i>
-                                    Online Event
-                                </span>
-                            </div>
-                            {% if event.online_link %}
-                            <div>
-                                <strong>Meeting Link:</strong><br>
-                                <a href="{{ event.online_link }}" target="_blank" class="text-break">
-                                    {{ event.online_link }}
-                                </a>
-                            </div>
-                            {% endif %}
-                            {% else %}
-                            <div class="mb-2">
-                                <strong>Venue:</strong> {{ event.venue }}
-                            </div>
-                            <div>
-                                <strong>City:</strong> {{ event.city }}
-                            </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Capacity & Registration -->
-                <div class="row g-4 mb-4">
-                    <div class="col-md-6">
-                        <div class="info-card">
-                            <h5>
-                                <i class="fas fa-users text-success me-2"></i>
-                                Capacity & Registration
-                            </h5>
-                            {% if event.max_attendees %}
-                            <div class="mb-2">
-                                <strong>Max Attendees:</strong> {{ event.max_attendees }}
-                            </div>
-                            {% else %}
-                            <div class="mb-2">
-                                <strong>Capacity:</strong> <span class="text-success">Unlimited</span>
-                            </div>
-                            {% endif %}
-                            <div>
-                                <strong>Current Registrations:</strong> {{ event.attendees.count }}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="info-card">
-                            <h5>
-                                <i class="fas fa-eye text-info me-2"></i>
-                                Engagement
-                            </h5>
-                            <div class="mb-2">
-                                <strong>Views:</strong> {{ event.views_count }}
-                            </div>
-                            <div>
-                                <strong>Last Updated:</strong> {{ event.updated_at|date:"M d, Y g:i A" }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tags -->
-                {% if event.tags %}
-                <div class="mb-4">
-                    <h4 class="section-title">
-                        <i class="fas fa-tags me-2"></i>
-                        Tags
-                    </h4>
-                    
+            <!-- Table for registered users -->
+            <!-- Table Section -->
+            <div class="table-responsive">
+                {% if attendees %}
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th scope="col" style="width: 60px;">#</th>
+                            <th scope="col">User</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Registered Date</th>
+                            <th scope="col" style="width: 150px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in attendees %}
+                        <tr>
+                            <td>
+                                <span class="text-muted">{{ forloop.counter }}</span>
+                            </td>
+                            <td>
+                                <div class="user-info">
+                                    <div class="user-avatar">
+                                        {% if user.first_name %}
+                                        {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+                                        {% else %}
+                                        {{ user.username|first|upper }}
+                                        {% endif %}
+                                    </div>
+                                    <div class="user-details">
+                                        <h6>
+                                            {% if user.first_name or user.last_name %}
+                                            {{ user.first_name }} {{ user.last_name }}
+                                            {% else %}
+                                            {{ user.username }}
+                                            {% endif %}
+                                        </h6>
+                                
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-envelope text-muted me-2"></i>
+                                    {{ user.email }}
+                                </div>
+                            </td>
+                        
+                            <td>
+                                <div>
+                                    <i class="fas fa-calendar text-muted me-2"></i>
+                                    {{ user.registered_at|date:"M d, Y" }}
+                                </div>
+                                <small class="text-muted">{{ user.joined_date|timesince }} ago</small>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="{% url 'user_profile' user.id %}" class="btn btn-sm btn-outline-info me-1"
+                                        title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{% url 'edit_user' user.id %}" class="btn btn-sm btn-outline-primary me-1"
+                                        title="Edit User">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    {% if user.role != 'admin' or user != request.user %}
+                                    <button type="button" class="btn btn-sm btn-outline-danger" title="Delete User">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No users found</h5>
+                    <p class="text-muted">Try adjusting your filters or add a new user.</p>
                 </div>
                 {% endif %}
             </div>
+
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+            <div class="d-flex justify-content-between align-items-center p-3 border-top">
+                <div class="text-muted">
+                    Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }}
+                    users
+                </div>
+                <nav aria-label="Users pagination">
+                    <ul class="pagination mb-0">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link"
+                                href="?page=1{% if request.GET.email %}&email={{ request.GET.email }}{% endif %}{% if request.GET.role %}&role={{ request.GET.role }}{% endif %}">
+                                <i class="fas fa-angle-double-left"></i>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link"
+                                href="?page={{ page_obj.previous_page_number }}{% if request.GET.email %}&email={{ request.GET.email }}{% endif %}{% if request.GET.role %}&role={{ request.GET.role }}{% endif %}">
+                                <i class="fas fa-angle-left"></i>
+                            </a>
+                        </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ num }}</span>
+                        </li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %} <li
+                            class="page-item">
+                            <a class="page-link"
+                                href="?page={{ num }}{% if request.GET.email %}&email={{ request.GET.email }}{% endif %}{% if request.GET.role %}&role={{ request.GET.role }}{% endif %}">{{
+                                num }}</a>
+                            </li>
+                            {% endif %}
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link"
+                                    href="?page={{ page_obj.next_page_number }}{% if request.GET.email %}&email={{ request.GET.email }}{% endif %}{% if request.GET.role %}&role={{ request.GET.role }}{% endif %}">
+                                    <i class="fas fa-angle-right"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link"
+                                    href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.email %}&email={{ request.GET.email }}{% endif %}{% if request.GET.role %}&role={{ request.GET.role }}{% endif %}">
+                                    <i class="fas fa-angle-double-right"></i>
+                                </a>
+                            </li>
+                            {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
         </div>
     </div>
 
@@ -355,7 +374,7 @@
         <!-- Budget Information -->
         <div class="budget-card mb-4">
             <h5 class="mb-3">
-                
+
                 Event Budget
             </h5>
 
@@ -524,7 +543,7 @@
                         <i class="fas fa-edit me-2"></i>
                         Edit Event
                     </a>
-                    <a href="{% url 'registered_users' event.id %}" class="btn btn-outline-info btn-sm">
+                    <a href="" class="btn btn-outline-info btn-sm">
                         <i class="fas fa-list me-2"></i>
                         View Registrations
                     </a>
@@ -541,14 +560,14 @@
 
 <!-- Navigation -->
 <div class="position-fixed bottom-0 end-0 p-3">
-    <a href="../" class="btn btn-secondary">
+    <a href="{% url 'preview' event.id %}" class="btn btn-secondary">
         <i class="fas fa-arrow-left me-2"></i>
         Back to Events List
     </a>
 </div>
 
 <script>
-    
+
     function toggleRejectForm() {
         const form = document.getElementById('rejectionForm');
         form.style.display = form.style.display === 'none' || form.style.display === '' ? 'block' : 'none';
