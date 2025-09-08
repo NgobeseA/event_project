@@ -225,7 +225,9 @@ def edit_event(request, event_id):
     if request.method == "POST":
         form = EventForm(request.POST, instance=event)
         if form.is_valid():
-            form.save()
+            event = form.save(commit=False)
+            event.status = Event.PENDING
+            event.save()
 
             # Notify attendees
             subject = f"Event Updated: {event.title}"
