@@ -16,6 +16,7 @@ from django.utils.timezone import now
 from .forms import UserRegistrationForm, AdminUserCreationForm, EventAttendeeRegistrationForm, EventForm, AdminUserChangeForm
 from .models import Event, Attendee, EventRegistration, CustomUser
 from .filters import UserFilter
+from .form_models import EventRegistrations
 
 User = get_user_model()
 # Create your views here.
@@ -23,7 +24,7 @@ def admin_dashboard(request):
     # Stats
     total_users = CustomUser.objects.count()
     total_published_events = Event.objects.filter(status=Event.PUBLISHED).count()
-    total_registrations = EventRegistration.objects.count()
+    total_registrations = EventRegistrations.objects.count()
     total_views = Event.objects.aggregate(views=Sum("views_count"))["views"] or 0
     avg_conversion_rate = round((total_registrations / total_views * 100), 1) if total_views > 0 else 0
 

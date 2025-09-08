@@ -17,7 +17,7 @@ from asgiref.sync import async_to_sync
 from django.contrib.auth import get_user_model
 from django.http import JsonResponse
 
-from .models import Event, Attendee, Notification, Budget, BudgetItem, Rejection
+from .models import Event, Attendee, Notification, Budget, BudgetItem, Rejection, EventRegistration
 from .forms import EventAttendeeRegistrationForm, EventForm
 from .utils import notify_event_attendees
 from django.forms import formset_factory
@@ -45,8 +45,8 @@ def notify_admins(message, url=None):
         )
 
 def register_for_event(request, event_id):
-    """Register an attendee for an event"""
-    event = get_object_or_404(Event,  id=event_id, status=Event.PUBLISHED)
+    """ Register an attendee for an event if the user doesn't exist"""
+    event = get_object_or_404(Event, id=event_id, status=Event.PUBLISHED)
 
     can_register, message = event.can_register()
     if not can_register:
@@ -57,16 +57,35 @@ def register_for_event(request, event_id):
         form = DynamicEventRegistrationForm(event, request.POST, request.FILES)
         if form.is_valid():
             try:
-                registration = form.save_registration(user=request.user if request.user.is_authenticated else None)
-                messages.success(request, f'Successfully registered for {event.title}')
+                if not request.user.is_authenticated:
+                    first_name = request.POST.get('first_name')
+                    last_name = request.POST.get('last_name')
+                    email = request.POST.get('email')
+
+                    try:
+                        user = User.objects.get(email=email)
+                    except User.DoesNotExist:
+                        # Create a new CustomUser with an unusable password
+                        user = User.objects.create(
+                            first_name = first_name,
+                            last_name = last_name,
+                            email = email,
+                            role = 'attendee',
+                        )
+                        user.set_unusable_password()
+                        user.save()
+                else:
+                    user = request.user
+                
+                registration = form.save_registration(user=user)
+                messages.success(request, f'Thank you!! You have successfully registered for {event.title}')
                 return redirect('event_details', event_id=event_id)
             except Exception as e:
                 messages.error(request, f'Registration failed: {str(e)}')
         else:
-            messages.error(request, f'Please correct the errors below.')
+            messages.error(request, 'Please correct the errors below.')
     else:
         form = DynamicEventRegistrationForm(event)
-    
     return render(request, 'event_details.html', {'form': form, 'event': event})
 
 @login_required
@@ -126,6 +145,7 @@ def view_event(request, event_id):
 def event_analytics(request, event_id):
     user = request.user
     event = get_object_or_404(Event, id=event_id)
+    registered_attendee = EventRegistrations.objects.filter(event=event)
 
     # Ensure only organizer can see analytics
     if user != event.organizer:
@@ -136,7 +156,8 @@ def event_analytics(request, event_id):
     total_views = event.views_count 
 
     # Total registrations (attendees linked via EventRegistration)
-    total_registrations = event.attendees.count()
+    total_registrations = EventRegistrations.objects.filter(event=event).count()
+   
 
     # Conversion rate (avoid division by zero)
     conversion_rate = 0
@@ -144,7 +165,7 @@ def event_analytics(request, event_id):
         conversion_rate = round((total_registrations / total_views) * 100, 1)
 
     # List of registered attendees
-    registered_users = event.attendees.all()
+    registered_users = registered_attendee
 
     # Group registrations by date
     registrations_over_time = (
