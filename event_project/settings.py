@@ -88,8 +88,12 @@ TEMPLATES = [
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',  # or 'django.db.backends.postgresql', 'sql_server.pyodbc' etc.
+        'NAME': 'eventapp',
+        'USER': 'root',
+        'PASSWORD': 'root',
+        'HOST': 'localhost',  # e.g., 'localhost' or an IP address
+        'PORT': '3306',  # e.g., '3306' for MySQL, '5432' for PostgreSQL, '1433' for SQL Server
     }
 }
 
