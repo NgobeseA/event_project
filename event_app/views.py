@@ -13,10 +13,9 @@ from django.utils.timezone import now
 
 
 
-from .forms import UserRegistrationForm, AdminUserCreationForm, EventAttendeeRegistrationForm, EventForm, AdminUserChangeForm
-from .models import Event, Attendee, EventRegistration, CustomUser
+from .forms import UserRegistrationForm, AdminUserCreationForm, EventForm, AdminUserChangeForm
+from .models import Event, EventRegistrations, CustomUser
 from .filters import UserFilter
-from .form_models import EventRegistrations
 
 User = get_user_model()
 # Create your views here.
@@ -123,14 +122,12 @@ def login_view(request):
         # ---- ATTENDEE LOGIN ----
         elif login_type == "attendee":
             email = request.POST.get("email")
-            attendee = Attendee.objects.filter(email=email).first()
+            attendee = User.objects.filter(email=email, role='attendee').first()
 
             if attendee:
-                # Store attendee in session
-                request.session["attendee_id"] = attendee.id
-                request.session["attendee_name"] = attendee.first_name
+                login(request, attendee)
                 messages.success(request, f"Welcome back, {attendee.first_name}!")
-                return redirect("attendee_overview", attendee.id)  # attendee homepage
+                return redirect('attendee_overview', user_id=attendee.id)  # attendee homepage
             else:
                 messages.error(request, "Attendee not found. Please register first.")
 
@@ -231,14 +228,12 @@ def organizer_overview(request):
     upcoming_events_count = upcoming_events_this_month.count()
     
     # Total attendees across all events
-    total_attendees = events.aggregate(
-        total=Count('attendees', distinct=True)
-    )['total'] or 0
+    total_attendees = 0
     
     # Get organizer's events ordered by number of attendees (most attendees first)
-    organizer_events = events.annotate(
-        attendee_count=Count('attendees')
-    ).order_by('-attendee_count', '-created_at')  # Secondary sort by creation date
+    # organizer_events = events.annotate(
+    #     attendee_count=Count('attendees')
+    # ).order_by('-attendee_count', '-created_at')  # Secondary sort by creation date
 
     category_data = events.values('category').annotate(
         count=Count('id')
@@ -295,7 +290,7 @@ def organizer_overview(request):
         'events': events,
         'upcoming_events_count': upcoming_events_count,
         'total_attendees': total_attendees,
-        'organizer_events': organizer_events,  # List of events ordered by attendee count
+        'organizer_events': events,  # List of events ordered by attendee count
         'category_chart_data': chart_data_json,  # JSON data for Chart.js
         'category_breakdown': category_data,
     }
@@ -316,12 +311,13 @@ def home_view(request):
     return render(request, 'home.html', {'events': events})
 
 
-def attendee_overview(request, attendee_id):
-    attendee = get_object_or_404(Attendee, id=attendee_id)
+def attendee_overview(request, user_id):
+    attendee = get_object_or_404(User, id=user_id)
     now = timezone.now()
 
     # Events the user is attending
-    events = Event.objects.filter(attendees=attendee).distinct()
+    #events = Event.objects.filter(attendees=attendee).distinct()
+    events = EventRegistrations.objects.filter(user=attendee)
     
     total_events = events.count()
     
@@ -395,7 +391,7 @@ def users_list_view(request):
     user = request.user
 
     if is_admin(user):
-        users = User.objects.select_related('attendee_profile').all()
+        users = User.objects.all()
         user_filter = UserFilter(request.GET, queryset=users)
         form = UserRegistrationForm()
 

@@ -141,7 +141,7 @@
           {% for form in decor_formset %}
           <tr>
             <td>{{ form.name }}</td>
-            <td>{{ form.budget }}</td>
+            {{ form.budget }}
           </tr>
           {% endfor %}
         </table>

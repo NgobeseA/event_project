@@ -2,9 +2,9 @@ from django.shortcuts import render,redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
-from .models import Event, Rejection
+from .models import Event, Rejection, EventRegistrations
 from .forms import EventForm
-from .form_models import EventRegistrations
+
 
 @login_required
 def events_list_view(request):
