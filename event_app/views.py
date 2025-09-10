@@ -140,11 +140,12 @@ def attendee_login(request):
     print('Attendee Attempt...')
     if request.method == "POST":
         email = request.POST.get('email')  # ✅ use POST instead of clean_data
-        user = Attendee.objects.filter(email=email).first()
+        user = User.objects.filter(email=email).first()
         print(user)
         if user:
             # You might want to "log in" the attendee in session
             request.session['attendee_id'] = user.id
+            login(request, user)
             messages.success(request, f"Welcome back, {user.first_name}!")
             return redirect('attendee_overview')
         else:
@@ -229,6 +230,8 @@ def organizer_overview(request):
     
     # Total attendees across all events
     total_attendees = 0
+    for event in events:
+        total_attendees = total_attendees + EventRegistrations.objects.filter(event=event).count()
     
     # Get organizer's events ordered by number of attendees (most attendees first)
     # organizer_events = events.annotate(
