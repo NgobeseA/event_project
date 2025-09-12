@@ -5,7 +5,7 @@ from django.db import DatabaseError, transaction
 from django.db.models.functions import TruncDate
 from django.utils.safestring import mark_safe
 from django.db.models import Count, F, Avg, Sum
-from datetime import datetime
+from datetime import timedelta
 from django.utils import timezone
 from django.core.paginator import Paginator
 from django.utils.timezone import now
@@ -60,6 +60,7 @@ def register_for_event(request, event_id):
                     first_name = request.POST.get('first_name')
                     last_name = request.POST.get('last_name')
                     email = request.POST.get('email')
+                    username = request.POST.get('username')
 
                     try:
                         user = User.objects.get(email=email)
@@ -70,6 +71,7 @@ def register_for_event(request, event_id):
                             last_name = last_name,
                             email = email,
                             role = 'attendee',
+                            username = username,
                         )
                         user.set_unusable_password()
                         user.save()
@@ -163,12 +165,21 @@ def event_analytics(request, event_id):
     if total_views > 0:
         conversion_rate = round((total_registrations / total_views) * 100, 1)
 
+    range_param = request.GET.get('range', 'week')
+    today = timezone.now().date()
+    if range_param == 'month':
+        start_date = today - timedelta(days=30)
+    elif range_param == '3months':
+        start_date = today - timedelta(days=90)
+    else:
+        start_date = today - timedelta(days=7)
+
     # List of registered attendees
     registered_users = registered_attendee
 
     # Group registrations by date
     registrations_over_time = (
-        EventRegistrations.objects.filter(event=event)
+        EventRegistrations.objects.filter(event=event, registered_at__date__gte=start_date)
         .annotate(date=TruncDate("registered_at"))
         .values("date")
         .annotate(count=Count("id"))
