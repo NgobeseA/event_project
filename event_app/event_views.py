@@ -168,23 +168,33 @@ def event_analytics(request, event_id):
     range_param = request.GET.get('range', 'week')
     today = timezone.now().date()
     if range_param == 'month':
-        start_date = today - timedelta(days=30)
+        days = 30
     elif range_param == '3months':
-        start_date = today - timedelta(days=90)
+        days = 90
     else:
-        start_date = today - timedelta(days=7)
+        days = 7
+
+    start_date = today - timedelta(days=days-1)
 
     # List of registered attendees
     registered_users = registered_attendee
 
-    # Group registrations by date
-    registrations_over_time = (
+    # Group registrations count per date
+    registrations_count = (
         EventRegistrations.objects.filter(event=event, registered_at__date__gte=start_date)
         .annotate(date=TruncDate("registered_at"))
         .values("date")
         .annotate(count=Count("id"))
         .order_by("date")
     )
+    # Dictionary for quick lookup 
+    reg_dict = {str(item['date']): item['count'] for item in registrations_count}
+    date_list = [(start_date + timedelta(days=i)) for i in range(days)]
+    chart_data = []
+    for day in date_list:
+        date_str = day.strftime('%Y-%m-%d')
+        chart_data.append({'date': date_str, 'count': reg_dict.get(date_str, 0)})
+
     reject = None
 
     # Rejected event
@@ -197,7 +207,7 @@ def event_analytics(request, event_id):
         'total_registrations': total_registrations,
         'conversion_rate': conversion_rate,
         'registered_users': registered_users,
-        'registrations_over_time': list(registrations_over_time),
+        'registrations_over_time': chart_data,
         'reject': reject,
     }
 
