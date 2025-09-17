@@ -175,10 +175,18 @@
                 <!-- Registration Chart -->
                 <div class="col-lg-6">
                     <div class="card border-0 shadow-sm h-100">
-                        <div class="card-header bg-white border-bottom">
+                        <div class="card-header bg-white border-bottom d-flex justify-content-between">
                             <h6 class="mb-0">
                                 <i class="bi bi-graph-up me-2"></i>Registration Trends
                             </h6>
+                            <form method="get" class="mb-3 d-flex justify-content-end align-items-center gap-2">
+                                <label for="range" class="form-label mb-0 me-2 text-muted small">Show:</label>
+                                <select name="range" id="range" class="form-select form-select-sm w-auto" onchange="this.form.submit()">
+                                    <option value="week" {% if request.GET.range == "week" %}selected{% endif %}>Last 7 days</option>
+                                    <option value="month" {% if request.GET.range == "month" %}selected{% endif %}>Last 30 days</option>
+                                    <option value="3months" {% if request.GET.range == "3months" %}selected{% endif %}>Last 3 months</option>
+                                </select>
+                            </form>
                         </div>
                         <div class="card-body">
                             {% if total_registrations > 0 %}

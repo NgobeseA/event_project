@@ -5,7 +5,7 @@ from django.db import DatabaseError, transaction
 from django.db.models.functions import TruncDate
 from django.utils.safestring import mark_safe
 from django.db.models import Count, F, Avg, Sum
-from datetime import datetime
+from datetime import timedelta
 from django.utils import timezone
 from django.core.paginator import Paginator
 from django.utils.timezone import now
@@ -60,6 +60,7 @@ def register_for_event(request, event_id):
                     first_name = request.POST.get('first_name')
                     last_name = request.POST.get('last_name')
                     email = request.POST.get('email')
+                    username = request.POST.get('username')
 
                     try:
                         user = User.objects.get(email=email)
@@ -70,6 +71,7 @@ def register_for_event(request, event_id):
                             last_name = last_name,
                             email = email,
                             role = 'attendee',
+                            username = username,
                         )
                         user.set_unusable_password()
                         user.save()
@@ -163,17 +165,36 @@ def event_analytics(request, event_id):
     if total_views > 0:
         conversion_rate = round((total_registrations / total_views) * 100, 1)
 
+    range_param = request.GET.get('range', 'week')
+    today = timezone.now().date()
+    if range_param == 'month':
+        days = 30
+    elif range_param == '3months':
+        days = 90
+    else:
+        days = 7
+
+    start_date = today - timedelta(days=days-1)
+
     # List of registered attendees
     registered_users = registered_attendee
 
-    # Group registrations by date
-    registrations_over_time = (
-        EventRegistrations.objects.filter(event=event)
+    # Group registrations count per date
+    registrations_count = (
+        EventRegistrations.objects.filter(event=event, registered_at__date__gte=start_date)
         .annotate(date=TruncDate("registered_at"))
         .values("date")
         .annotate(count=Count("id"))
         .order_by("date")
     )
+    # Dictionary for quick lookup 
+    reg_dict = {str(item['date']): item['count'] for item in registrations_count}
+    date_list = [(start_date + timedelta(days=i)) for i in range(days)]
+    chart_data = []
+    for day in date_list:
+        date_str = day.strftime('%Y-%m-%d')
+        chart_data.append({'date': date_str, 'count': reg_dict.get(date_str, 0)})
+
     reject = None
 
     # Rejected event
@@ -186,7 +207,7 @@ def event_analytics(request, event_id):
         'total_registrations': total_registrations,
         'conversion_rate': conversion_rate,
         'registered_users': registered_users,
-        'registrations_over_time': list(registrations_over_time),
+        'registrations_over_time': chart_data,
         'reject': reject,
     }
 

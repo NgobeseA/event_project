@@ -137,8 +137,7 @@
 
     <!-- Highligh of the report -->
    
-        <div class="row g-3">
-
+    <div class="row g-3">
         <div class="col-md-6">
             <div class="bg-white rounded shadow p-3 mb-3">
                 {%if total_events > 0 %}
@@ -149,135 +148,142 @@
                 {% endif %}
             </div>
         </div>
+
         <div class="col-md-6">
-            <div class="table-container mt-3">
-    <div class="table-header bg-danger">
-        <h5 class="mb-0">
-            <i class="fas fa-calendar-alt me-2"></i>
-            Events Management
-        </h5>
-    </div>
-    <div class="table-responsive" style="max-height: 420px; overflow-y: auto;">
-        <table class="table table-hover mb-0">
-            <thead>
-                <tr>
-                    <th scope="col">Event Details</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Date & Time</th>
-                    <th scope="col">Location</th>
-                    <th scope="col">Attendees</th>
-                    <th scope="col">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Loop through events here -->
-                {% for event in events %}
-                <tr>
-                    <td>
-                        <div>
-                           <p> {{ event.title }}</p>
-                               
-                           
-                        
-                        </div>
-                    </td>
-                    
-                    <td>
-                        {% if event.status == 'pending' %}
-                            <span class="badge bg-primary">Pending</span>
-                        {% elif event.status == 'draft' %}
-                            <span class="badge bg-secondary">Draft</span>
-                        {% elif event.status == 'cancelled' %}
-                            <span class="badge bg-danger">Cancelled</span>
-                        {% elif event.status == 'rejected' %}
-                            <span class="badge badge-rejected">Rejected</span>
-                        {% elif event.status == 'published' %}
-                            <span class="badge bg-success">Published</span>
-                        {% endif %}
-                        
-                        {% if event.is_approved %}
-                            <div class="mt-1">
-                                <span class="badge bg-success small">
-                                    <i class="fas fa-check-circle"></i> Approved
-                                </span>
-                            </div>
-                        {% endif %}
-                    </td>
-                    <td>
-                        <div>
-                            <strong>{{ event.start_date|date:"M d, Y" }}</strong>
-                        </div>
-                        <div class="text-muted small">
-                            {{ event.start_time|time:"g:i A" }}
-                        </div>
-                    </td>
-                    <td>
-                        {% if event.is_online %}
-                            <span class="badge bg-info mb-1">
-                                <i class="fas fa-globe"></i> Online
-                            </span>
-                            {% if event.online_link %}
-                            <div class="small">
-                                <a href="{{ event.online_link }}" target="_blank" class="text-decoration-none">
-                                    <i class="fas fa-external-link-alt"></i> Join Link
-                                </a>
-                            </div>
-                            {% endif %}
-                        {% else %}
-                            <div>
-                                <i class="fas fa-map-marker-alt text-muted"></i>
-                                {{ event.venue }}
-                            </div>
-                            <div class="text-muted small">{{ event.city }}</div>
-                        {% endif %}
-                    </td>
-                    
-                    <td>
-                        <div>
-                            <span class="badge bg-info">
-                                {{ event.attendees.count }}
-                                {% if event.max_attendees %}
-                                    / {{ event.max_attendees }}
-                                {% endif %}
-                            </span>
-                        </div>
-                        <div class="text-muted small mt-1">
-                            <i class="fas fa-eye"></i> {{ event.views_count }} views
-                        </div>
-                    </td>
-                    <td>
-                        <div class="action-buttons">
-                            <a href="{% url 'edit_event' event.id %}" class="btn btn-sm btn-outline-primary me-1" title="Edit">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            <a href="{% url 'event_analytics' event.id %}" class="btn btn-sm btn-outline-info me-1" title="View">
-                                <i class="fas fa-eye"></i>
-                            </a>
-                            <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteEventModal{{event.id}}"
-                                    title="Delete">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-
-
-
-                {% empty %}
-                <tr>
-                    <td colspan="8" class="text-center py-4 text-muted">
-                        <i class="fas fa-calendar-times fa-2x mb-2"></i>
-                        <div>No events found</div>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
-</div>
+            <div class="card shadow p-2">
+                <div class="">
+                    <div>
+                        <h6>View analytics</h6>
+                        <small class="text-muted">Check out the views you have under your channels</small>
+                    </diV>
+                </div>
+                <div>
+                    <canvas id="viewsChart"></canvas>
+                </div>
+            </div>
         </div>
+        
     </div>
+
+    <div class="table-container mt-3">
+                <div class="table-header bg-danger">
+                    <h5 class="mb-0">
+                        <i class="fas fa-calendar-alt me-2"></i>
+                        Events Management
+                    </h5>
+                </div>
+                <div class="table-responsive" style="max-height: 420px; overflow-y: auto;">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th scope="col">Event Details</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Date & Time</th>
+                                <th scope="col">Location</th>
+                                <th scope="col">Attendees</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <!-- Loop through events here -->
+                        {% for event in events %}
+                        <tr>
+                            <td>
+                                <div>
+                                    <p> {{ event.title }}</p>
+                                </div>
+                            </td>
+                    
+                            <td>
+                                {% if event.status == 'pending' %}
+                                    <span class="badge bg-primary">Pending</span>
+                                {% elif event.status == 'draft' %}
+                                    <span class="badge bg-secondary">Draft</span>
+                                {% elif event.status == 'cancelled' %}
+                                    <span class="badge bg-danger">Cancelled</span>
+                                {% elif event.status == 'rejected' %}
+                                    <span class="badge badge-rejected">Rejected</span>
+                                {% elif event.status == 'published' %}
+                                    <span class="badge bg-success">Published</span>
+                                {% endif %}
+                                
+                                {% if event.is_approved %}
+                                    <div class="mt-1">
+                                        <span class="badge bg-success small">
+                                            <i class="fas fa-check-circle"></i> Approved
+                                        </span>
+                                    </div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div>
+                                    <strong>{{ event.start_date|date:"M d, Y" }}</strong>
+                                </div>
+                                <div class="text-muted small">
+                                    {{ event.start_time|time:"g:i A" }}
+                                </div>
+                            </td>
+                            <td>
+                                {% if event.is_online %}
+                                    <span class="badge bg-info mb-1">
+                                        <i class="fas fa-globe"></i> Online
+                                    </span>
+                                    {% if event.online_link %}
+                                    <div class="small">
+                                        <a href="{{ event.online_link }}" target="_blank" class="text-decoration-none">
+                                            <i class="fas fa-external-link-alt"></i> Join Link
+                                        </a>
+                                    </div>
+                                    {% endif %}
+                                {% else %}
+                                    <div>
+                                        <i class="fas fa-map-marker-alt text-muted"></i>
+                                        {{ event.venue }}
+                                    </div>
+                                    <div class="text-muted small">{{ event.city }}</div>
+                                {% endif %}
+                            </td>
+                    
+                            <td>
+                                <div>
+                                    <span class="badge bg-info">
+                                        {{ event.attendees.count }}
+                                        {% if event.max_attendees %}
+                                            / {{ event.max_attendees }}
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                <div class="text-muted small mt-1">
+                                    <i class="fas fa-eye"></i> {{ event.views_count }} views
+                                </div>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="{% url 'edit_event' event.id %}" class="btn btn-sm btn-outline-primary me-1" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'event_analytics' event.id %}" class="btn btn-sm btn-outline-info me-1" title="View">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteEventModal{{event.id}}"
+                                            title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center py-4 text-muted">
+                                <i class="fas fa-calendar-times fa-2x mb-2"></i>
+                                <div>No events found</div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 </div>
 
 
@@ -296,77 +302,95 @@
     }
 
     {% if total_events > 0 %}
-    document.addEventListener('DOMContentLoaded', function () {
-        // Get chart data from Django context
-        const chartData = JSON.parse('{{ category_chart_data|safe }}');
+document.addEventListener('DOMContentLoaded', function () {
+    // ----- PIE CHART -----
+    const chartData = JSON.parse('{{ category_chart_data|safe }}');
+    const ctx = document.getElementById('categoryChart').getContext('2d');
 
-        // Get canvas context
-        const ctx = document.getElementById('categoryChart').getContext('2d');
-
-        // Create the pie chart
-        new Chart(ctx, {
-            type: 'pie',
-            data: {
-                labels: chartData.labels,
-                datasets: [{
-                    data: chartData.data,
-                    backgroundColor: chartData.colors,
-                    borderColor: '#ffffff',
-                    borderWidth: 2,
-                    hoverBorderWidth: 3,
-                    hoverOffset: 10
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Event Categories by Percentage',
-                        font: {
-                            size: 16,
-                            weight: 'bold'
-                        },
-                        padding: 20
-                    },
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            padding: 15,
-                            usePointStyle: true,
-                            font: {
-                                size: 12
-                            }
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: chartData.labels,
+            datasets: [{
+                data: chartData.data,
+                backgroundColor: chartData.colors,
+                borderColor: '#ffffff',
+                borderWidth: 2,
+                hoverBorderWidth: 3,
+                hoverOffset: 10
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Event Categories by Percentage',
+                    font: { size: 16, weight: 'bold' },
+                    padding: 20
+                },
+                legend: {
+                    position: 'bottom',
+                    labels: { padding: 15, usePointStyle: true, font: { size: 12 } }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            const label = context.label || '';
+                            const value = context.parsed;
+                            return `${label}: ${value}%`;
                         }
                     },
-                    tooltip: {
-                        callbacks: {
-                            label: function (context) {
-                                const label = context.label || '';
-                                const value = context.parsed;
-                                return `${label}: ${value}%`;
-                            }
-                        },
-                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                        titleColor: '#ffffff',
-                        bodyColor: '#ffffff',
-                        borderColor: '#ffffff',
-                        borderWidth: 1
-                    }
-                },
-                animation: {
-                    animateRotate: true,
-                    animateScale: true,
-                    duration: 1000
-                },
-                interaction: {
-                    intersect: false,
-                    mode: 'index'
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: '#ffffff',
+                    bodyColor: '#ffffff',
+                    borderColor: '#ffffff',
+                    borderWidth: 1
                 }
-            }
-        });
+            },
+            animation: { animateRotate: true, animateScale: true, duration: 1000 },
+            interaction: { intersect: false, mode: 'index' }
+        }
     });
-    {% endif %}
+
+    // ----- LINE CHART -----
+    viewsChart(); // call function after DOM is ready
+});
+{% endif %}
+
+// Line chart function
+function viewsChart() {
+    console.log('Line chart is running....')
+    try {
+        const labels = Array.from({length: 30}, (_, i) => `Day ${i + 1}`);
+        const data = {
+            labels: labels,
+            datasets: [{
+                label: 'Total Views',
+                data: Array.from({length: 30}, () => Math.floor(Math.random() * 10)),
+                borderColor: 'blue',
+                backgroundColor: 'rgba(0, 0, 255, 0.2)',
+                fill: true,
+                tension: 0.3
+            }]
+        };
+
+        const config = {
+            type: 'line',
+            data: data,
+            options: {
+                responsive: true,
+                plugins: { legend: { display: true } },
+                scales: { y: { beginAtZero: true } }
+            }
+        };
+
+        new Chart(document.getElementById('viewsChart'), config);
+    } catch (error) {
+        console.error(`failed to load line chart: ${error}`);
+    }
+
+}
 </script>
 {% endblock content %}
