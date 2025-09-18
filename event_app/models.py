@@ -212,7 +212,7 @@ class EventFavorite(models.Model):
 class Budget(models.Model):
     event = models.OneToOneField(Event, on_delete=models.CASCADE, related_name='budget')
     total_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
-    notes = models.TextField()
+    notes = models.TextField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     update_at = models.DateTimeField(auto_now=True)
 

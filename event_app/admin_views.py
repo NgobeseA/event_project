@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
-from .models import Event, Rejection, EventRegistrations
+from .models import Event, Rejection, EventRegistrations, BudgetItem
 from .forms import EventForm
 
 
@@ -14,8 +14,10 @@ def events_list_view(request):
 
 def preview_event(request, event_id):
     event = get_object_or_404(Event, id=event_id)
+    budget_items = BudgetItem.objects.filter(budget=event.budget.id)
+    print(len(budget_items))
 
-    return render(request, 'admin/preview.html', {'event': event})
+    return render(request, 'admin/preview.html', {'event': event, 'budget_items': budget_items})
 
 def admin_delete_event_view(request, event_id):
     event = get_object_or_404(Event, id=event_id)
@@ -44,7 +46,7 @@ def reject_event_view(request, event_id):
 
     if request.method == 'POST':
         admin = request.user
-        message = request.POST.get('message', '')
+        message = request.POST.get('message')
 
         Rejection.objects.create(event=event, admin=admin, message=message)
 

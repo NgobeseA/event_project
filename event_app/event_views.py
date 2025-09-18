@@ -16,6 +16,8 @@ from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from django.contrib.auth import get_user_model
 from django.http import JsonResponse
+import json
+from django.views.decorators.csrf import csrf_exempt
 
 from .models import Event, Notification, Budget, BudgetItem, Rejection, EventRegistrations, FormField
 from .forms import EventForm
@@ -270,6 +272,7 @@ def upcoming_events_view(request):
 
 CATEGORIES = ['venue', 'catering', 'decor', 'program']  # centralize categories
 
+@csrf_exempt
 def event_budget_view(request, event_id):
     event = get_object_or_404(Event, id=event_id)
     if request.method == 'POST':
@@ -285,6 +288,7 @@ def event_budget_view(request, event_id):
                 category=item_data['category'],
                 amount=item_data['amount']
             )
+        return JsonResponse({'success': True, 'event_id': event.id})
 
     return render(request, 'budget.html', {'event': event,})
 

@@ -332,6 +332,7 @@
         if (description || rate > 0) {
           items.push({
             name: description,
+            category: category,
             amount: rate.toFixed(2)
           });
         }
@@ -347,7 +348,7 @@
     submitBudget() {
       const budgetData = this.getBudgetData();
 
-      fetch('/api/budget/', {
+      fetch('/events/{{event.id}}/budget/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -358,7 +359,8 @@
       .then(res => res.json())
       .then(data => {
         console.log('Budget saved:', data)
-        // I want to move to the next page with is the summary page
+        // I want to move to the next page with is the summary page\
+        window.location.href = `/events/${data.event_id}/summary/`;
       })
       .catch(error => {console.error('Error: ', error)})
     }
