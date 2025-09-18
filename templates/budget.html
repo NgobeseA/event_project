@@ -116,7 +116,7 @@
     <div class="budget-form">
             <form id="budgetForm">
                 <!-- Budget Items Section -->
-                <div class="budget-item-header">
+                <div class="budget-item-header bg-success">
                     <div class="row align-items-center">
                         <div class="col-5">Item</div>
                         <div class="col-md-3 text-center d-md-block">Category</div>
@@ -133,7 +133,7 @@
                                 <input type="text" class="form-control item-description" placeholder="Description of item/service..." name="items[1][name]">
                             </div>
                             <div class="col-3 d-md-block">
-                                <input type="text" class="form-control" placeholder="Gift, Venue, Catering..." name="items[1][category]">
+                                <input type="text" class="form-control item-category" placeholder="Gift, Venue, Catering..." name="items[1][category]">
                             </div>
                             <div class="col-2">
                                 <div class="input-group">
@@ -165,33 +165,7 @@
                 <div class="summary-section p-4">
                     <div class="row justify-content-end">
                         <div class="col-md-6">
-                            <!-- Subtotal -->
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span>Subtotal</span>
-                                <span><span class="currency-symbol">R</span> <span id="subtotal">0.00</span></span>
-                            </div>
-                            
-                            <!-- Discount -->
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span>Discount</span>
-                                <div class="d-flex align-items-center">
-                                    <input type="number" class="form-control form-control-sm me-2" style="width: 80px;" id="discountAmount" placeholder="0" min="0" step="0.01">
-                                    <select class="form-select form-select-sm me-2" style="width: 60px;" id="discountType">
-                                        <option value="%">%</option>
-                                        <option value="fixed">R</option>
-                                    </select>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" id="refreshDiscount">
-                                        <i class="fas fa-sync-alt"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <!-- Tax and Shipping -->
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="add-section">+ Tax</span>
-                                <span class="add-section">+ Shipping</span>
-                            </div>
-                            
+
                             <!-- Total -->
                             <div class="d-flex justify-content-between align-items-center mb-3 border-top pt-2">
                                 <span class="total-amount">Total</span>
@@ -294,7 +268,7 @@
             <input type="text" class="form-control item-description" placeholder="Description of item" name="items[${this.itemCounter}][name]">
           </div>
           <div class="col-3 d-block">
-            <input type="text" class="form-control" placeholder="Gift, Venue, Catering..." name="items[${this.itemCounter}][category]">
+            <input type="text" class="form-control item-category" placeholder="Gift, Venue, Catering..." name="items[${this.itemCounter}][category]">
           </div>
           <div class="col-2">
               <div class="input-group">
@@ -327,14 +301,12 @@
     };
 
     calculateItemAmount(itemRow) {
-      console.log('Calculating item amount per row...')
       const input = itemRow.querySelector('.item-rate');
       if (!input) {
         console.warn('No .item-rate input found in this row:', itemRow);
         return 0;
       }
       const rate = parseFloat(input.value) || 0;
-      console.log('Rate is: R', rate.toFixed(2))
       itemRow.querySelector('.item-amount').textContent = rate.toFixed(2);
 
       return rate;
@@ -363,18 +335,52 @@
             amount: rate.toFixed(2)
           });
         }
+      });
 
-        return {
-          items: items,
-          total_amount: document.getElementById('total').textContent,
-        }
-      })
+      return {
+        items: items,
+        total_amount: document.getElementById('total').textContent,
+        notes: document.querySelector('textarea[name="notes"]').value,
+      };
     }
 
+    submitBudget() {
+      const budgetData = this.getBudgetData();
+
+      fetch('/api/budget/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCookie('csrftoken'),
+        },
+        body: JSON.stringify(budgetData)
+      })
+      .then(res => res.json())
+      .then(data => {
+        console.log('Budget saved:', data)
+        // I want to move to the next page with is the summary page
+      })
+      .catch(error => {console.error('Error: ', error)})
+    }
   }
 
   document.addEventListener('DOMContentLoaded', () => {
     new BudgetCalculator
-  })
+  });
+
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1)) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
 </script>
 {% endblock %}
