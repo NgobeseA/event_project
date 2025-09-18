@@ -1,236 +1,380 @@
 {%extends 'base.html' %} {% block content %}
 <style>
-  h1,
-  h2 {
-    text-align: center;
-    color: #222;
-  }
-  form {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  .row-sections {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 24px;
-    width: 100%;
-    justify-content: center;
-  }
-  .section {
-    margin-bottom: 20px;
-    width: 45%;
-    min-width: 300px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  table {
-    width: 90%;
-    border-collapse: collapse;
-    margin-bottom: 5px;
-  }
-  th,
-  td {
-    border: 1px solid #ccc;
-    padding: 6px 8px;
-    text-align: center;
-    font-size: 15px;
-  }
-  th {
-    background-color: rgb(7, 109, 55);
-    color: white;
-    font-size: 16px;
-  }
-  input[type="text"],
-  input[type="number"] {
-    width: 90%;
-    padding: 4px 6px;
-    box-sizing: border-box;
-    text-align: center;
-  }
-  .event-details {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 30px;
-    justify-items: center;
-  }
-  label {
-    font-weight: bold;
-    display: block;
-    margin-bottom: 5px;
-    text-align: center;
-  }
-  .form-group {
-    margin-bottom: 10px;
-  }
-  button {
-    display: block;
-    margin: 0 auto;
-    padding: 12px 10px;
-    background-color: rgb(7, 109, 55);
-    border: none;
-    border-radius: 6px;
-    font-size: 16px;
-    cursor: pointer;
-    color: white;
-  }
-  @media (max-width: 900px) {
-    .section {
-      width: 100%;
-      min-width: unset;
-    }
-    .row-sections {
-      flex-direction: column;
-      gap: 0;
-    }
-  }
-</style>
+        .budget-form {
+            max-width: 1200px;
+            margin: 2rem auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .budget-header {
+            background: #1e3a5f;
+            color: white;
+            padding: 1rem 2rem;
+            font-weight: 600;
+        }
+        
+        .budget-item-header {
+            background: #1e3a5f;
+            color: white;
+            padding: 0.75rem 1rem;
+        }
+        
+        .budget-item-row {
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .budget-item-row:last-child {
+            border-bottom: none;
+        }
+        
+        .form-control:focus {
+            border-color: #1e3a5f;
+            box-shadow: 0 0 0 0.2rem rgba(30, 58, 95, 0.25);
+        }
+        
+        .btn-add-item {
+            background: #17a2b8;
+            border: 1px solid #17a2b8;
+            color: white;
+            border-radius: 20px;
+            padding: 0.375rem 1rem;
+            font-size: 0.875rem;
+        }
+        
+        .btn-add-item:hover {
+            background: #138496;
+            border-color: #117a8b;
+            color: white;
+        }
+        
+        .btn-remove {
+            color: #dc3545;
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+        }
+        
+        .btn-remove:hover {
+            color: #c82333;
+        }
+        
+        .summary-section {
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .currency-symbol {
+            color: #6c757d;
+            font-weight: 500;
+        }
+        
+        .total-amount {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .balance-due {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #dc3545;
+        }
+        
+        .add-section {
+            color: #17a2b8;
+            font-size: 0.875rem;
+        }
+        
+        .notes-section, .terms-section {
+            background: #f8f9fa;
+        }
+        
+        @media (max-width: 768px) {
+            .budget-item-header .col-2,
+            .budget-item-row .col-2 {
+                display: none;
+            }
+            
+            .budget-item-header .col-3,
+            .budget-item-row .col-3 {
+                flex: 0 0 50%;
+                max-width: 50%;
+            }
+        }
+    </style>
 {% include "partials/progress_bar.html" with step=2 %}
+
 <div class="container">
-  <h1>Event Budget</h1>
-  <form method="post">
-    {% csrf_token %}
-    <div class="event-details mt-2">
-      {{ event_form.event_name.label_tag }} {{ event_form.event_name }} {{ event_form.date.label_tag }} {{ event_form.date }}
+  <div class="bg-white shadow-sm p-md-3">
+    <div class="mb-md-3">
+      <h3>Budget for {{ event.title }}</h3>
+      <small class="text-muted">by {{ event.organizer.get_full_name }}</small>
     </div>
 
-    <div class="row-sections">
-      <div class="section">
-        <h2>Venue</h2>
-        <table>
-          <tr>
-            <th style="width: 60%">Item</th>
-            <th style="width: 40%">Budget</th>
-          </tr>
-          {% for form in venue_formset %}
-          <tr>
-            <td>{{ form.name }}</td>
-            <td>{{ form.budget }}</td>
-          </tr>
-          {% endfor %}
-        </table>
-      </div>
-      <div class="section">
-        <h2>Catering</h2>
-        <table>
-          <tr>
-            <th style="width: 60%">Item</th>
-            <th style="width: 40%">Budget</th>
-          </tr>
-          {% for form in catering_formset %}
-          <tr>
-            <td>{{ form.name }}</td>
-            <td>{{ form.budget }}</td>
-          </tr>
-          {% endfor %}
-        </table>
-      </div>
-    </div>
-
-    <div class="row-sections">
-      <div class="section">
-        <h2>Décor & Tools</h2>
-        <table>
-          <tr>
-            <th style="width: 60%">Item</th>
-            <th style="width: 40%">Budget</th>
-          </tr>
-          {% for form in decor_formset %}
-          <tr>
-            <td>{{ form.name }}</td>
-            {{ form.budget }}
-          </tr>
-          {% endfor %}
-        </table>
-      </div>
-      <div class="section">
-        <h2>Program</h2>
-        <table>
-          <tr>
-            <th style="width: 60%">Item</th>
-            <th style="width: 40%">Budget</th>
-          </tr>
-          {% for form in program_formset %}
-          <tr>
-            <td>{{ form.name }}</td>
-            <td>{{ form.budget }}</td>
-          </tr>
-          {% endfor %}
-        </table>
-      </div>
-    </div>
-
-    <div class="section">
-      <h2>Totals</h2>
-      <table>
-        <tr>
-          <th>Section</th>
-          <th>Budget Total</th>
-        </tr>
-        <tr>
-          <td>Venue</td>
-          <td id="venue-budget-total">0.00</td>
-        </tr>
-        <tr>
-          <td>Catering</td>
-          <td id="catering-budget-total">0.00</td>
-        </tr>
-        <tr>
-          <td>Décor & Tools</td>
-          <td id="decor-budget-total">0.00</td>
-        </tr>
-        <tr>
-          <td>Program</td>
-          <td id="program-budget-total">0.00</td>
-        </tr>
-        <tr>
-          <th>Overall</th>
-          <th id="overall-budget-total">0.00</th>
-        </tr>
-      </table>
-    </div>
-    <button type="submit">Submit Budget</button>
-  </form>
+    <div class="budget-form">
+            <form id="budgetForm">
+                <!-- Budget Items Section -->
+                <div class="budget-item-header">
+                    <div class="row align-items-center">
+                        <div class="col-5">Item</div>
+                        <div class="col-md-3 text-center d-md-block">Category</div>
+                        <div class="col-2 text-center">Rate</div>
+                        <div class="col-2 text-end">Amount</div>
+                    </div>
+                </div>
+                
+                <!-- Dynamic Budget Items -->
+                <div id="budgetItems">
+                    <div class="budget-item-row p-3" data-item-id="1">
+                        <div class="row align-items-center">
+                            <div class="col-5">
+                                <input type="text" class="form-control item-description" placeholder="Description of item/service..." name="items[1][name]">
+                            </div>
+                            <div class="col-3 d-md-block">
+                                <input type="text" class="form-control" placeholder="Gift, Venue, Catering..." name="items[1][category]">
+                            </div>
+                            <div class="col-2">
+                                <div class="input-group">
+                                    <span class="input-group-text currency-symbol">R</span>
+                                    <input type="number" class="form-control item-rate" placeholder="0.00" step="0.01" name="items[1][rate]">
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span class="currency-symbol me-1">R</span>
+                                    <span class="item-amount">0.00</span>
+                                    <button type="button" class="btn btn-remove ms-2 remove-item" title="Remove item">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Add Line Item Button -->
+                <div class="p-3 border-bottom">
+                    <button type="button" class="btn btn-outline-success" id="addItemBtn">
+                        <i class="fas fa-plus me-1"></i> Line Item
+                    </button>
+                </div>
+                
+                <!-- Summary Section -->
+                <div class="summary-section p-4">
+                    <div class="row justify-content-end">
+                        <div class="col-md-6">
+                            <!-- Subtotal -->
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span>Subtotal</span>
+                                <span><span class="currency-symbol">R</span> <span id="subtotal">0.00</span></span>
+                            </div>
+                            
+                            <!-- Discount -->
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span>Discount</span>
+                                <div class="d-flex align-items-center">
+                                    <input type="number" class="form-control form-control-sm me-2" style="width: 80px;" id="discountAmount" placeholder="0" min="0" step="0.01">
+                                    <select class="form-select form-select-sm me-2" style="width: 60px;" id="discountType">
+                                        <option value="%">%</option>
+                                        <option value="fixed">R</option>
+                                    </select>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" id="refreshDiscount">
+                                        <i class="fas fa-sync-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Tax and Shipping -->
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="add-section">+ Tax</span>
+                                <span class="add-section">+ Shipping</span>
+                            </div>
+                            
+                            <!-- Total -->
+                            <div class="d-flex justify-content-between align-items-center mb-3 border-top pt-2">
+                                <span class="total-amount">Total</span>
+                                <span class="total-amount"><span class="currency-symbol">R</span> <span id="total">0.00</span></span>
+                            </div>
+                            
+                            <!-- Amount Paid -->
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span>Amount Paid</span>
+                                <div class="d-flex align-items-center">
+                                    <span class="currency-symbol me-2">R</span>
+                                    <input type="number" class="form-control form-control-sm text-end" style="width: 100px;" id="amountPaid" placeholder="0" min="0" step="0.01" name="amount_paid">
+                                </div>
+                            </div>
+                            
+                            <!-- Balance Due -->
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="balance-due">Balance Due</span>
+                                <span class="balance-due"><span class="currency-symbol">R</span> <span id="balanceDue">0.00</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Notes Section -->
+                <div class="notes-section p-4">
+                    <h6 class="mb-3">Notes</h6>
+                    <textarea class="form-control" rows="3" placeholder="Notes - any relevant information not already covered" name="notes"></textarea>
+                </div>
+                
+                <!-- Terms Section -->
+                <div class="terms-section p-4">
+                    <h6 class="mb-3">Terms</h6>
+                    <textarea class="form-control" rows="3" placeholder="Terms and conditions - late fees, payment methods, delivery schedule" name="terms"></textarea>
+                </div>
+                
+                <!-- Submit Button -->
+                <div class="p-4 border-top">
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-outline-secondary">Save Draft</button>
+                        <button type="submit" class="btn btn-primary">Save Budget</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+  </div>
 </div>
+
 <script>
-  function sumInputs(selector) {
-    let total = 0;
-    document.querySelectorAll(selector).forEach((input) => {
-      let value = parseFloat(input.value);
-      if (!isNaN(value)) total += value;
-    });
-    return total.toFixed(2);
+  class BudgetCalculator {
+    constructor() {
+      this.itemCounter = 1;
+      this.init();
+    }
+
+    init() {
+      this.bindEvents();
+      this.calculateTotals();
+    }
+
+    bindEvents() {
+      // Add new item
+      document.getElementById('addItemBtn').addEventListener('click', () => {
+        console.log('Adding a new row in the table..')
+        this.addBudgetItem();
+      });
+
+      // Remove item
+      document.addEventListener('click', (e) => {
+        if (e.target.closest('.remove-item')) {
+          this.removeBudgetItem(e.target.closest('.budget-item-row'));
+        }
+      });
+
+      // Calculate on input change
+      document.addEventListener('input', (e) => {
+        if (e.target.matches('.item-rate')) {
+          this.calculateTotals();
+        }
+      });
+
+      // Form submission
+      document.getElementById('budgetForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        this.submitBudget();
+      });
+    }
+
+    addBudgetItem() {
+      this.itemCounter++;
+      const itemsContainer = document.getElementById('budgetItems');
+
+      const itemRow = document.createElement('div');
+      itemRow.className = 'budget-item-row p-3';
+      itemRow.dataset.itemId = this.itemCounter;
+
+      itemRow.innerHTML = `
+        <div class="row align-items-center">
+          <div class="col-5">
+            <input type="text" class="form-control item-description" placeholder="Description of item" name="items[${this.itemCounter}][name]">
+          </div>
+          <div class="col-3 d-block">
+            <input type="text" class="form-control" placeholder="Gift, Venue, Catering..." name="items[${this.itemCounter}][category]">
+          </div>
+          <div class="col-2">
+              <div class="input-group">
+                  <span class="input-group-text currency-symbol">R</span>
+                  <input type="number" class="form-control item-rate" placeholder="0.00" step="0.01" name="items[${this.itemCounter}][rate]">
+              </div>
+          </div>
+          <div class="col-2">
+            <div class="d-flex align-items-center justify-content-between">
+                <span class="currency-symbol me-1">R</span>
+                <span class="item-amount">0.00</span>
+                <button type="button" class="btn btn-remove ms-2 remove-item" title="Remove item">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+          </div>
+        </div>
+      `;
+      itemsContainer.appendChild(itemRow);
+
+      // auto focus on the new item description
+      itemRow.querySelector('.item-description').focus()
+    }
+
+    removeBudgetItem(itemRow) {
+      if (document.querySelectorAll('.budget-item-row').length > 1) {
+        itemRow.remove();
+        this.calculateTotals();
+      }
+    };
+
+    calculateItemAmount(itemRow) {
+      console.log('Calculating item amount per row...')
+      const input = itemRow.querySelector('.item-rate');
+      if (!input) {
+        console.warn('No .item-rate input found in this row:', itemRow);
+        return 0;
+      }
+      const rate = parseFloat(input.value) || 0;
+      console.log('Rate is: R', rate.toFixed(2))
+      itemRow.querySelector('.item-amount').textContent = rate.toFixed(2);
+
+      return rate;
+    }
+
+    calculateTotals() {
+      let total = 0
+      document.querySelectorAll('.budget-item-row').forEach(row => {
+        total += this.calculateItemAmount(row);
+      });
+
+      document.getElementById('total').textContent = total.toFixed(2);
+    }
+
+    getBudgetData() {
+      const items = [];
+
+      document.querySelectorAll('.budget-item-row').forEach(row => {
+        const description = row.querySelector('.item-description').value.trim();
+        const category = row.querySelector('.item-category').value.trim();
+        const rate = parseFloat(row.querySelector('.item-rate')?.value || 0);
+        
+        if (description || rate > 0) {
+          items.push({
+            name: description,
+            amount: rate.toFixed(2)
+          });
+        }
+
+        return {
+          items: items,
+          total_amount: document.getElementById('total').textContent,
+        }
+      })
+    }
+
   }
 
-  function updateTotals() {
-    document.getElementById("venue-budget-total").textContent = sumInputs(
-      'input[name^="venue-"][name$="-budget"]'
-    );
-    document.getElementById("catering-budget-total").textContent = sumInputs(
-      'input[name^="catering-"][name$="-budget"]'
-    );
-    document.getElementById("decor-budget-total").textContent = sumInputs(
-      'input[name^="decor-"][name$="-budget"]'
-    );
-    document.getElementById("program-budget-total").textContent = sumInputs(
-      'input[name^="program-"][name$="-budget"]'
-    );
-    let overallBudget = 0;
-    document.querySelectorAll('input[name$="-budget"]').forEach((input) => {
-      let value = parseFloat(input.value);
-      if (!isNaN(value)) overallBudget += value;
-    });
-    document.getElementById("overall-budget-total").textContent =
-      overallBudget.toFixed(2);
-  }
-  document.addEventListener("input", function (e) {
-    if (e.target.matches('input[name$="-budget"]')) {
-      updateTotals();
-    }
-  });
-  document.addEventListener("DOMContentLoaded", updateTotals);
+  document.addEventListener('DOMContentLoaded', () => {
+    new BudgetCalculator
+  })
 </script>
 {% endblock %}
