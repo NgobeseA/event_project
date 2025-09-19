@@ -1,145 +1,233 @@
 {% extends "admin/base.html" %}
 {% block title %}User Profile{% endblock title %}
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
-        <div class="card shadow">
-            <div class="card-header bg-primary text-white">
-                <h4 class="mb-0">
-                    <i class="fas fa-user me-2"></i>User Profile
-                </h4>
+<div class="p-md-3 p-sm-1">
+    <div class="d-flex gap-3 w-100">
+        <div class="text-center">
+            <div class="position-relative d-inline-block">
+                <img src="https://via.placeholder.com/120x120/6c757d/ffffff?text=User" 
+                        alt="Profile Picture" 
+                        class="rounded-circle border border-3 border-primary"
+                        width="120" height="120">
+                
+                <!-- <span class="position-absolute bottom-0 end-0 badge bg-success rounded-pill">
+                    {{ user.get_role_display }}
+                </span> -->
             </div>
-            <div class="card-body">
-                <!-- Profile Picture Section -->
-                <div class="text-center mb-4">
-                    <div class="position-relative d-inline-block">
-                        <img src="https://via.placeholder.com/120x120/6c757d/ffffff?text=User" 
-                                alt="Profile Picture" 
-                                class="rounded-circle border border-3 border-primary"
-                                width="120" height="120">
-                        <!-- Role Badge -->
-                        <span class="position-absolute bottom-0 end-0 badge bg-success rounded-pill">
-                            {{ user.get_role_display }}
-                        </span>
-                    </div>
+        </div>
+        <div class="w-100">
+            <div class="d-flex align-items-center gap-2">
+                <h4>{{user.get_full_name}}</h4>
+                <span class="badge bg-primary rounded-fill">{{user.get_role_display}}</span>
+            </div>
+            <div class="d-flex justify-content-between ">
+                <div class="d-inline-block">
+                    <small class="text-muted"><i class="fas fa-envelope me-2"></i>Email Address:</small> <br>
+                    <span>{{ user.email|default:"Not provided" }}</span>
+                </div>
+                <div class="bottom-0">
+                    <small class="text-muted"><i class="fas fa-phone me-2"></i>Phone Number:</small> <br>
+                    <span>{{ user.contact_number|default:"Not provided" }}</span>
+                </div>
+                <div class="">
+                    <small class="text-muted"><i class="fas fa-check-circle me-2"></i>Account Status</small> <br>
+                    {% if user.is_active %}
+                        <span class="badge bg-success">Active</span>
+                    {% else %}
+                        <span class="badge bg-danger">Inactive</span>
+                    {% endif %}
+                </div>
+                <div>
+                    <small class="text-muted"><i class="fas fa-calendar-alt me-2"></i>Date Joined</small> <br>
+                    <span>{{ user.date_joined|date:"F d, Y" }}</span>
                 </div>
 
-                <!-- User Information -->
-                <div class="row">
-                    <div class="col-12">
-                        <div class="mb-3">
-                            <label class="form-label fw-bold text-muted">
-                                <i class="fas fa-user me-2"></i>Username
-                            </label>
-                            <div class="border rounded p-2 bg-light">
-                                {{ user.username }}
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-bold text-muted">
-                                <i class="fas fa-envelope me-2"></i>Email Address
-                            </label>
-                            <div class="border rounded p-2 bg-light">
-                                {{ user.email|default:"Not provided" }}
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-bold text-muted">
-                                <i class="fas fa-user-tag me-2"></i>First Name
-                            </label>
-                            <div class="border rounded p-2 bg-light">
-                                {{ user.first_name|default:"Not provided" }}
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-bold text-muted">
-                                <i class="fas fa-user-tag me-2"></i>Last Name
-                            </label>
-                            <div class="border rounded p-2 bg-light">
-                                {{ user.last_name|default:"Not provided" }}
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-bold text-muted">
-                                <i class="fas fa-phone me-2"></i>Contact Number
-                            </label>
-                            <div class="border rounded p-2 bg-light">
-                                {{ user.contact_number|default:"Not provided" }}
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-bold text-muted">
-                                <i class="fas fa-shield-alt me-2"></i>Role
-                            </label>
-                            <div class="border rounded p-2 bg-light">
-                                <span class="badge bg-{% if user.role == 'admin' %}danger{% elif user.role == 'organizer' %}warning{% else %}info{% endif %} fs-6">
-                                    {{ user.get_role_display }}
-                                </span>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-bold text-muted">
-                                <i class="fas fa-calendar-alt me-2"></i>Date Joined
-                            </label>
-                            <div class="border rounded p-2 bg-light">
-                                {{ user.date_joined|date:"F d, Y" }}
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-bold text-muted">
-                                <i class="fas fa-clock me-2"></i>Last Login
-                            </label>
-                            <div class="border rounded p-2 bg-light">
-                                {{ user.last_login|date:"F d, Y g:i A"|default:"Never" }}
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-bold text-muted">
-                                <i class="fas fa-check-circle me-2"></i>Account Status
-                            </label>
-                            <div class="border rounded p-2 bg-light">
-                                {% if user.is_active %}
-                                    <span class="badge bg-success">Active</span>
-                                {% else %}
-                                    <span class="badge bg-danger">Inactive</span>
-                                {% endif %}
-                                
-                                {% if user.is_staff %}
-                                    <span class="badge bg-warning ms-2">Staff</span>
-                                {% endif %}
-                                
-                                {% if user.is_superuser %}
-                                    <span class="badge bg-danger ms-2">Superuser</span>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="d-flex gap-2 mt-4">
-                    <a href="" class="btn btn-primary">
-                        <i class="fas fa-edit me-2"></i>Edit Profile
-                    </a>
-                    <a href="" class="btn btn-outline-secondary">
-                        <i class="fas fa-key me-2"></i>Change Password
-                    </a>
-                    <a href="{% url 'users' %}" class="btn btn-outline-dark">
-                        <i class="fas fa-arrow-left me-2"></i>Back to Users
-                    </a>
+                <div>
+                    <small class="text-muted"><i class="fas fa-clock me-2"></i>Last Login</small> <br>
+                    <span>{{ user.last_login|date:"F d, Y g:i A"|default:"Never" }}</span>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<div class="">
+    <div class="card shadow-sm mt-3 border success">
+        <div class="card-body">
+            <h6>All Events for {{ user.username}}</h6>
+            <p class="text-muted small">Browse the upcoming events</p>
+
+            <div class="chart-card">
+                <h5 class="mb-3">
+                    <i class="bi bi-calendar-plus me-2"></i>
+                    Upcoming Events
+                </h5>
+
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th scope="col">Event Details</th>
+                                <th scope="col">Category</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Date & Time</th>
+                                <th scope="col">Location</th>
+                                <th scope="col">Organizer</th>
+                                <th scope="col">Attendees</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Loop through events here -->
+                            {% for event in events %}
+                            <tr>
+                                <td>
+                                    <div>
+                                        <h5> {{ event.title }}</h5>
+
+
+
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if event.category == 'music-arts' %}
+                                    <span class="badge bg-purple" style="background-color: #6f42c1 !important;">Music &
+                                        Arts</span>
+                                    {% elif event.category == 'business' %}
+                                    <span class="badge bg-primary">Business & Professional</span>
+                                    {% elif event.category == 'sports' %}
+                                    <span class="badge bg-warning text-dark">Sports & Fitness</span>
+                                    {% elif event.category == 'technology' %}
+                                    <span class="badge bg-info">Technology</span>
+                                    {% elif event.category == 'food-drink' %}
+                                    <span class="badge bg-orange" style="background-color: #fd7e14 !important;">Food &
+                                        Drink</span>
+                                    {% elif event.category == 'health-wellness' %}
+                                    <span class="badge bg-success">Health & Wellness</span>
+                                    {% elif event.category == 'education' %}
+                                    <span class="badge bg-dark">Education & Learning</span>
+                                    {% elif event.category == 'community' %}
+                                    <span class="badge bg-secondary">Community & Culture</span>
+                                    {% elif event.category == 'charity' %}
+                                    <span class="badge bg-pink" style="background-color: #d63384 !important;">Charity &
+                                        Fundraising</span>
+                                    {% elif event.category == 'government' %}
+                                    <span class="badge bg-indigo"
+                                        style="background-color: #6610f2 !important;">Government & Politics</span>
+                                    {% elif event.category == 'tourism' %}
+                                    <span class="badge bg-teal" style="background-color: #20c997 !important;">Tourism &
+                                        Hospitality</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if event.status == 'pending' %}
+                                    <span class="badge bg-primary">Pending</span>
+                                    {% elif event.status == 'draft' %}
+                                    <span class="badge bg-secondary">Draft</span>
+                                    {% elif event.status == 'cancelled' %}
+                                    <span class="badge bg-danger">Cancelled</span>
+                                    {% elif event.status == 'rejected' %}
+                                    <span class="badge badge-rejected">Rejected</span>
+                                    {% elif event.status == 'published' %}
+                                    <span class="badge bg-success">Published</span>
+                                    {% endif %}
+
+                                    {% if event.is_approved %}
+                                    <div class="mt-1">
+                                        <span class="badge bg-success small">
+                                            <i class="fas fa-check-circle"></i> Approved
+                                        </span>
+                                    </div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div>
+                                        <strong>{{ event.start_date|date:"M d, Y" }}</strong>
+                                        {% if event.end_date != event.start_date %}
+                                        - {{ event.end_date|date:"M d, Y" }}
+                                        {% endif %}
+                                    </div>
+                                    <div class="text-muted small">
+                                        {{ event.start_time|time:"g:i A" }} - {{ event.end_time|time:"g:i A" }}
+                                    </div>
+                                    {% if event.registration_deadline %}
+                                    <div class="text-muted small">
+                                        <i class="fas fa-clock"></i> Reg. deadline: {{event.registration_deadline|date:"M d, g:i A" }}
+                                    </div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if event.is_online %}
+                                    <span class="badge bg-info mb-1">
+                                        <i class="fas fa-globe"></i> Online
+                                    </span>
+                                    {% if event.online_link %}
+                                    <div class="small">
+                                        <a href="{{ event.online_link }}" target="_blank" class="text-decoration-none">
+                                            <i class="fas fa-external-link-alt"></i> Join Link
+                                        </a>
+                                    </div>
+                                    {% endif %}
+                                    {% else %}
+                                    <div>
+                                        <i class="fas fa-map-marker-alt text-muted"></i>
+                                        {{ event.venue }}
+                                    </div>
+                                    <div class="text-muted small">{{ event.city }}</div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div>{{ event.organizer.get_full_name|default:event.organizer.username }}</div>
+                                    <div class="text-muted small">{{ event.organizer.email }}</div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <span class="badge bg-info">
+                                            {{ event.attendees.count }}
+                                            {% if event.max_attendees %}
+                                            / {{ event.max_attendees }}
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                    <div class="text-muted small mt-1">
+                                        <i class="fas fa-eye"></i> {{ event.views_count }} views
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a href="" class="btn btn-sm btn-outline-primary me-1" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'preview' event.id %}" class="btn btn-sm btn-outline-info me-1"
+                                            title="View">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-outline-danger"
+                                            data-bs-toggle="modal" data-bs-target="#deleteEventModal{{event.id}}"
+                                            title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+
+
+                            {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center py-4 text-muted">
+                                    <i class="fas fa-calendar-times fa-2x mb-2"></i>
+                                    <div>No events found</div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
 
 {% endblock content %}

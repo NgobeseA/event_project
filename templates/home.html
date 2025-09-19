@@ -71,25 +71,103 @@
 
     <!-- list of events -->
     <div class="row">
-      {% for event in events %}
-      <div class="col-md-3 d-flex align-items-stretch">
-        <div class="card w-100 h-100" style="border-radius: 8px; min-height: 320px;">
-          {% if event.image %}
-            <img src="{{ event.image.url }}" class="card-img-top" style="height: 160px; object-fit: cover; border-top-left-radius: 8px; border-top-right-radius: 8px;" alt="{{ event.title }}">
-          {% else %}
-            <img src="{% static 'images/default1.jpg' %}" class="card-img-top" style="height: 160px; object-fit: cover; border-top-left-radius: 8px; border-top-right-radius: 8px;" alt="Default Event Image">
-          {% endif %}
-          <div class="card-body text-center bg-light text-dark d-flex flex-column justify-content-between" style="height: 160px;">
-            <h5 class="card-title" style="font-size: 1.1rem;">{{ event.title }}</h5>
-            <p class="card-text mb-2">{{ event.start_date }}</p>
-            <a href="{% url 'event_details' event.pk %}" class="btn btn-success mt-auto">View More</a>
-          </div>
+            <!-- Django Template Loop - Replace with actual Django template syntax -->
+            {% for event in events %}
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                <div class="event-card">
+                    <!-- Event Thumbnail -->
+                    <div class="event-thumbnail">
+                        {% if event.image %}
+                        <img src="{{ event.image.url }}" alt="{{ event.title }}">
+                        {% else %}
+                        <i class="fas fa-calendar-check placeholder-icon"></i>
+                        {% endif %}
+                        
+                        <!-- Event Status Badge -->
+                        <div class="event-status status-{{ event.status }}">
+                            {{ event.get_status_display }}
+                        </div>
+                        
+                        <!-- Duration Badge -->
+                        <div class="event-duration">
+                            {% if event.start_date == event.end_date %}
+                                {{ event.start_time|date:"H:i" }} - {{ event.end_time|date:"H:i" }}
+                            {% else %}
+                                {{ event.start_date|date:"M d" }} - {{ event.end_date|date:"M d" }}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Event Content -->
+                    <div class="event-content">
+                        <!-- Event Title -->
+                        <h3 class="event-title">{{ event.title }}</h3>
+                        
+                        <!-- Event Organizer -->
+                        <div class="event-organizer">
+                            <i class="fas fa-user me-1"></i>
+                            {{ event.organizer.get_full_name|default:event.organizer.username }}
+                        </div>
+
+                        <!-- Event Description -->
+                        <p class="event-description">{{ event.description }}</p>
+
+                        <!-- Event Date and Time -->
+                        <div class="event-date-time">
+                            <span>
+                                <i class="fas fa-calendar me-1"></i>
+                                {{ event.start_date|date:"M d, Y" }}
+                            </span>
+                            <span>
+                                <i class="fas fa-clock me-1"></i>
+                                {{ event.start_time|date:"H:i" }}
+                            </span>
+                        </div>
+
+                        <!-- Event Location -->
+                        <div class="event-location">
+                            {% if event.is_online %}
+                                <i class="fas fa-globe me-1"></i>
+                                <span>Online Event</span>
+                                <span class="online-badge">Virtual</span>
+                            {% else %}
+                                <i class="fas fa-map-marker-alt me-1"></i>
+                                <span>{{ event.venue }}, {{ event.city }}</span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Event Meta Information -->
+                        <div class="event-meta">
+                            <div class="event-stats">
+                                <span>
+                                    <i class="fas fa-eye me-1"></i>
+                                    {{ event.views_count }} views
+                                </span>
+                                {% if event.max_attendees %}
+                                <span>
+                                    <i class="fas fa-users me-1"></i>
+                                    {{ event.attendees.count }}/{{ event.max_attendees }}
+                                </span>
+                                {% endif %}
+                            </div>
+                            <div class="event-category">
+                                {{ event.get_category_display }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <!-- No Events Message -->
+            <div class="col-12">
+                <div class="text-center py-5">
+                    <i class="fas fa-calendar-times" style="font-size: 4rem; color: #dee2e6; margin-bottom: 20px;"></i>
+                    <h3 class="text-muted">No events found</h3>
+                    <p class="text-muted">Check back later for upcoming events!</p>
+                </div>
+            </div>
+            {% endfor %}
         </div>
-      </div>
-      {% empty %}
-      <p class="text-muted">No events found.</p>
-      {% endfor %}
-    </div>
     <!-- end list of events -->
   </div>
 </section>

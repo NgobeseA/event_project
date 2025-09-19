@@ -423,8 +423,13 @@ def users_list_view(request):
 
 def get_user_profile_view(request, user_id):
     user = get_object_or_404(User, id=user_id)
+    events = Event.objects.filter(organizer=user)
 
-    return render(request, 'admin/user_profile.html', {'user': user})
+    context = {
+        'user': user, 
+        'events': events,
+    }
+    return render(request, 'admin/user_profile.html', context)
 
 def edit_user_view(request, user_id):
     user = get_object_or_404(User, id=user_id)

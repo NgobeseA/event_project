@@ -16,6 +16,8 @@ from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from django.contrib.auth import get_user_model
 from django.http import JsonResponse
+import json
+from django.views.decorators.csrf import csrf_exempt
 
 from .models import Event, Notification, Budget, BudgetItem, Rejection, EventRegistrations, FormField
 from .forms import EventForm
@@ -270,61 +272,25 @@ def upcoming_events_view(request):
 
 CATEGORIES = ['venue', 'catering', 'decor', 'program']  # centralize categories
 
+@csrf_exempt
 def event_budget_view(request, event_id):
     event = get_object_or_404(Event, id=event_id)
-    BudgetItemFormSet = formset_factory(BudgetItemForm, extra=4)
-
     if request.method == 'POST':
-        event_form = EventBudgetForm(request.POST)
-        venue_formset = BudgetItemFormSet(request.POST, prefix='venue')
-        catering_formset = BudgetItemFormSet(request.POST, prefix='catering')
-        decor_formset = BudgetItemFormSet(request.POST, prefix='decor')
-        program_formset = BudgetItemFormSet(request.POST, prefix='program')
+        data = json.loads(request.body)
 
-        if all([event_form.is_valid(), venue_formset.is_valid(), catering_formset.is_valid(), 
-                decor_formset.is_valid(), program_formset.is_valid()]):
-            # Create or get the Budget for this event
-            budget, created = Budget.objects.get_or_create(event=event)
-            total = 0
+        budget = Budget.objects.create(event=event, total_amount=data['total_amount'], notes=data['notes'])
+        
+        # Create Items in a budget
+        for item_data in data['items']:
+            BudgetItem.objects.create(
+                budget=budget,
+                name=item_data['name'],
+                category=item_data['category'],
+                amount=item_data['amount']
+            )
+        return JsonResponse({'success': True, 'event_id': event.id})
 
-            # Helper to save items
-            def save_items(formset):
-                nonlocal total
-                for form in formset:
-                    name = form.cleaned_data.get('name')
-                    amount = form.cleaned_data.get('amount')
-                    if name or amount:  # Only save if at least one field is filled
-                        item = form.save(commit=False)
-                        item.budget = budget
-                        item.save()
-                        if amount:
-                            total += float(amount)
-
-            save_items(venue_formset)
-            save_items(catering_formset)
-            save_items(decor_formset)
-            save_items(program_formset)
-
-            budget.total_amount = total
-            budget.save()
-
-            return redirect('event_summary', event_id=event.id)
-    else:
-        event_form = EventBudgetForm(initial={
-            'event_name': event.title,})
-        venue_formset = BudgetItemFormSet(prefix='venue')
-        catering_formset = BudgetItemFormSet(prefix='catering')
-        decor_formset = BudgetItemFormSet(prefix='decor')
-        program_formset = BudgetItemFormSet(prefix='program')
-
-    return render(request, 'budget.html', {
-        'event_form': event_form,
-        'venue_formset': venue_formset,
-        'catering_formset': catering_formset,
-        'decor_formset': decor_formset,
-        'program_formset': program_formset,
-        'event': event,
-    })
+    return render(request, 'budget.html', {'event': event,})
 
 def publish_event(request, event_id):
     event = get_object_or_404(Event, id=event_id)
