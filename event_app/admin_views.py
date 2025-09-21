@@ -14,8 +14,12 @@ def events_list_view(request):
 
 def preview_event(request, event_id):
     event = get_object_or_404(Event, id=event_id)
-    budget_items = BudgetItem.objects.filter(budget=event.budget.id)
-    print(len(budget_items))
+    budget_items = []
+    try:
+        if event.budget:
+            budget_items = BudgetItem.objects.filter(budget=event.budget.id)
+    except Exception as e:
+        print(f"Could not load budget items: {e}")
 
     return render(request, 'admin/preview.html', {'event': event, 'budget_items': budget_items})
 
