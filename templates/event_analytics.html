@@ -220,7 +220,7 @@
                         <p class="mb-0">{{ reject.message }}</p>
                     </div>
                     
-                    {% if event.rejected_by %}
+                    
                     <div class="border-top pt-3 mt-3">
                         <small class="text-muted d-block">Rejected by:</small>
                         <div class="d-flex align-items-center mt-1">
@@ -232,13 +232,13 @@
                                 {% if reject.admin.email %}
                                 <small class="text-muted d-block">{{ reject.admin.email }}</small>
                                 {% endif %}
-                                {% if event.rejection_date %}
-                                <small class="text-muted d-block">{{ event.rejection_date|date:"M d, Y g:i A" }}</small>
+                                {% if reject.created_at %}
+                                <small class="text-muted d-block">{{ reject.created_at|date:"M d, Y g:i A" }}</small>
                                 {% endif %}
                             </div>
                         </div>
                     </div>
-                    {% endif %}
+                    
                     
                     <div class="mt-3">
                         <a href="" class="btn btn-warning btn-sm">
