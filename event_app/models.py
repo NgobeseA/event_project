@@ -134,7 +134,7 @@ class Event(models.Model):
     def get_category_display_info(self):
         category_info = {
             self.MUSIC_ARTS: {"label": "Music & Arts", "color": "bg-purple-100 text-purple-800"},
-            self.BUSINESS: {"label": "Business & Professional", "color": "bg-blue-100 text-blue-800"},
+            self.BUSINESS: {"label": "Business & Professional", "color": "#87ceeb"},
             self.SPORTS: {"label": "Sports & Fitness", "color": "bg-green-100 text-green-800"},
             self.TECHNOLOGY: {"label": "Technology", "color": "bg-gray-100 text-gray-800"},
             self.FOOD_DRINK: {"label": "Food & Drink", "color": "bg-orange-100 text-orange-800"},

@@ -1,7 +1,91 @@
 {% extends "base.html" %} {% block title %}View Event Details | EMS{%endblock %}
 {%load static%}
 {% block content%}
+<style>
+.background-overlay {
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0));
+}
+</style>
 <section class="fluid-container bg-light">
+    {% comment %} new updates on the event details UI with UX {% endcomment %}
+    <div class="position-relative overflow-hidden" style="height: 60vh;">
+        <img 
+            src="{% static "./images/event-hero.jpg" %}" 
+            alt="People inside the event hall with the presenter on the stage" 
+            class="w-100 h-100 object-fit-cover"
+        >
+        <div class="position-absolute top-0 start-0 w-100 h-100 background-overlay">
+            <div class="position-absolute bottom-0 start-0 end-0 p-4 p-md-5">
+                <div class="container" style="max-width: 900px;">
+                    <span class="badge {{event.get_category_display_info.color}} mb-3">
+                        {{event.category.capitalize}}
+                    </span>
+                    <h2 class="text-white fw-bold display-5 mb-3">{{event.title}}</h2>
+                    {% comment %} Event Meta data {% endcomment %}
+                    <div class="d-flex flex-wrap gap-4 text-white">
+                        <div class="d-flex">
+                            <i class="bi bi-calender-event"></i>
+                            {% if event.start_date == event.end_date%}
+                                <span>{{event.start_date|date:"d M, Y"}}</span>
+                            {%else%}
+                                <span>{{event.start_date|date:"d M, Y"}} - {{event.end_date|date:"d M, Y"}}</span>
+                            {%endif%}
+                        </div>
+
+                        <div class="d-flex align-items-center gap-2">
+                            <i class"bi bi-clock"></i>
+                            <span>{{event.start_time}} - {{event.end_time}}</span>
+                        </div>
+
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-geo-alt"></i>
+                            {% if event.is_online %}
+                                <span>Virtual Event</span>
+                            {% else %}
+                                <span>{{event.venue}}, {{event.city}}</span>
+                            {%endif%}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% comment %} Main content {% endcomment %}
+    <div class="container px-2 py-4">
+        <div class="d-grid g-4">
+            <div class="col-lg-8">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h6 class="fs-4 fw-bold mb-3 text-dark">About This Event.</h6>
+                        <p class="text-muted fs-5 lh-lg"> {{event.description}}</p>
+                    </div>
+                </div>
+            </div>
+
+            {% comment %} Tags {% endcomment %}
+            <div class="card shadow-m mt-4">
+                <div class="card-body p-4">
+                    <h6 class="fs-5 fw-semibold mb-3 text-dark">Topics & Tags</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for tag in tags %}
+                            <span class="badge bg-secondary text-light">{{tag}}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
     <div class="event-container event-image">
         <div class="container text-container">
             {% if messages %}
