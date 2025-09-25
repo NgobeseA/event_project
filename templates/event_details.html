@@ -9,8 +9,12 @@
 <section class="bg-light">
     {% comment %} new updates on the event details UI with UX {% endcomment %}
     <div class="position-relative overflow-hidden" style="height: 60vh;">
-        <img src="{% static './images/event-hero.jpg' %}"
+        {% if event.image %}
+            <img src="{{event.image}}" alt="{{event.title}}" class="w-100 h-100 object-fit-cover">
+        {% else %}
+            <img src="{% static './images/event-hero.jpg' %}"
             alt="People inside the event hall with the presenter on the stage" class="w-100 h-100 object-fit-cover">
+        {%endif%}
         <div class="position-absolute top-0 start-0 w-100 h-100 background-overlay">
             <div class="position-absolute bottom-0 start-0 end-0 p-4 p-md-5">
                 <div class="container" style="max-width: 900px;">
@@ -141,23 +145,23 @@
                             <div class="d-flex align-items-start gap-3 mb-3">
                                 <i class="bi bi-calendar-event text-primary fs-5"></i>
                                 <div>
-                                    <div class="fw-medium">2025-09-28</div>
-                                    <div class="small text-muted">to 2025-09-30</div>
+                                    <div class="fw-medium">{{event.start_date|date:"Y-m-d"}}</div>
+                                    <div class="small text-muted">to {{event.end_date|date:"Y-m-d"}}</div>
                                 </div>
                             </div>
 
                             <div class="d-flex align-items-start gap-3 mb-3">
                                 <i class="bi bi-clock text-primary fs-5"></i>
                                 <div>
-                                    <div class="fw-medium">10:00 AM - 2:00 PM</div>
+                                    <div class="fw-medium">{{event.start_time}} - {{event.end_time}}</div>
                                 </div>
                             </div>
 
                             <div class="d-flex align-items-start gap-3 mb-3">
                                 <i class="bi bi-geo-alt text-primary fs-5"></i>
                                 <div>
-                                    <div class="fw-medium">Cape Town Convention Center</div>
-                                    <div class="small text-muted">Cape Town</div>
+                                    <div class="fw-medium">{{event.venue}}</div>
+                                    <div class="small text-muted">{{event.city}}</div>
                                 </div>
                             </div>
 
