@@ -139,7 +139,7 @@ def view_event(request, event_id):
     total_registrations = EventRegistrations.objects.filter(event=event).count()
     can_register = True
     deadline_naive = event.registration_deadline.replace(tzinfo=None)
-    
+
     if deadline_naive <= today:
         can_register = False
 
@@ -169,6 +169,14 @@ def event_analytics(request, event_id):
     user = request.user
     event = get_object_or_404(Event, id=event_id)
     registered_attendee = EventRegistrations.objects.filter(event=event)
+
+    try:
+        event_budget = Budget.objects.get(event=event)
+        event_budgets = BudgetItem.objects.filter(budget=event_budget)
+    except Budget.DoesNotExist:
+        event_budget = None
+        event_budgets = []
+
 
     # Ensure only organizer can see analytics
     if user != event.organizer:
@@ -231,6 +239,8 @@ def event_analytics(request, event_id):
         'registered_users': registered_users,
         'registrations_over_time': chart_data,
         'reject': reject,
+        'budget': event_budget,
+        'budget_items': event_budgets
     }
 
     return render(request, 'event_analytics.html', context)
