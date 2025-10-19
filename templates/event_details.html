@@ -18,10 +18,13 @@
         <div class="position-absolute top-0 start-0 w-100 h-100 background-overlay">
             <div class="position-absolute bottom-0 start-0 end-0 p-4 p-md-5">
                 <div class="container" style="max-width: 900px;">
-                    <span class="badge {{event.get_category_display_info.color}} mb-3">
-                        {{event.category.capitalize}}
-                    </span>
-                    <h2 class="text-white fw-bold display-5 mb-3">{{event.title}}</h2>
+                    {% with info=event.get_category_display_info %}
+                        <span style="background-color: {{ info.bg_color }}; color: {{ info.text_color }}; padding: 6px 12px; border-radius: 8px;">
+                            {{ info.label.capitalize }}
+                        </span>
+                    {% endwith %}
+                    
+                    <h2 class="text-white fw-bold display-5 my-3">{{event.title}}</h2>
                     {% comment %} Event Meta data {% endcomment %}
                     <div class="d-flex flex-wrap gap-4 text-white">
                         <div class="d-flex">
@@ -47,6 +50,26 @@
                             {%endif%}
                         </div>
                     </div>
+                    <div class="text-light d-flex gap-3 mt-3">
+                        <div>
+                            <h5 id="days">0</h5>
+                            <p>Days</p>
+                        </div>
+                        <div>
+                            <h5 id="hours">0</h5>
+                            <p>Hours</p>
+                        </div>
+
+                        <div>
+                            <h5 id="minutes">0</h5>
+                            <p>Minutes</p>
+                        </div>
+
+                        <div>
+                            <h5 id="seconds">0</h5>
+                            <p>Seconds</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -59,10 +82,10 @@
                 <div class="card shadow-sm">
                     <div class="card-body">
                         <h6 class="fs-4 fw-bold mb-3 text-dark">About This Event.</h6>
-                        <p class="text-muted fs-5 lh-lg"> {{event.description}}</p>
+                        <p class="text-muted"> {{event.description}}</p>
                     </div>
                 </div>
-                {% comment %} Tags {% endcomment %}
+                <!-- {% comment %} Tags {% endcomment %}
                 <div class="card shadow-m mt-4">
                     <div class="card-body p-4">
                         <h6 class="fs-5 fw-semibold mb-3 text-dark">Topics & Tags</h6>
@@ -72,7 +95,7 @@
                             {% endfor %}
                         </div>
                     </div>
-                </div>
+                </div> -->
 
                 <!-- Organizer -->
                 <div class="card shadow-sm mt-4">
@@ -107,15 +130,15 @@
                             <div class="mb-4">
                                 <div class="d-flex justify-content-between mb-2">
                                     <span class="small text-muted">Attendees</span>
-                                    <span class="fw-semibold">12/50</span>
+                                    <span class="fw-semibold">{{ total_registered }}/{{ event.max_attendees }}</span>
                                 </div>
                                 <div class="d-flex justify-content-between mb-2">
                                     <span class="small text-muted">Available Spots</span>
-                                    <span class="fw-semibold text-success">38 left</span>
+                                    <span class="fw-semibold text-success">{{spots_left}}</span>
                                 </div>
                                 <div class="d-flex justify-content-between">
                                     <span class="small text-muted">Deadline</span>
-                                    <span class="fw-semibold small">2025-09-30</span>
+                                    <span class="fw-semibold small">{{ event.registration_deadline }}</span>
                                 </div>
                             </div>
 
@@ -130,10 +153,21 @@
                                 <p class="small text-muted">Check your email for event details</p>
                             </div>
 
-                            <!-- Example: Not registered -->
-                            <button class="btn btn-lg w-100 gradient-btn py-3 shadow-sm" disabled>
-                                Registration Closed
-                            </button>
+                            
+                            {% if can_register %}
+                                <button 
+                                    type="button" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#RegisterModal"
+                                    class="w-100 btn btn-primary"
+                                >
+                                    Register
+                                </button>
+                            {% else %}
+                                <button class="btn btn-lg w-100 gradient-btn py-3 shadow-sm" disabled>
+                                    Registration Closed
+                                </button>
+                            {% endif %}
                         </div>
                     </div>
 
@@ -168,8 +202,8 @@
                             <div class="d-flex align-items-start gap-3">
                                 <i class="bi bi-people text-primary fs-5"></i>
                                 <div>
-                                    <div class="fw-medium">12 attending</div>
-                                    <div class="small text-muted">38 spots remaining</div>
+                                    <div class="fw-medium">{{total_registered}} attending</div>
+                                    <div class="small text-muted">{{ spots_left }} spots remaining</div>
                                 </div>
                             </div>
                         </div>
@@ -263,63 +297,6 @@
                                     <h5 class="modal-title fw-semibold" id="RegisterModalLabel">
                                         Register for {{ event.title }}
                                     </h5>
-
-                                    <!-- Upcoming Events
-            <div class="col-lg-6">
-                <div class="chart-card">
-                    <h5 class="mb-3">
-                        <i class="bi bi-calendar-plus me-2"></i>
-                        Upcoming Events
-                    </h5>
-                    <div class="upcoming-event">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <h6 class="mb-0">Tech Conference 2024</h6>
-                            <span class="event-date">Sep 15</span>
-                        </div>
-                        <div class="text-muted small mb-1">by Sarah Johnson</div>
-                        <div class="d-flex justify-content-between text-sm">
-                            <span><i class="bi bi-people me-1"></i>250 registered</span>
-                            <span><i class="bi bi-geo-alt me-1"></i>Convention Center</span>
-                        </div>
-                    </div>
-
-                    <div class="upcoming-event">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <h6 class="mb-0">Marketing Workshop</h6>
-                            <span class="event-date">Sep 18</span>
-                        </div>
-                        <div class="text-muted small mb-1">by Mike Chen</div>
-                        <div class="d-flex justify-content-between text-sm">
-                            <span><i class="bi bi-people me-1"></i>85 registered</span>
-                            <span><i class="bi bi-geo-alt me-1"></i>Online</span>
-                        </div>
-                    </div>
-
-                    <div class="upcoming-event">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <h6 class="mb-0">Startup Networking</h6>
-                            <span class="event-date">Sep 20</span>
-                        </div>
-                        <div class="text-muted small mb-1">by Alex Rodriguez</div>
-                        <div class="d-flex justify-content-between text-sm">
-                            <span><i class="bi bi-people me-1"></i>120 registered</span>
-                            <span><i class="bi bi-geo-alt me-1"></i>Business Hub</span>
-                        </div>
-                    </div>
-
-                    <div class="upcoming-event">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <h6 class="mb-0">Design Thinking Summit</h6>
-                            <span class="event-date">Sep 25</span>
-                        </div>
-                        <div class="text-muted small mb-1">by Emma Wilson</div>
-                        <div class="d-flex justify-content-between text-sm">
-                            <span><i class="bi bi-people me-1"></i>180 registered</span>
-                            <span><i class="bi bi-geo-alt me-1"></i>Creative Space</span>
-                        </div>
-                    </div>
-                </div>
-            </div> -->
                                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                                         aria-label="Close"></button>
                                 </div>

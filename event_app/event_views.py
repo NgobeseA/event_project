@@ -5,7 +5,7 @@ from django.db import DatabaseError, transaction
 from django.db.models.functions import TruncDate
 from django.utils.safestring import mark_safe
 from django.db.models import Count, F, Avg, Sum
-from datetime import timedelta
+from datetime import timedelta, datetime
 from django.utils import timezone
 from django.core.paginator import Paginator
 from django.utils.timezone import now
@@ -97,10 +97,10 @@ def create_event(request):
         form = EventForm(request.POST, request.FILES)
         if form.is_valid():
             event = form.save(commit=False)
-            event.organizer = request.user  # attach logged-in user
-            event.status = Event.PENDING  # default status
+            event.organizer = request.user
+            event.status = Event.PENDING 
             event.save()
-            form.save_m2m()  # save tags/relations
+            form.save_m2m()
 
             if event.status == Event.PENDING:
                 notify_admins(f'New event "{event.title}" awaiting approval', url=f'/admin/events/{event.id}/preview/')
@@ -125,6 +125,7 @@ def view_event(request, event_id):
     organizer_name = event.organizer_name()  # This method already exists in your model
     organizer_contact = organizer.contact_number
     organizer_email = organizer.email
+    today = datetime.now()
 
     # user_contact = user.mobile_number
     session_key = f'viewed_event_{event_id}'
@@ -135,12 +136,31 @@ def view_event(request, event_id):
     
     form = DynamicEventRegistrationForm(event)
 
+    total_registrations = EventRegistrations.objects.filter(event=event).count()
+    can_register = True
+    deadline_naive = event.registration_deadline.replace(tzinfo=None)
+    
+    if deadline_naive <= today:
+        can_register = False
+
+    if event.max_attendees != None:
+        spots_left = event.max_attendees - total_registrations
+
+        if total_registrations >= event.max_attendees:
+            can_register = False  
+    else:
+        spots_left = 'Unlimited'
+    
+    
     context = {
         'event': event,
         'organizer_name': organizer_name,
         'organizer_email': organizer_email,
         'organizer_contact': organizer_contact,
         'form': form,
+        'total_registered': total_registrations,
+        'spots_left': spots_left,
+        'can_register': can_register,
     }
     return render(request, 'event_details.html', context)
 

@@ -34,9 +34,10 @@ class Event(models.Model):
     CHARITY = 'charity'
     GOVERNMENT = 'government'
     TOURISM = 'tourism'
+    BIRTHDAY_CELEBRATION = 'birthday-celebration'
 
     CATEGORY_CHOICES = [
-        (MUSIC_ARTS, 'Music & Arts'),
+        (BIRTHDAY_CELEBRATION, 'Birthday Celebration'),
         (BUSINESS, 'Business & Professional'),
         (SPORTS, 'Sports & Fitness'),
         (TECHNOLOGY, 'Technology'),
@@ -133,19 +134,72 @@ class Event(models.Model):
     
     def get_category_display_info(self):
         category_info = {
-            self.MUSIC_ARTS: {"label": "Music & Arts", "color": "bg-purple-100 text-purple-800"},
-            self.BUSINESS: {"label": "Business & Professional", "color": "#87ceeb"},
-            self.SPORTS: {"label": "Sports & Fitness", "color": "bg-green-100 text-green-800"},
-            self.TECHNOLOGY: {"label": "Technology", "color": "bg-gray-100 text-gray-800"},
-            self.FOOD_DRINK: {"label": "Food & Drink", "color": "bg-orange-100 text-orange-800"},
-            self.HEALTH_WELLNESS: {"label": "Health & Wellness", "color": "bg-emerald-100 text-emerald-800"},
-            self.EDUCATION: {"label": "Education & Learning", "color": "bg-yellow-100 text-yellow-800"},
-            self.COMMUNITY: {"label": "Community & Culture", "color": "bg-pink-100 text-pink-800"},
-            self.CHARITY: {"label": "Charity & Fundraising", "color": "bg-red-100 text-red-800"},
-            self.GOVERNMENT: {"label": "Government & Politics", "color": "bg-indigo-100 text-indigo-800"},
-            self.TOURISM: {"label": "Tourism & Hospitality", "color": "bg-teal-100 text-teal-800"},
+            self.BIRTHDAY_CELEBRATION: {
+                "label": "Birthday Celebration",
+                "bg_color": "#E9D5FF",
+                "text_color": "#5B21B6",
+            },
+            self.BUSINESS: {
+                "label": "Business & Professional",
+                "bg_color": "#E0F7FA",
+                "text_color": "#0288D1",
+            },
+            self.SPORTS: {
+                "label": "Sports & Fitness",
+                "bg_color": "#DCFCE7",
+                "text_color": "#166534",
+            },
+            self.TECHNOLOGY: {
+                "label": "Technology",
+                "bg_color": "#F3F4F6",
+                "text_color": "#1F2937",
+            },
+            self.FOOD_DRINK: {
+                "label": "Food & Drink",
+                "bg_color": "#FFEDD5",
+                "text_color": "#9A3412",
+            },
+            self.HEALTH_WELLNESS: {
+                "label": "Health & Wellness",
+                "bg_color": "#D1FAE5",
+                "text_color": "#065F46",
+            },
+            self.EDUCATION: {
+                "label": "Education & Learning",
+                "bg_color": "#FEF9C3",
+                "text_color": "#854D0E",
+            },
+            self.COMMUNITY: {
+                "label": "Community & Culture",
+                "bg_color": "#FCE7F3",
+                "text_color": "#9D174D",
+            },
+            self.CHARITY: {
+                "label": "Charity & Fundraising",
+                "bg_color": "#FEE2E2",
+                "text_color": "#991B1B",
+            },
+            self.GOVERNMENT: {
+                "label": "Government & Politics",
+                "bg_color": "#E0E7FF",
+                "text_color": "#3730A3",
+            },
+            self.TOURISM: {
+                "label": "Tourism & Hospitality",
+                "bg_color": "#CCFBF1",
+                "text_color": "#134E4A",
+            },
         }
-        return category_info.get(self.category, {'label': self.get_category_display(), 'color': 'bg-secondary text-white'})
+
+        return category_info.get(
+            self.category,
+            {
+                'label': self.get_category_display(),
+                'bg_color': '#6B7280', 
+                'text_color': '#FFFFFF',
+            }
+        )
+
 
 class EventRegistration(models.Model):
     """

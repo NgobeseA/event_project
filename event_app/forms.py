@@ -146,8 +146,8 @@ class EventForm(forms.ModelForm):
             "category": forms.Select(attrs={"class": "form-select"}),
             "status": forms.Select(attrs={"class": "form-select"}),
             "is_online": forms.CheckboxInput(attrs={"class": "form-check-input"}),
-            "max_attendees": forms.NumberInput(attrs={"type": "date", "class": "form-control"}),
-            "registration_deadline": forms.DateInput(attrs={"type": "date", "class": "form-control"}),
+            "max_attendees": forms.NumberInput(attrs={"type": "number", "class": "form-control"}),
+            "registration_deadline": forms.DateTimeInput(attrs={"type": "datetime-local", "class": "form-control"}),
 
         }
 
