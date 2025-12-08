@@ -134,7 +134,9 @@
                     <h6 class="card-title fw-bold">Events by Category</h6>
                     <p class="text-muted small">Distribution of event categories</p>
 
-                    <canvas id="categoryPieChart"></canvas>
+                    <div style="width: 250px; height: 250px; margin: 0 auto;">
+                <canvas id="categoryPieChart"></canvas>
+            </div>
                 </div>
             </div>
         </div>
@@ -320,24 +322,40 @@
 </div>
 
 <script>
+    // 1. Get the raw JSON string from the Django template variable
+    const rawData = {{ chart_data_json|safe }};
+
+    // 2. Parse the JSON data into a usable JavaScript array
+    const chartDataList = rawData;
+
+    // 3. Extract the labels, data points, and colors into separate arrays for Chart.js
+    const labels = chartDataList.map(item => item.label);
+    const dataValues = chartDataList.map(item => item.data_value);
+    const backgroundColors = chartDataList.map(item => item.color);
+
+    console.log('Labels:', labels);
+    console.log('Data Values:', dataValues);
+    // 4. Initialize the Chart
     const ctx = document.getElementById('categoryPieChart').getContext('2d');
     new Chart(ctx, {
         type: 'pie',
         data: {
-            labels: {{ chart_labels| safe }},
-        datasets: [{
-            data: {{ chart_data| safe }},
-        backgroundColor: {{ chart_colors| safe }},
-      }]
-    },
+            // Use the extracted labels array
+            labels: labels,
+            datasets: [{
+                // Use the extracted data values and colors
+                data: dataValues,
+                backgroundColor: backgroundColors,
+            }]
+        },
         options: {
-        responsive: true,
-        plugins: {
-            legend: {
-                position: 'bottom'
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
             }
         }
-    }
-  });
+    });
 </script>
 {% endblock content %}

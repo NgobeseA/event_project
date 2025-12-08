@@ -10,6 +10,7 @@ from datetime import datetime
 from django.utils import timezone
 import json
 from django.utils.timezone import now
+from django.utils.safestring import mark_safe
 
 
 
@@ -47,27 +48,32 @@ def admin_dashboard(request):
     )
     total_events = Event.objects.count()
     category_data = []
+    category_data_list = []
+    
+    # Define your color mapping within the view function for clarity
+    COLOR_MAP = {
+        Event.MUSIC_ARTS: '#FF6384',
+        Event.BUSINESS: '#36A2EB',
+        Event.SPORTS: '#FFCE56',
+        Event.TECHNOLOGY: '#4BC0C0',
+        Event.FOOD_DRINK: '#9966FF',
+        Event.HEALTH_WELLNESS: '#FF9F40',
+        Event.EDUCATION: '#FF6384', # Repeated color, maybe revise
+        Event.COMMUNITY: '#C9CBCF',
+        Event.CHARITY: '#4BC0C0',
+        Event.GOVERNMENT: '#36A2EB',
+        Event.TOURISM: '#FFCE56'
+    }
+
     for c in category_counts:
         percentage = (c["total"] / total_events * 100) if total_events > 0 else 0
-        category_data.append({
-            "category": c["category"],
+        category_data_list.append({
             "label": dict(Event.CATEGORY_CHOICES).get(c["category"], "Other"),
-            "percentage": round(percentage, 1),
-            "color": {
-                Event.MUSIC_ARTS: '#FF6384',
-                Event.BUSINESS: '#36A2EB',
-                Event.SPORTS: '#FFCE56',
-                Event.TECHNOLOGY: '#4BC0C0',
-                Event.FOOD_DRINK: '#9966FF',
-                Event.HEALTH_WELLNESS: '#FF9F40',
-                Event.EDUCATION: '#FF6384',
-                Event.COMMUNITY: '#C9CBCF',
-                Event.CHARITY: '#4BC0C0',
-                Event.GOVERNMENT: '#36A2EB',
-                Event.TOURISM: '#FFCE56'
-            }.get(c["category"], "#999999"),
+            "data_value": round(percentage, 1),
+            "color": COLOR_MAP.get(c["category"], "#999999"),
         })
     
+    chart_data_json = json.dumps(category_data_list)
     # Fetching upcomming events
     events = Event.objects.filter(start_date__gte=now(), status=Event.PUBLISHED).order_by('start_date')
     paginator = Paginator(events, 10)
@@ -80,7 +86,7 @@ def admin_dashboard(request):
         "total_registrations": total_registrations,
         "avg_conversion_rate": avg_conversion_rate,
         "top_organizers": top_organizers,
-        "category_data": category_data,
+        'chart_data_json': mark_safe(chart_data_json),
         "upcoming_events": upcoming_events
     }
     return render(request, "adminDashboard.html", context)
